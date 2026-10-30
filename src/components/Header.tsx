@@ -1,7 +1,7 @@
 import { MAX_BOOSTERS } from "../game/store";
 import { formatDuration } from "../lib/format";
 
-export type Page = "home" | "archive" | "links";
+export type Page = "home" | "archive" | "albums" | "links";
 
 interface Props {
   page: Page;
@@ -11,9 +11,11 @@ interface Props {
   nextIn: number;
   /** Nombre de dossiers liés prêts à être agrafés. */
   readyLinks: number;
+  /** Nombre d'albums complets dont la récompense attend. */
+  readyAlbums: number;
 }
 
-export function Header({ page, onNavigate, boosters, ink, nextIn, readyLinks }: Props) {
+export function Header({ page, onNavigate, boosters, ink, nextIn, readyLinks, readyAlbums }: Props) {
   return (
     <header className="header">
       <button className="wordmark" onClick={() => onNavigate("home")}>
@@ -25,6 +27,14 @@ export function Header({ page, onNavigate, boosters, ink, nextIn, readyLinks }: 
         </button>
         <button className={page === "archive" ? "is-active" : ""} onClick={() => onNavigate("archive")}>
           Archive
+        </button>
+        <button className={page === "albums" ? "is-active" : ""} onClick={() => onNavigate("albums")}>
+          Albums
+          {readyAlbums > 0 && (
+            <span className="nav-badge mono" aria-label={`${readyAlbums} à récupérer`}>
+              {readyAlbums}
+            </span>
+          )}
         </button>
         <button className={page === "links" ? "is-active" : ""} onClick={() => onNavigate("links")}>
           Liaisons

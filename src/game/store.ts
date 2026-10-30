@@ -4,6 +4,7 @@ import { REQUEST_COST, SHRED_INK, shreddable } from "./economy";
 import { canFuse, type Link } from "./links";
 import { dayKey, missionsForDay, type Counter } from "./missions";
 import { rarityRank } from "./rarities";
+import { ALBUMS } from "./series";
 
 // Sauvegarde locale (navigateur). À remplacer par un backend quand il y aura des comptes.
 
@@ -14,7 +15,21 @@ export interface Daily {
   day: string;
   counts: Partial<Record<Counter, number>>;
   claimed: string[];
+  /** Dossier spécial du jour déjà ouvert. */
+  special: boolean;
 }
+
+/** Série de connexion : jours consécutifs avec au moins une visite. */
+export interface Streak {
+  last: string;
+  days: number;
+}
+
+/** Encre offerte à chaque première visite du jour. */
+export const DAILY_INK = 5;
+/** Tous les 7 jours de série, des dossiers en cadeau. */
+export const STREAK_GOAL = 7;
+export const STREAK_BOOSTERS = 2;
 
 export interface SaveData {
   /** id de carte → nombre d'exemplaires */
@@ -38,11 +53,16 @@ export interface SaveData {
   /** Avis de recherche : fiches que le joueur veut obtenir. */
   wanted: number[];
   daily: Daily;
+  /** Dossiers ouverts depuis la dernière fiche A. */
+  pity: number;
+  streak: Streak;
+  /** Albums complets dont la récompense a été récupérée. */
+  albumsClaimed: string[];
 }
 
 const KEY = "registre-save-v1";
 
-const freshDaily = (t: number): Daily => ({ day: dayKey(t), counts: {}, claimed: [] });
+const freshDaily = (t: number): Daily => ({ day: dayKey(t), counts: {}, claimed: [], special: false });
 
 const fresh = (): SaveData => ({
   owned: {},
@@ -57,21 +77,39 @@ const fresh = (): SaveData => ({
   secret: {},
   wanted: [],
   daily: freshDaily(Date.now()),
+  pity: 0,
+  streak: { last: "", days: 0 },
+  albumsClaimed: [],
 });
 
 function load(): SaveData {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return { ...fresh(), ...JSON.parse(raw) };
+    if (raw) {
+      const base = fresh();
+      const data = { ...base, ...JSON.parse(raw) };
+      return { ...data, daily: { ...base.daily, ...data.daily } };
+    }
   } catch {
     /* sauvegarde illisible : on repart de zéro */
   }
   return fresh();
 }
 
-/** Remet les enquêtes à zéro quand on change de jour. */
+/** Remet les enquêtes à zéro quand on change de jour, et compte la série de connexion. */
 function rollDay(s: SaveData, now: number): SaveData {
-  return s.daily.day === dayKey(now) ? s : { ...s, daily: freshDaily(now) };
+  const today = dayKey(now);
+  if (s.daily.day === today && s.streak.last === today) return s;
+  const next = s.daily.day === today ? s : { ...s, daily: freshDaily(now) };
+  if (s.streak.last === today) return next;
+  const yesterday = dayKey(now - 24 * 60 * 60 * 1000);
+  const days = s.streak.last === yesterday ? s.streak.days + 1 : 1;
+  return {
+    ...next,
+    streak: { last: today, days },
+    ink: next.ink + DAILY_INK,
+    boosters: next.boosters + (days % STREAK_GOAL === 0 ? STREAK_BOOSTERS : 0),
+  };
 }
 
 function recharge(s: SaveData, now: number): SaveData {
@@ -117,9 +155,9 @@ export function useSave() {
   }, [save]);
 
   /** Consomme un booster et ajoute ses cartes à la collection. */
-  const spendBooster = useCallback((cards: Card[], secrets: boolean[]) => {
+  const spendBooster = useCallback((cards: Card[], secrets: boolean[], special = false) => {
     setSave((s) => {
-      if (s.boosters <= 0) return s;
+      if (special ? s.daily.special : s.boosters <= 0) return s;
       const owned = { ...s.owned };
       const firstSeen = { ...s.firstSeen };
       const secret = { ...s.secret };
@@ -139,9 +177,11 @@ export function useSave() {
         firstSeen,
         secret,
         wanted: s.wanted.filter((id) => !got.has(id)),
-        boosters: s.boosters - 1,
-        lastRecharge: wasFull ? t : s.lastRecharge,
+        boosters: special ? s.boosters : s.boosters - 1,
+        lastRecharge: wasFull && !special ? t : s.lastRecharge,
         opened: s.opened + 1,
+        pity: cards.some((c) => c.rarity === "A") ? 0 : s.pity + 1,
+        daily: special ? { ...s.daily, special: true } : s.daily,
       };
       next = bump(next, "opened");
       next = bump(next, "fresh", freshCount);
@@ -231,11 +271,38 @@ export function useSave() {
     });
   }, []);
 
+  /** Récupère la récompense d'un album complet. */
+  const claimAlbum = useCallback((series: string) => {
+    setSave((s) => {
+      const album = ALBUMS.find((a) => a.series === series);
+      if (!album || s.albumsClaimed.includes(series)) return s;
+      if (!album.cards.every((c) => (s.owned[c.id] ?? 0) > 0)) return s;
+      return {
+        ...s,
+        ink: s.ink + album.reward,
+        boosters: s.boosters + album.bonusBoosters,
+        albumsClaimed: [...s.albumsClaimed, series],
+      };
+    });
+  }, []);
+
   const setKeepOne = useCallback((keepOne: boolean) => setSave((s) => ({ ...s, keepOne })), []);
 
   const reset = useCallback(() => setSave(fresh()), []);
 
   const nextIn = save.boosters >= MAX_BOOSTERS ? 0 : Math.max(0, save.lastRecharge + RECHARGE_MS - now);
 
-  return { save, spendBooster, fuse, shred, request, toggleWanted, claim, setKeepOne, reset, nextIn };
+  return {
+    save,
+    spendBooster,
+    fuse,
+    shred,
+    request,
+    toggleWanted,
+    claim,
+    claimAlbum,
+    setKeepOne,
+    reset,
+    nextIn,
+  };
 }

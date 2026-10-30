@@ -1,6 +1,6 @@
 import { CARDS_BY_RARITY, type Card } from "./cards";
 import { SECRET_CHANCE } from "./economy";
-import { RARITIES, type Rarity } from "./rarities";
+import { RARITIES, rarityRank, type Rarity } from "./rarities";
 
 export const CARDS_PER_BOOSTER = 5;
 
@@ -30,12 +30,29 @@ function rollRarity(minRank = 0): Rarity {
   return pool[pool.length - 1].id;
 }
 
+/** Après ce nombre de dossiers sans fiche A, la 5ᵉ fiche est forcément A. */
+export const PITY_LIMIT = 60;
+
+interface BoosterOptions {
+  /** Force une fiche A sur le dernier emplacement (indice de pitié atteint). */
+  guaranteeA?: boolean;
+  /** Dossier thématique : on ne tire que dans ces fiches. */
+  pool?: Card[];
+}
+
 /** 4 emplacements normaux + 1 emplacement garanti classe D ou mieux. */
-export function openBooster(): Card[] {
+export function openBooster({ guaranteeA = false, pool }: BoosterOptions = {}): Card[] {
+  if (pool && pool.length) {
+    const best = pool.filter((c) => rarityRank(c.rarity) >= rarityRank("C"));
+    const cards = Array.from({ length: CARDS_PER_BOOSTER - 1 }, () => pick(pool));
+    cards.push(pick(best.length ? best : pool));
+    return cards;
+  }
   const cards: Card[] = [];
   for (let i = 0; i < CARDS_PER_BOOSTER; i++) {
     const last = i === CARDS_PER_BOOSTER - 1;
-    cards.push(pick(CARDS_BY_RARITY[rollRarity(last ? 1 : 0)]));
+    if (last && guaranteeA) cards.push(pick(CARDS_BY_RARITY.A));
+    else cards.push(pick(CARDS_BY_RARITY[rollRarity(last ? 1 : 0)]));
   }
   return cards;
 }

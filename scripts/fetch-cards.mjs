@@ -6,16 +6,16 @@
 
 import { writeFile, mkdir } from "node:fs/promises";
 
-const PAGES = 6; // 6 × 50 = 300 cartes
+const PAGES = 20; // 20 × 50 = 1000 cartes
 const PER_PAGE = 50;
 
 // Répartition des classes selon le rang de popularité (doit totaliser PAGES × PER_PAGE).
 const TIERS = [
-  { rarity: "A", count: 12 },
-  { rarity: "B", count: 28 },
-  { rarity: "C", count: 60 },
-  { rarity: "D", count: 80 },
-  { rarity: "E", count: 120 },
+  { rarity: "A", count: 30 },
+  { rarity: "B", count: 80 },
+  { rarity: "C", count: 180 },
+  { rarity: "D", count: 280 },
+  { rarity: "E", count: 430 },
 ];
 
 const QUERY = `

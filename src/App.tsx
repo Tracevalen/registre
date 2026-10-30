@@ -6,14 +6,27 @@ import { OpeningScreen } from "./components/OpeningScreen";
 import { FicheModal } from "./components/FicheModal";
 import { LinksPage } from "./components/LinksPage";
 import { LinkModal } from "./components/LinkModal";
-import { openBooster, rollSecrets, type Pull } from "./game/booster";
+import { openBooster, PITY_LIMIT, rollSecrets, type Pull } from "./game/booster";
 import type { Card } from "./game/cards";
 import { canFuse, LINKS, type Link } from "./game/links";
+import { ALBUMS, specialSeries } from "./game/series";
 import { useSave } from "./game/store";
+import { AlbumsPage } from "./components/AlbumsPage";
 
 export default function App() {
-  const { save, spendBooster, fuse, shred, request, toggleWanted, claim, setKeepOne, reset, nextIn } =
-    useSave();
+  const {
+    save,
+    spendBooster,
+    fuse,
+    shred,
+    request,
+    toggleWanted,
+    claim,
+    claimAlbum,
+    setKeepOne,
+    reset,
+    nextIn,
+  } = useSave();
   const [page, setPage] = useState<Page>("home");
   const [pull, setPull] = useState<Pull | null>(null);
   const [focus, setFocus] = useState<Card | null>(null);
@@ -27,13 +40,19 @@ export default function App() {
     setFocusLink({ link, fresh: true });
   };
 
-  const open = () => {
-    if (save.boosters <= 0) return;
-    const cards = openBooster();
+  const readyAlbums = ALBUMS.filter(
+    (a) => !save.albumsClaimed.includes(a.series) && a.cards.every((c) => save.owned[c.id]),
+  ).length;
+
+  const open = (special = false) => {
+    if (special ? save.daily.special : save.boosters <= 0) return;
+    const cards = special
+      ? openBooster({ pool: specialSeries(save.daily.day).cards })
+      : openBooster({ guaranteeA: save.pity + 1 >= PITY_LIMIT });
     const secret = rollSecrets(cards.length);
     const fresh = new Set(cards.filter((c) => !save.owned[c.id]).map((c) => c.id));
     const wanted = new Set(cards.filter((c) => save.wanted.includes(c.id)).map((c) => c.id));
-    spendBooster(cards, secret);
+    spendBooster(cards, secret, special);
     setPull({ id: save.opened + 1, cards, fresh, secret, wanted });
   };
 
@@ -46,6 +65,7 @@ export default function App() {
         ink={save.ink}
         nextIn={nextIn}
         readyLinks={readyLinks}
+        readyAlbums={readyAlbums}
       />
 
       <main className="main">
@@ -53,11 +73,14 @@ export default function App() {
           <HomePage
             save={save}
             nextIn={nextIn}
-            onOpen={open}
+            onOpen={() => open()}
+            onOpenSpecial={() => open(true)}
             onShowArchive={() => setPage("archive")}
             onFocus={setFocus}
             onClaim={claim}
           />
+        ) : page === "albums" ? (
+          <AlbumsPage save={save} onFocus={setFocus} onClaim={claimAlbum} />
         ) : page === "archive" ? (
           <ArchivePage save={save} onFocus={setFocus} onShredAll={() => shred()} onReset={reset} />
         ) : (
@@ -76,7 +99,7 @@ export default function App() {
           key={pull.id}
           pull={pull}
           boostersLeft={save.boosters}
-          onAgain={open}
+          onAgain={() => open()}
           onClose={() => setPull(null)}
           onShowArchive={() => {
             setPull(null);

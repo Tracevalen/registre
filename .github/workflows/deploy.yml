@@ -25,6 +25,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Récupère les 1000 personnages les plus populaires d'AniList.
+      # Si AniList ne répond pas, on garde les fiches déjà présentes dans le dépôt.
+      - run: npm run cards || echo "AniList indisponible, fiches actuelles conservées"
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

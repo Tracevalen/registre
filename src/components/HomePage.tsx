@@ -1,8 +1,9 @@
 import { CARDS, CARDS_BY_RARITY, formatNumber, type Card } from "../game/cards";
-import { CARDS_PER_BOOSTER, formatOdds, slotOdds } from "../game/booster";
+import { CARDS_PER_BOOSTER, formatOdds, PITY_LIMIT, slotOdds } from "../game/booster";
 import { RARITIES } from "../game/rarities";
 import { formatReward, missionsForDay } from "../game/missions";
-import { MAX_BOOSTERS, type SaveData } from "../game/store";
+import { specialSeries } from "../game/series";
+import { DAILY_INK, MAX_BOOSTERS, STREAK_BOOSTERS, STREAK_GOAL, type SaveData } from "../game/store";
 import { formatDate, formatDuration, plural } from "../lib/format";
 import { Fiche } from "./Fiche";
 
@@ -10,12 +11,17 @@ interface Props {
   save: SaveData;
   nextIn: number;
   onOpen: () => void;
+  onOpenSpecial: () => void;
   onShowArchive: () => void;
   onFocus: (c: Card) => void;
   onClaim: (missionId: string) => void;
 }
 
-export function HomePage({ save, nextIn, onOpen, onShowArchive, onFocus, onClaim }: Props) {
+export function HomePage({ save, nextIn, onOpen, onOpenSpecial, onShowArchive, onFocus, onClaim }: Props) {
+  const special = specialSeries(save.daily.day);
+  const specialHave = special.cards.filter((c) => save.owned[c.id]).length;
+  const pityLeft = Math.max(1, PITY_LIMIT - save.pity);
+  const streakDay = ((save.streak.days - 1) % STREAK_GOAL) + 1;
   const missions = missionsForDay(save.daily.day);
   const ownedCount = CARDS.filter((c) => save.owned[c.id]).length;
   const recent = CARDS.filter((c) => save.firstSeen[c.id])
@@ -77,6 +83,18 @@ export function HomePage({ save, nextIn, onOpen, onShowArchive, onFocus, onClaim
           <strong>{save.ink}</strong>
           <span>encre</span>
         </li>
+        <li className="pill pill-pity">
+          <span className="pill-icon">★</span>
+          <strong>{pityLeft}</strong>
+          <span>avant une fiche A garantie</span>
+        </li>
+        <li className="pill pill-streak">
+          <span className="pill-icon">⟳</span>
+          <strong>
+            J{streakDay}/{STREAK_GOAL}
+          </strong>
+          <span>série de connexion</span>
+        </li>
         <li className="pill pill-collection">
           <span className="pill-icon">◆</span>
           <strong>
@@ -85,6 +103,25 @@ export function HomePage({ save, nextIn, onOpen, onShowArchive, onFocus, onClaim
           <span>fiches archivées</span>
         </li>
       </ul>
+
+      <section className={`special ${save.daily.special ? "is-used" : ""}`}>
+        <div className="special-copy">
+          <p className="hero-eyebrow">Dossier spécial du jour · gratuit</p>
+          <h2 className="special-title">{special.series}</h2>
+          <p className="special-lede">
+            5 fiches tirées uniquement dans cette série, dont une classe C ou mieux si la série en a. Tu as{" "}
+            {specialHave}/{special.cards.length} fiches de cet album.
+          </p>
+        </div>
+        <button className="btn btn-primary special-btn" onClick={onOpenSpecial} disabled={save.daily.special}>
+          {save.daily.special ? "Déjà ouvert, nouveau dossier demain" : "Ouvrir le dossier spécial"}
+        </button>
+      </section>
+
+      <p className="streak-note mono">
+        +{DAILY_INK} encre à chaque première visite du jour · +{STREAK_BOOSTERS} dossiers tous les{" "}
+        {STREAK_GOAL} jours de série
+      </p>
 
       <section className="section">
         <div className="section-head">

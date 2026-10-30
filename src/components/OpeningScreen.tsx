@@ -25,8 +25,8 @@ const reducedMotion = () =>
 const SCAN_STAGGER_MS = 180;
 
 export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose, onShowArchive }: Props) {
-  // « Tout ouvrir » saute le sceau et révèle toutes les fiches d'un coup.
-  const [stage, setStage] = useState<Stage>(pull.batch ? "fiches" : "sealed");
+  // « Tout ouvrir » saute le sceau : lumière, walkout de la meilleure fiche, puis toutes les fiches révélées.
+  const [stage, setStage] = useState<Stage>(pull.batch ? "flare" : "sealed");
   const [revealed, setRevealed] = useState<boolean[]>(() => pull.cards.map(() => Boolean(pull.batch)));
   const revealedCount = revealed.filter(Boolean).length;
   const done = revealedCount === pull.cards.length;
@@ -43,7 +43,6 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose,
     return b;
   }, [pull]);
   const bestCard = pull.cards[best];
-  const isWalkout = rarityRank(bestCard.rarity) >= rarityRank("B") || pull.secret[best];
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -57,10 +56,10 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose,
       return () => clearTimeout(t);
     }
     if (stage === "flare") {
-      const t = setTimeout(() => setStage(isWalkout ? "walkout" : "fiches"), FLARE_MS[bestCard.rarity]);
+      const t = setTimeout(() => setStage("walkout"), FLARE_MS[bestCard.rarity]);
       return () => clearTimeout(t);
     }
-  }, [stage, isWalkout, bestCard.rarity]);
+  }, [stage, bestCard.rarity]);
 
   const reveal = (i: number) => setRevealed((r) => r.map((v, j) => v || j === i));
 
@@ -86,7 +85,7 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose,
         <div
           className={`flare class-${bestCard.rarity} ${pull.secret[best] ? "is-secret" : ""}`}
           style={{ animationDuration: `${FLARE_MS[bestCard.rarity]}ms` }}
-          onClick={() => setStage(isWalkout ? "walkout" : "fiches")}
+          onClick={() => setStage("walkout")}
         >
           <span className="flare-rays" aria-hidden />
           <span className="flare-core" aria-hidden />

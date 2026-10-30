@@ -27,11 +27,12 @@ query ($page: Int, $perPage: Int) {
       image { large }
       favourites
       siteUrl
+      gender
       anime: media(type: ANIME, sort: POPULARITY_DESC, perPage: 1) {
-        nodes { title { romaji english } }
+        edges { characterRole node { title { romaji english } coverImage { large } } }
       }
       any: media(sort: POPULARITY_DESC, perPage: 1) {
-        nodes { title { romaji english } }
+        edges { characterRole node { title { romaji english } coverImage { large } } }
       }
     }
   }
@@ -76,7 +77,8 @@ for (let page = 1; page <= PAGES; page++) {
 const rarities = TIERS.flatMap((t) => Array(t.count).fill(t.rarity));
 
 const cards = characters.map((c, i) => {
-  const media = c.anime.nodes[0] ?? c.any.nodes[0];
+  const edge = c.anime.edges[0] ?? c.any.edges[0];
+  const media = edge?.node;
   return {
     id: c.id,
     number: i + 1,
@@ -87,6 +89,10 @@ const cards = characters.map((c, i) => {
     favourites: c.favourites,
     url: c.siteUrl,
     rarity: rarities[i] ?? "E",
+    // Indices du walkout : sexe, rôle dans l'œuvre et affiche de l'œuvre.
+    gender: c.gender ?? null,
+    role: edge?.characterRole ?? null,
+    cover: media?.coverImage?.large ?? null,
   };
 });
 

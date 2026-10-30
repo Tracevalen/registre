@@ -11,6 +11,12 @@ export interface Card {
   favourites: number;
   url: string;
   rarity: Rarity;
+  /** Sexe indiqué sur AniList (Male, Female, Non-binary…), si connu. */
+  gender?: string | null;
+  /** Rôle dans l'œuvre : MAIN, SUPPORTING ou BACKGROUND. */
+  role?: string | null;
+  /** Affiche de l'œuvre principale. */
+  cover?: string | null;
 }
 
 export const CARDS = raw as Card[];

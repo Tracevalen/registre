@@ -4254,3 +4254,127 @@ button.empty-fiche:hover {
 .flare-dossier {
   animation-duration: inherit;
 }
+
+/* ---------- Walkout v2 : indices façon FIFA (univers, sexe, rôle) ---------- */
+
+/* Projecteurs de stade qui balaient la scène */
+.walkout-beams {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.walkout-beams i {
+  position: absolute;
+  bottom: -10%;
+  left: 50%;
+  width: 22vmin;
+  height: 140%;
+  background: linear-gradient(to top, color-mix(in srgb, var(--glow) 55%, transparent), transparent 80%);
+  transform-origin: bottom center;
+  filter: blur(6px);
+  opacity: 0.55;
+  animation: beam-sweep 3.2s ease-in-out infinite alternate;
+}
+
+.walkout-beams i:nth-child(1) {
+  --from: -38deg;
+  --to: -12deg;
+}
+
+.walkout-beams i:nth-child(2) {
+  --from: -6deg;
+  --to: 6deg;
+  animation-duration: 2.4s;
+}
+
+.walkout-beams i:nth-child(3) {
+  --from: 38deg;
+  --to: 12deg;
+}
+
+@keyframes beam-sweep {
+  from {
+    transform: translateX(-50%) rotate(var(--from));
+  }
+  to {
+    transform: translateX(-50%) rotate(var(--to));
+  }
+}
+
+.walkout.is-secret {
+  --glow: var(--stamp);
+}
+
+.walkout-clue {
+  gap: 14px;
+  animation: clue-slide 1.7s cubic-bezier(0.2, 1, 0.3, 1) both;
+}
+
+.walkout-label {
+  padding: 4px 12px;
+  background: color-mix(in srgb, var(--glow) 22%, transparent);
+  color: color-mix(in srgb, var(--glow) 60%, #fff);
+}
+
+/* L'affiche de l'œuvre joue le rôle de l'écusson du club */
+.walkout-cover {
+  width: clamp(120px, 22vmin, 190px);
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--glow) 70%, transparent),
+    0 0 60px color-mix(in srgb, var(--glow) 60%, transparent);
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+}
+
+/* Le symbole du sexe joue le rôle du drapeau */
+.walkout-symbol {
+  font-size: clamp(110px, 24vmin, 200px);
+  line-height: 1;
+  color: color-mix(in srgb, var(--glow) 70%, #fff);
+  text-shadow: 0 0 50px color-mix(in srgb, var(--glow) 80%, transparent);
+}
+
+.walkout-steps {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.walkout-steps i {
+  width: 28px;
+  height: 4px;
+  background: var(--hair);
+}
+
+.walkout-steps i.is-on {
+  background: color-mix(in srgb, var(--glow) 80%, #fff);
+}
+
+@keyframes clue-slide {
+  0% {
+    opacity: 0;
+    transform: translateX(-60px) skewX(-8deg);
+    filter: blur(8px);
+  }
+  18% {
+    opacity: 1;
+    transform: translateX(0) skewX(0);
+    filter: blur(0);
+  }
+  85% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .walkout-beams i {
+    animation: none;
+  }
+}

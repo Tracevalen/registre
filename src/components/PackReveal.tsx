@@ -4,6 +4,7 @@ import { RARITY_BY_ID, type Rarity } from "../game/rarities";
 import { Dossier } from "./Dossier";
 import { Fiche } from "./Fiche";
 import { Particles } from "./Particles";
+import * as sound from "../lib/sound";
 
 interface Props {
   card: Card;
@@ -63,6 +64,7 @@ export function PackReveal({ card, secret, fresh, dossierNumber, batch, onDone }
   const [clue, setClue] = useState(0);
   const [burst, setBurst] = useState(0);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [muted, setMutedState] = useState(sound.isMuted);
   const r = RARITY_BY_ID[card.rarity];
   const color = secret ? "#ff3b47" : GLOW[card.rarity];
 
@@ -83,6 +85,25 @@ export function PackReveal({ card, secret, fresh, dossierNumber, batch, onDone }
     if (phase === "show") setBurst((b) => b + 1);
     return () => clearTimeout(t);
   }, [phase, clue, clues.length, card.rarity]);
+
+  // Bande-son synchronisée sur chaque étape
+  useEffect(() => {
+    if (phase === "charge") sound.charge(CHARGE_MS[card.rarity] / 1000);
+    if (phase === "burst") sound.burst();
+    if (phase === "spin") sound.spin(SPIN_MS / 1000);
+    if (phase === "show") sound.land(card.rarity);
+  }, [phase, card.rarity]);
+
+  useEffect(() => {
+    if (phase === "clue") sound.clue(clue);
+  }, [phase, clue]);
+
+  useEffect(() => () => sound.stopAll(), []);
+
+  const toggleSound = () => {
+    sound.setMuted(!muted);
+    setMutedState(!muted);
+  };
 
   const skip = () => {
     if (phase === "show") return;
@@ -176,6 +197,10 @@ export function PackReveal({ card, secret, fresh, dossierNumber, batch, onDone }
           )}
         </div>
       )}
+
+      <button className="reveal-sound mono" onClick={toggleSound} aria-pressed={!muted}>
+        {muted ? "Son coupé" : "Son activé"}
+      </button>
 
       {phase !== "show" && (
         <button className="reveal-skip mono" onClick={skip}>

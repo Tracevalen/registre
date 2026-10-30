@@ -4993,3 +4993,82 @@ button.empty-fiche:hover {
     width: min(260px, 70vw);
   }
 }
+
+/* ==================================================================
+   Mode allégé téléphone : on garde la mise en scène, on retire ce qui
+   oblige le téléphone à tout redessiner à chaque image.
+   ================================================================== */
+
+@media (pointer: coarse), (max-width: 820px) {
+  /* Le flou derrière la barre se recalculait à chaque image de l'animation */
+  .opening-bar,
+  .header,
+  .modal {
+    backdrop-filter: none;
+  }
+
+  .opening-bar {
+    background: #000a30;
+  }
+
+  /* Le sol en perspective avec masque est le plus coûteux : retiré sur téléphone */
+  .reveal-floor {
+    display: none;
+  }
+
+  /* Halo fixe au lieu d'animé */
+  .reveal-halo,
+  .phase-charge .reveal-halo {
+    animation: none;
+    opacity: 0.85;
+  }
+
+  /* Pas de reflet holographique ni d'ombres floues sur la carte révélée */
+  .card3d-foil {
+    display: none;
+  }
+
+  .reveal .fiche,
+  .reveal .fiche::before {
+    filter: none !important;
+    animation: none !important;
+  }
+
+  .card3d.is-landed {
+    animation: none;
+  }
+
+  /* Ombres de texte allégées */
+  .clue3d-value,
+  .clue3d-symbol,
+  .reveal-name {
+    text-shadow: none;
+  }
+
+  .clue3d-cover {
+    box-shadow: 0 0 0 2px var(--glow);
+  }
+
+  .reveal-pack .dossier {
+    box-shadow: none;
+  }
+
+  /* Fond plus simple : un seul dégradé */
+  .reveal {
+    background: radial-gradient(
+      ellipse at 50% 45%,
+      color-mix(in srgb, var(--glow) 22%, #000514),
+      #000514 65%
+    );
+  }
+
+  .opening {
+    background-image: none;
+  }
+}
+
+/* Pendant l'ouverture, la page derrière n'est plus dessinée (ses reflets animés coûtaient cher) */
+body:has(.opening) .main,
+body:has(.opening) .header {
+  visibility: hidden;
+}

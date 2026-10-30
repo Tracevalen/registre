@@ -19,8 +19,11 @@ interface Spark {
   size: number;
 }
 
-/** Résolution plafonnée : sur téléphone, un canvas en 3x plein écran fait ramer. */
-const ratio = () => Math.min(window.devicePixelRatio || 1, 1.5);
+/** Mode allégé pour téléphones et tablettes : moins d'étincelles, résolution simple. */
+const lite = () => window.matchMedia?.("(pointer: coarse), (max-width: 820px)").matches ?? false;
+
+/** Résolution plafonnée : sur téléphone, un canvas haute résolution plein écran fait ramer. */
+const ratio = () => (lite() ? 1 : Math.min(window.devicePixelRatio || 1, 1.5));
 
 /** Étincelles sur canvas : braises qui montent, et explosion au moment de la révélation. */
 export function Particles({ color, burst, ambient = 0.5 }: Props) {
@@ -47,7 +50,7 @@ export function Particles({ color, burst, ambient = 0.5 }: Props) {
       const h = canvas.height;
       const s = ratio();
       // Braises qui montent du bas de l'écran
-      if (Math.random() < a * Math.min(1, w / (900 * s))) {
+      if (Math.random() < a * Math.min(1, w / (900 * s)) * (lite() ? 0.25 : 1)) {
         sparks.current.push({
           x: Math.random() * w,
           y: h + 10,
@@ -96,7 +99,7 @@ export function Particles({ color, burst, ambient = 0.5 }: Props) {
     const s = ratio();
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
-    const count = canvas.clientWidth < 600 ? 80 : 150;
+    const count = lite() ? 45 : 150;
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
       const speed = (3 + Math.random() * 9) * s;

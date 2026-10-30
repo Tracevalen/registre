@@ -29,14 +29,71 @@ query ($page: Int, $perPage: Int) {
       siteUrl
       gender
       anime: media(type: ANIME, sort: POPULARITY_DESC, perPage: 1) {
-        edges { characterRole node { title { romaji english } coverImage { large } } }
+        nodes { title { romaji english } coverImage { large } genres tags { name rank } }
       }
       any: media(sort: POPULARITY_DESC, perPage: 1) {
-        edges { characterRole node { title { romaji english } coverImage { large } } }
+        nodes { title { romaji english } coverImage { large } genres tags { name rank } }
       }
     }
   }
 }`;
+
+// Style de l'œuvre, montré pendant la révélation : public visé (shōnen, shōjo…)
+// puis un thème marquant (isekai, mecha…) ou, à défaut, le genre le plus parlant.
+const DEMOGRAPHIC = {
+  Shounen: "Shōnen",
+  Shoujo: "Shōjo",
+  Seinen: "Seinen",
+  Josei: "Josei",
+  Kids: "Jeunesse",
+};
+// Thèmes par ordre de priorité, retenus seulement s'ils sont centraux (rang AniList ≥ 60).
+const THEMES = [
+  ["Isekai", "Isekai"],
+  ["Mahou Shoujo", "Magical girl"],
+  ["Real Robot", "Mecha"],
+  ["Super Robot", "Mecha"],
+  ["Idol", "Idol"],
+  ["Battle Royale", "Battle royale"],
+  ["Cyberpunk", "Cyberpunk"],
+  ["Vampire", "Vampires"],
+  ["Ninja", "Ninja"],
+  ["Samurai", "Samouraï"],
+  ["Post-Apocalyptic", "Post-apocalyptique"],
+];
+// Genres du plus distinctif au plus courant.
+const GENRES = [
+  ["Sports", "Sport"],
+  ["Mecha", "Mecha"],
+  ["Mahou Shoujo", "Magical girl"],
+  ["Music", "Musique"],
+  ["Horror", "Horreur"],
+  ["Mystery", "Mystère"],
+  ["Psychological", "Psychologique"],
+  ["Sci-Fi", "Science-fiction"],
+  ["Action", "Action"],
+  ["Adventure", "Aventure"],
+  ["Fantasy", "Fantasy"],
+  ["Supernatural", "Surnaturel"],
+  ["Romance", "Romance"],
+  ["Slice of Life", "Tranche de vie"],
+  ["Thriller", "Thriller"],
+  ["Drama", "Drame"],
+  ["Comedy", "Comédie"],
+];
+
+function styleOf(media) {
+  if (!media) return null;
+  const rank = Object.fromEntries((media.tags ?? []).map((t) => [t.name, t.rank]));
+  const demo = Object.keys(DEMOGRAPHIC)
+    .filter((k) => rank[k] >= 50)
+    .sort((a, b) => rank[b] - rank[a])
+    .map((k) => DEMOGRAPHIC[k])[0];
+  const genres = media.genres ?? [];
+  const theme = THEMES.find(([k]) => rank[k] >= 60)?.[1] ?? GENRES.find(([k]) => genres.includes(k))?.[1];
+  const parts = [...new Set([demo, theme].filter(Boolean))];
+  return parts.length ? parts.join(" · ") : null;
+}
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -77,8 +134,7 @@ for (let page = 1; page <= PAGES; page++) {
 const rarities = TIERS.flatMap((t) => Array(t.count).fill(t.rarity));
 
 const cards = characters.map((c, i) => {
-  const edge = c.anime.edges[0] ?? c.any.edges[0];
-  const media = edge?.node;
+  const media = c.anime.nodes[0] ?? c.any.nodes[0];
   return {
     id: c.id,
     number: i + 1,
@@ -89,9 +145,9 @@ const cards = characters.map((c, i) => {
     favourites: c.favourites,
     url: c.siteUrl,
     rarity: rarities[i] ?? "E",
-    // Indices du walkout : sexe, rôle dans l'œuvre et affiche de l'œuvre.
+    // Indices de la révélation : sexe, style de l'œuvre, puis l'œuvre et son affiche.
     gender: c.gender ?? null,
-    role: edge?.characterRole ?? null,
+    style: styleOf(media),
     cover: media?.coverImage?.large ?? null,
   };
 });

@@ -13,8 +13,8 @@ export interface Card {
   rarity: Rarity;
   /** Sexe indiqué sur AniList (Male, Female, Non-binary…), si connu. */
   gender?: string | null;
-  /** Rôle dans l'œuvre : MAIN, SUPPORTING ou BACKGROUND. */
-  role?: string | null;
+  /** Style de l'œuvre : public visé et thème (« Shōnen · Isekai »). */
+  style?: string | null;
   /** Affiche de l'œuvre principale. */
   cover?: string | null;
 }

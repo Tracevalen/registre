@@ -41,19 +41,13 @@ const GENDER: Record<string, { value: string; symbol: string }> = {
   "non-binary": { value: "Non-binaire", symbol: "⚧" },
 };
 
-const ROLE: Record<string, string> = {
-  MAIN: "Personnage principal",
-  SUPPORTING: "Personnage secondaire",
-  BACKGROUND: "Figurant",
-};
-
+/** Ordre des indices : sexe, puis style de l'œuvre, puis l'œuvre elle-même. */
 function cluesFor(card: Card): Clue[] {
-  const clues: Clue[] = [
-    { key: "univers", label: "Univers", value: card.anime, image: card.cover ?? undefined },
-  ];
+  const clues: Clue[] = [];
   const g = card.gender ? GENDER[card.gender.toLowerCase()] : undefined;
   if (g) clues.push({ key: "genre", label: "Sexe", value: g.value, symbol: g.symbol });
-  if (card.role && ROLE[card.role]) clues.push({ key: "role", label: "Rôle", value: ROLE[card.role] });
+  if (card.style) clues.push({ key: "style", label: "Style", value: card.style });
+  clues.push({ key: "univers", label: "Univers", value: card.anime, image: card.cover ?? undefined });
   return clues;
 }
 

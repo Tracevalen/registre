@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Pull } from "../game/booster";
-import { RARITY_BY_ID } from "../game/rarities";
+import { RARITY_BY_ID, rarityRank } from "../game/rarities";
+import { Walkout } from "./Walkout";
 import { Dossier } from "./Dossier";
 import { Fiche } from "./Fiche";
 
@@ -13,9 +14,14 @@ interface Props {
   onShowArchive: () => void;
 }
 
-type Stage = "sealed" | "unsealing" | "fiches";
+type Stage = "sealed" | "unsealing" | "flare" | "walkout" | "fiches";
 
 const UNSEAL_MS = 700;
+/** Durée de la montée en lumière avant l'ouverture, plus longue pour les gros tirages. */
+const FLARE_MS = { E: 1100, D: 1300, C: 1600, B: 2200, A: 2800 } as const;
+
+const reducedMotion = () =>
+  typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 const SCAN_STAGGER_MS = 180;
 
 export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose, onShowArchive }: Props) {
@@ -25,6 +31,20 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose,
   const revealedCount = revealed.filter(Boolean).length;
   const done = revealedCount === pull.cards.length;
 
+  // La meilleure fiche du dossier donne la couleur de la lumière et déclenche le walkout (B, A ou Top secret).
+  const best = useMemo(() => {
+    let b = 0;
+    pull.cards.forEach((c, i) => {
+      const cur = pull.cards[b];
+      const score = rarityRank(c.rarity) * 2 + (pull.secret[i] ? 1 : 0);
+      const bestScore = rarityRank(cur.rarity) * 2 + (pull.secret[b] ? 1 : 0);
+      if (score > bestScore || (score === bestScore && c.favourites > cur.favourites)) b = i;
+    });
+    return b;
+  }, [pull]);
+  const bestCard = pull.cards[best];
+  const isWalkout = rarityRank(bestCard.rarity) >= rarityRank("B") || pull.secret[best];
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
@@ -32,10 +52,15 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose,
   }, [onClose]);
 
   useEffect(() => {
-    if (stage !== "unsealing") return;
-    const t = setTimeout(() => setStage("fiches"), UNSEAL_MS);
-    return () => clearTimeout(t);
-  }, [stage]);
+    if (stage === "unsealing") {
+      const t = setTimeout(() => setStage(reducedMotion() ? "fiches" : "flare"), UNSEAL_MS);
+      return () => clearTimeout(t);
+    }
+    if (stage === "flare") {
+      const t = setTimeout(() => setStage(isWalkout ? "walkout" : "fiches"), FLARE_MS[bestCard.rarity]);
+      return () => clearTimeout(t);
+    }
+  }, [stage, isWalkout, bestCard.rarity]);
 
   const reveal = (i: number) => setRevealed((r) => r.map((v, j) => v || j === i));
 
@@ -57,7 +82,29 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose,
         </button>
       </header>
 
-      {stage !== "fiches" ? (
+      {stage === "flare" ? (
+        <div
+          className={`flare class-${bestCard.rarity} ${pull.secret[best] ? "is-secret" : ""}`}
+          style={{ animationDuration: `${FLARE_MS[bestCard.rarity]}ms` }}
+          onClick={() => setStage(isWalkout ? "walkout" : "fiches")}
+        >
+          <span className="flare-rays" aria-hidden />
+          <span className="flare-core" aria-hidden />
+          <div className="flare-dossier">
+            <Dossier number={pull.id} />
+          </div>
+        </div>
+      ) : stage === "walkout" ? (
+        <Walkout
+          card={bestCard}
+          secret={pull.secret[best]}
+          fresh={pull.fresh.has(bestCard.id)}
+          onDone={() => {
+            reveal(best);
+            setStage("fiches");
+          }}
+        />
+      ) : stage !== "fiches" ? (
         <div className={`opening-dossier is-${stage}`}>
           <Dossier number={pull.id} onUnseal={stage === "sealed" ? () => setStage("unsealing") : undefined} />
         </div>

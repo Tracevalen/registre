@@ -25,7 +25,7 @@ Chaque personnage a sa fiche d'archive. Sa **classe** dépend de sa popularité 
 
 - La 5ᵉ fiche d'un dossier est toujours classe D ou mieux.
 - À l'ouverture, les fiches sont masquées : on clique pour les « déclassifier » (scan de haut en bas). Une fiche B a un liseré blanc, une A pulse en vert avant d'être révélée.
-- 6 dossiers maximum en stock, +1 toutes les 3 minutes.
+- 15 dossiers maximum en stock, +1 toutes les 3 minutes.
 - L'archive montre les 300 fiches, en grille ou en liste, avec filtres par classe et par série.
 - La sauvegarde est locale au navigateur (`localStorage`), pas encore de compte.
 

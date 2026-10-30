@@ -11,7 +11,7 @@ import { canPrestige, prestigeCost } from "./prestige";
 
 // Sauvegarde locale (navigateur). À remplacer par un backend quand il y aura des comptes.
 
-export const MAX_BOOSTERS = 6;
+export const MAX_BOOSTERS = 15;
 export const RECHARGE_MS = 3 * 60 * 1000; // un booster toutes les 3 minutes
 
 export interface Daily {

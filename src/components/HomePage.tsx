@@ -4,7 +4,7 @@ import { RARITIES } from "../game/rarities";
 import { formatReward, missionsForDay } from "../game/missions";
 import { MAX_BOOSTERS, type SaveData } from "../game/store";
 import { formatDate, formatDuration, plural } from "../lib/format";
-import { Dossier } from "./Dossier";
+import { Fiche } from "./Fiche";
 
 interface Props {
   save: SaveData;
@@ -21,45 +21,70 @@ export function HomePage({ save, nextIn, onOpen, onShowArchive, onFocus, onClaim
   const recent = CARDS.filter((c) => save.firstSeen[c.id])
     .sort((a, b) => save.firstSeen[b.id] - save.firstSeen[a.id])
     .slice(0, 6);
+  const missionsDone = missions.filter((m) => (save.daily.counts[m.counter] ?? 0) >= m.goal).length;
+  // Trois fiches en éventail : les plus rares du joueur, sinon les plus populaires du registre.
+  const byFans = [...CARDS].sort((a, b) => b.favourites - a.favourites);
+  const mine = byFans.filter((c) => save.owned[c.id] && (c.rarity === "A" || c.rarity === "B"));
+  const showcase = [...mine, ...byFans.filter((c) => !mine.includes(c))].slice(0, 3);
 
   return (
     <div className="home">
       <section className="hero">
         <div className="hero-copy">
-          <p className="kicker mono">Série 01 · {CARDS.length} personnages · 5 classes</p>
+          <p className="hero-eyebrow">Série 01 · {CARDS.length} personnages</p>
           <h1 className="hero-title">
-            Chaque personnage
+            Chaque perso
             <br />a sa fiche.
           </h1>
           <p className="hero-lede">
-            Ouvre des dossiers scellés de {CARDS_PER_BOOSTER} fiches et complète le registre. La classe d'un
-            personnage dépend de sa popularité sur AniList&nbsp;: plus il a de fans, plus il est rare.
+            Ouvre des dossiers de {CARDS_PER_BOOSTER} fiches et complète le registre. Plus un personnage a de
+            fans sur AniList, plus sa fiche est rare.
           </p>
           <div className="hero-actions">
             <button className="btn btn-primary" onClick={onOpen} disabled={save.boosters <= 0}>
-              Ouvrir un dossier
+              {save.boosters > 0 ? "Ouvrir un dossier" : `Prochain dossier dans ${formatDuration(nextIn)}`}
             </button>
-            <p className="hero-status mono">
-              {save.boosters}/{MAX_BOOSTERS} disponibles
-              {save.boosters < MAX_BOOSTERS && <> · prochain dans {formatDuration(nextIn)}</>}
-            </p>
+            <button className="btn btn-ghost" onClick={onShowArchive}>
+              Voir ma collection
+            </button>
           </div>
         </div>
 
-        <div className="hero-stack" aria-hidden>
-          {save.boosters === 0 ? (
-            <div className="hero-empty mono">Aucun dossier disponible</div>
-          ) : (
-            Array.from({ length: Math.min(save.boosters, 3) }).map((_, i, all) => (
-              <Dossier
-                key={i}
-                number={save.opened + all.length - i}
-                className={`depth-${all.length - 1 - i}`}
-              />
-            ))
-          )}
+        <div className="hero-fan" aria-hidden>
+          {showcase.map((c, i) => (
+            <Fiche key={c.id} card={c} className={`fan-${i}`} />
+          ))}
         </div>
       </section>
+
+      <ul className="pills">
+        <li className="pill pill-boosters">
+          <span className="pill-icon">▤</span>
+          <strong>
+            {save.boosters}/{MAX_BOOSTERS}
+          </strong>
+          <span>dossiers{save.boosters < MAX_BOOSTERS && <> · +1 dans {formatDuration(nextIn)}</>}</span>
+        </li>
+        <li className="pill pill-missions">
+          <span className="pill-icon">◎</span>
+          <strong>
+            {missionsDone}/{missions.length}
+          </strong>
+          <span>enquêtes du jour</span>
+        </li>
+        <li className="pill pill-ink">
+          <span className="pill-icon">✒</span>
+          <strong>{save.ink}</strong>
+          <span>encre</span>
+        </li>
+        <li className="pill pill-collection">
+          <span className="pill-icon">◆</span>
+          <strong>
+            {ownedCount}/{CARDS.length}
+          </strong>
+          <span>fiches archivées</span>
+        </li>
+      </ul>
 
       <section className="section">
         <div className="section-head">

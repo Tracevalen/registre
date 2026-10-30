@@ -5,26 +5,31 @@
    ================================================================== */
 
 :root {
-  --bg: #eceef2; /* papier d'archive, légèrement bleuté */
-  --surface: #ffffff;
-  --ink: #1b2348; /* bleu carbone */
-  --ink-2: #5a6180;
-  --hair: #d3d8e3;
-  --accent: #3550d8; /* encre de stylo, actions */
-  --accent-soft: #dfe5ff; /* surlignage au survol */
-  --stamp: #d1453b; /* tampon rouge */
-  --manila: #e8cf92; /* chemise kraft des dossiers */
-  --night: #121a38; /* bureau de nuit, écran d'ouverture */
-  --night-2: #1c2550;
+  /* Bureau de nuit : fond bleu-noir, panneaux sombres, accent violet électrique,
+     dossiers dorés. Chaque classe a sa couleur de cadre. */
+  --bg: #0b0c12;
+  --surface: #141722;
+  --surface-2: #1b1f2d;
+  --ink: #eef0f7;
+  --ink-2: #8d93a8;
+  --hair: #232737;
+  --line: #2e3346;
+  --accent: #8b7bff;
+  --accent-2: #a99dff;
+  --accent-soft: rgba(139, 123, 255, 0.16);
+  --stamp: #ff5c7a;
+  --manila: #f5c451;
+  --night: #0b0c12;
+  --night-2: #141722;
+  --radius: 14px;
 
-  /* Couleur d'encre de chaque classe */
-  --class-E: #c5cad6;
-  --class-D: #2f9a77;
-  --class-C: #2f6fe0;
-  --class-B: #7a4ad6;
-  --class-A: #e2a52a;
+  --class-E: #5b6175;
+  --class-D: #2fd08c;
+  --class-C: #4c9bff;
+  --class-B: #a57bff;
+  --class-A: #ffc44d;
 
-  --font: "Archivo Variable", "Helvetica Neue", Arial, sans-serif;
+  --font: "Archivo Variable", "Archivo", "Helvetica Neue", Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
 
   --page-x: clamp(16px, 4vw, 40px);
@@ -32,23 +37,23 @@
 
 .class-E {
   --k: var(--class-E);
-  --k-ink: var(--ink);
+  --k-ink: #e6e8f0;
 }
 .class-D {
   --k: var(--class-D);
-  --k-ink: #fff;
+  --k-ink: #04221a;
 }
 .class-C {
   --k: var(--class-C);
-  --k-ink: #fff;
+  --k-ink: #04203f;
 }
 .class-B {
   --k: var(--class-B);
-  --k-ink: #fff;
+  --k-ink: #1e0f45;
 }
 .class-A {
   --k: var(--class-A);
-  --k-ink: var(--ink);
+  --k-ink: #3a2600;
 }
 
 *,
@@ -107,7 +112,7 @@ p {
 .btn {
   height: 48px;
   padding: 0 24px;
-  border: 1.5px solid var(--ink);
+  border: 1.5px solid var(--line);
   border-radius: 0;
   background: transparent;
   font-weight: 600;
@@ -125,7 +130,7 @@ p {
 
 .btn-primary {
   background: var(--ink);
-  color: #fff;
+  color: var(--bg);
 }
 
 .btn-primary:not(:disabled):hover {
@@ -170,7 +175,7 @@ p {
   height: 60px;
   padding: 0 var(--page-x);
   background: var(--bg);
-  border-bottom: 1px solid var(--ink);
+  border-bottom: 1px solid var(--line);
 }
 
 .wordmark {
@@ -268,7 +273,7 @@ button.fiche:focus-visible .fiche-inner {
   grid-template-rows: auto minmax(0, 1fr) auto auto;
   overflow: hidden;
   background: var(--surface);
-  border: 1px solid var(--ink);
+  border: 1px solid var(--line);
   color: var(--ink);
 }
 
@@ -379,17 +384,7 @@ button.fiche:focus-visible .fiche-inner {
   opacity: 0.7;
 }
 
-/* E — courant : papier gris, photo désaturée */
-.fiche.class-E .fiche-inner {
-  background: #f6f7fa;
-  border-color: #b8bfd0;
-  color: #2b3358;
-}
-
-.fiche.class-E .fiche-class {
-  outline: 1px solid #2b3358;
-  outline-offset: -1px;
-}
+/* E — courant : photo désaturée */
 
 .fiche.class-E .fiche-img img {
   filter: grayscale(1) contrast(1.05) brightness(1.04);
@@ -403,29 +398,9 @@ button.fiche:focus-visible .fiche-inner {
 
 /* C — rare : la couleur apparaît */
 
-/* B — exceptionnel : fiche inversée */
-.fiche.class-B .fiche-inner {
-  background: var(--ink);
-  color: var(--bg);
-  border-color: var(--ink);
-}
+/* B — exceptionnel : halo violet */
 
-.fiche.class-B .fiche-class {
-  background: var(--bg);
-  color: var(--ink);
-}
-
-/* A — mythique : fiche dorée avec reflet */
-.fiche.class-A .fiche-inner {
-  background: var(--class-A);
-  border: 1.5px solid var(--ink);
-  box-shadow: 0 14px 30px -14px rgba(176, 120, 10, 0.85);
-}
-
-.fiche.class-A .fiche-class {
-  background: var(--ink);
-  color: var(--class-A);
-}
+/* A — mythique : cadre doré avec reflet */
 
 .fiche.class-A .fiche-inner::after {
   content: "";
@@ -488,7 +463,7 @@ button.fiche:focus-visible .fiche-inner {
   height: 23px;
   padding: 4px 10px 0;
   background: var(--manila);
-  border: 1.5px solid var(--ink);
+  border: 1.5px solid var(--line);
   border-bottom: 0;
   font-size: 10px;
 }
@@ -500,7 +475,7 @@ button.fiche:focus-visible .fiche-inner {
   flex-direction: column;
   padding: 6cqw;
   background: var(--manila);
-  border: 1.5px solid var(--ink);
+  border: 1.5px solid var(--line);
   transition:
     transform 0.55s cubic-bezier(0.6, 0, 0.8, 0.4),
     opacity 0.45s;
@@ -533,7 +508,7 @@ button.fiche:focus-visible .fiche-inner {
 .dossier-meta {
   margin-top: auto;
   padding-top: 4cqw;
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid var(--line);
   color: var(--ink-2);
 }
 
@@ -555,7 +530,7 @@ button.fiche:focus-visible .fiche-inner {
   padding: 0 7cqw;
   background: var(--stamp);
   color: #fff;
-  border: 1.5px solid var(--ink);
+  border: 1.5px solid var(--line);
   transform: rotate(-5deg);
   font-size: 4.4cqw;
   font-weight: 500;
@@ -590,7 +565,7 @@ button.fiche:focus-visible .fiche-inner {
   align-items: center;
   gap: 32px;
   padding: 72px 0 80px;
-  border-bottom: 1px solid var(--ink);
+  border-bottom: 1px solid var(--line);
 }
 
 .hero-copy {
@@ -651,7 +626,7 @@ button.fiche:focus-visible .fiche-inner {
 
 .section {
   padding: 48px 0;
-  border-bottom: 1px solid var(--ink);
+  border-bottom: 1px solid var(--line);
 }
 
 .section-head {
@@ -774,10 +749,6 @@ button.fiche:focus-visible .fiche-inner {
   transition: width 0.4s;
 }
 
-.class-A .progress-fill {
-  background: var(--class-A);
-  box-shadow: inset 0 0 0 1px var(--ink);
-}
 
 .progress-list .mono {
   text-align: right;
@@ -798,7 +769,7 @@ button.fiche:focus-visible .fiche-inner {
   text-align: left;
   color: var(--ink-2);
   padding: 10px 8px;
-  border-bottom: 1px solid var(--ink);
+  border-bottom: 1px solid var(--line);
 }
 
 .table td {
@@ -866,7 +837,7 @@ button.fiche:focus-visible .fiche-inner {
   align-items: flex-end;
   gap: 24px;
   padding: 48px 0 28px;
-  border-bottom: 1px solid var(--ink);
+  border-bottom: 1px solid var(--line);
 }
 
 .archive-count {
@@ -885,7 +856,7 @@ button.fiche:focus-visible .fiche-inner {
 
 .segmented {
   display: flex;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--line);
   background: var(--surface);
 }
 
@@ -897,7 +868,7 @@ button.fiche:focus-visible .fiche-inner {
   min-width: 64px;
   padding: 10px 14px;
   border: 0;
-  border-right: 1px solid var(--ink);
+  border-right: 1px solid var(--line);
   background: none;
   cursor: pointer;
 }
@@ -923,7 +894,7 @@ button.fiche:focus-visible .fiche-inner {
 
 .segmented button.is-active {
   background: var(--ink);
-  color: #fff;
+  color: var(--bg);
 }
 
 .segmented button.is-active .mono {
@@ -942,7 +913,7 @@ button.fiche:focus-visible .fiche-inner {
 .field {
   height: 40px;
   padding: 0 12px;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--line);
   border-radius: 0;
   background: var(--surface);
   font-size: 14px;
@@ -977,7 +948,7 @@ button.fiche:focus-visible .fiche-inner {
 .view-toggle {
   display: flex;
   margin-left: auto;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--line);
 }
 
 .view-toggle button {
@@ -990,12 +961,12 @@ button.fiche:focus-visible .fiche-inner {
 }
 
 .view-toggle button + button {
-  border-left: 1px solid var(--ink);
+  border-left: 1px solid var(--line);
 }
 
 .view-toggle button.is-active {
   background: var(--ink);
-  color: #fff;
+  color: var(--bg);
 }
 
 .result-count {
@@ -1020,7 +991,7 @@ button.fiche:focus-visible .fiche-inner {
   right: -8px;
   padding: 2px 6px;
   background: var(--ink);
-  color: #fff;
+  color: var(--bg);
   font-size: 11px;
 }
 
@@ -1028,7 +999,7 @@ button.fiche:focus-visible .fiche-inner {
   aspect-ratio: 5 / 7;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  border: 1px dashed #9aa0b4;
+  border: 1px dashed var(--line);
   background: repeating-linear-gradient(-45deg, transparent 0 9px, rgba(27, 35, 72, 0.03) 9px 10px);
   color: var(--ink-2);
 }
@@ -1073,7 +1044,7 @@ button.fiche:focus-visible .fiche-inner {
 
 .empty-fiche-series {
   padding: 3cqw 4cqw;
-  border-top: 1px dashed #9aa0b4;
+  border-top: 1px dashed var(--line);
   font-size: 4.8cqw;
   white-space: nowrap;
   overflow: hidden;
@@ -1380,7 +1351,7 @@ button.fiche:focus-visible .fiche-inner {
   width: min(840px, 100%);
   padding: 40px;
   background: var(--bg);
-  border: 1px solid var(--ink);
+  border: 1px solid var(--line);
   animation: rise 0.3s cubic-bezier(0.2, 1, 0.3, 1);
 }
 
@@ -1407,7 +1378,7 @@ button.fiche:focus-visible .fiche-inner {
   display: grid;
   grid-template-columns: auto 1fr;
   margin: 28px 0;
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid var(--line);
 }
 
 .spec dt,
@@ -1601,7 +1572,7 @@ button.fiche:focus-visible .fiche-inner {
   inset: 0;
   transform: translate(2.5cqw, 2.5cqw) rotate(1.6deg);
   background: var(--surface);
-  border: 1px solid var(--ink);
+  border: 1px solid var(--line);
 }
 
 .linked-fiche .fiche-inner {
@@ -1762,7 +1733,7 @@ button.fiche:focus-visible .fiche-inner {
 .link-item {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--line);
   background: var(--surface);
 }
 
@@ -1828,7 +1799,7 @@ button.fiche:focus-visible .fiche-inner {
   height: 40px;
   padding: 0;
   overflow: hidden;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--line);
   background: var(--hair);
   cursor: pointer;
 }
@@ -1928,7 +1899,7 @@ button.fiche:focus-visible .fiche-inner {
   margin: 12px 0 0;
   padding: 0;
   list-style: none;
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid var(--line);
 }
 
 .dialog-list li {
@@ -2045,7 +2016,7 @@ button.empty-fiche:hover {
 }
 
 .empty-fiche.is-wanted {
-  border: 1.5px solid var(--ink);
+  border: 1.5px solid var(--line);
   background: var(--manila);
   color: var(--ink);
 }
@@ -2195,4 +2166,494 @@ button.empty-fiche:hover {
   .header-ink {
     display: none;
   }
+}
+
+/* ==================================================================
+   Thème nuit : cartes à cadre coloré, boutons arrondis, halos
+   ================================================================== */
+
+body {
+  background:
+    radial-gradient(1200px 520px at 75% -120px, rgba(139, 123, 255, 0.18), transparent 70%),
+    radial-gradient(900px 480px at 0% 0%, rgba(245, 196, 81, 0.07), transparent 70%), var(--bg);
+  background-attachment: fixed;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+.header {
+  background: rgba(11, 12, 18, 0.78);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--hair);
+}
+
+.btn {
+  border-radius: 12px;
+  border-color: var(--line);
+}
+
+.btn:not(:disabled):hover {
+  background: var(--surface-2);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:not(:disabled):hover {
+  background: var(--accent-2);
+  border-color: var(--accent-2);
+  color: #fff;
+}
+
+.hero .btn-primary {
+  height: 54px;
+  padding: 0 30px;
+  background: var(--manila);
+  border-color: var(--manila);
+  color: #2a1d00;
+  font-size: 16px;
+  box-shadow: 0 10px 30px -10px rgba(245, 196, 81, 0.6);
+}
+
+.hero .btn-primary:not(:disabled):hover {
+  background: #ffd36e;
+  border-color: #ffd36e;
+  color: #2a1d00;
+}
+
+.link:hover {
+  background: none;
+  color: var(--accent-2);
+}
+
+/* Les fiches : cadre à la couleur de la classe, coins arrondis */
+.fiche-inner {
+  background: var(--surface-2);
+  color: var(--ink);
+  border: 1.2cqw solid var(--k);
+  border-radius: 5cqw;
+  box-shadow: 0 12px 28px -16px rgba(0, 0, 0, 0.8);
+}
+
+.fiche-head,
+.fiche-img,
+.fiche-foot {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.fiche-class {
+  border-radius: 2.4cqw;
+}
+
+.fiche.class-B .fiche-inner {
+  box-shadow:
+    0 0 0 0.4cqw rgba(165, 123, 255, 0.25),
+    0 14px 34px -12px rgba(165, 123, 255, 0.55);
+}
+
+.fiche.class-A .fiche-inner {
+  background: linear-gradient(160deg, #2a2312, var(--surface-2) 55%);
+  box-shadow:
+    0 0 0 0.4cqw rgba(255, 196, 77, 0.3),
+    0 16px 40px -12px rgba(255, 196, 77, 0.6);
+}
+
+.fiche.class-A .fiche-name {
+  color: var(--class-A);
+}
+
+button.fiche:hover .fiche-inner,
+button.fiche:focus-visible .fiche-inner {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+button.fiche {
+  transition: transform 0.15s;
+}
+
+button.fiche:hover {
+  transform: translateY(-3px);
+}
+
+.class-chip,
+.empty-fiche-class,
+.progress-letter {
+  border-radius: 6px;
+}
+
+.empty-fiche {
+  border-radius: 5cqw;
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.empty-fiche.is-wanted {
+  border: 1.5px solid var(--manila);
+  background: rgba(245, 196, 81, 0.08);
+  color: var(--manila);
+}
+
+.copies {
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Panneaux */
+.shredder,
+.mission {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+}
+
+.shredder {
+  border-left: 1px solid var(--hair);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.mission.is-ready {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 10px 30px -14px rgba(139, 123, 255, 0.7);
+}
+
+.mission.is-claimed {
+  background: transparent;
+}
+
+.mission-track,
+.progress-track {
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--hair);
+}
+
+.mission-fill {
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--stamp));
+}
+
+.ink-count strong,
+.header-ink strong {
+  color: var(--manila);
+}
+
+.field {
+  background: var(--surface);
+  border-color: var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+}
+
+.segmented,
+.view-toggle {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.segmented button.is-active,
+.view-toggle button.is-active,
+.nav button.is-active {
+  color: var(--ink);
+}
+
+.segmented button.is-active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.modal-panel {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: 20px;
+}
+
+.modal {
+  background: rgba(5, 6, 10, 0.75);
+  backdrop-filter: blur(6px);
+}
+
+.link-item {
+  background: var(--surface);
+  border-radius: var(--radius);
+}
+
+/* Dossiers scellés : chemises dorées */
+.dossier-body,
+.dossier-tab {
+  color: #2a1d00;
+  border-color: #c99a2e;
+}
+
+.dossier-body {
+  border-radius: 4px 14px 14px 14px;
+  box-shadow: 0 24px 50px -20px rgba(245, 196, 81, 0.45);
+}
+
+.dossier-tab {
+  border-radius: 8px 8px 0 0;
+}
+
+.opening {
+  background-color: var(--night);
+}
+
+.dist-bar,
+.progress-fill {
+  border-radius: 4px;
+}
+
+/* ---------- Accueil : bannière, éventail de cartes, pastilles ---------- */
+
+.hero {
+  position: relative;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  margin-top: 28px;
+  padding: clamp(32px, 5vw, 64px);
+  border: 1px solid rgba(245, 196, 81, 0.28);
+  border-radius: 24px;
+  background:
+    radial-gradient(520px 340px at 85% 50%, rgba(139, 123, 255, 0.35), transparent 70%),
+    radial-gradient(420px 300px at 70% 90%, rgba(255, 92, 122, 0.22), transparent 70%),
+    radial-gradient(600px 300px at 0% 0%, rgba(245, 196, 81, 0.12), transparent 70%),
+    linear-gradient(180deg, #151826, #0e1019);
+  overflow: hidden;
+}
+
+.hero-copy {
+  grid-column: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-eyebrow {
+  margin-bottom: 18px;
+  color: var(--manila);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hero-title {
+  font-size: clamp(44px, 6.4vw, 92px);
+  font-weight: 900;
+  font-stretch: 125%;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.hero-lede {
+  margin-top: 22px;
+  max-width: 44ch;
+  font-size: 17px;
+}
+
+.hero-actions {
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.btn-ghost {
+  height: 54px;
+  padding: 0 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: var(--ink);
+}
+
+.hero-fan {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 380px;
+}
+
+.hero-fan .fiche {
+  grid-area: 1 / 1;
+  width: clamp(150px, 15vw, 200px);
+  transition: transform 0.35s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.hero-fan .fan-0 {
+  z-index: 3;
+  transform: translateY(-6px) rotate(2deg);
+}
+
+.hero-fan .fan-1 {
+  z-index: 2;
+  transform: translateX(-62%) translateY(18px) rotate(-12deg);
+}
+
+.hero-fan .fan-2 {
+  z-index: 1;
+  transform: translateX(62%) translateY(22px) rotate(13deg);
+}
+
+.hero:hover .fan-1 {
+  transform: translateX(-72%) translateY(14px) rotate(-15deg);
+}
+
+.hero:hover .fan-2 {
+  transform: translateX(72%) translateY(18px) rotate(16deg);
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px 8px 8px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.pill strong {
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 15px;
+}
+
+.pill-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  font-size: 14px;
+}
+
+.pill-boosters {
+  border-color: rgba(245, 196, 81, 0.4);
+}
+
+.pill-boosters .pill-icon {
+  background: rgba(245, 196, 81, 0.16);
+  color: var(--manila);
+}
+
+.pill-missions .pill-icon {
+  background: rgba(47, 208, 140, 0.16);
+  color: var(--class-D);
+}
+
+.pill-ink .pill-icon {
+  background: rgba(139, 123, 255, 0.18);
+  color: var(--accent-2);
+}
+
+.pill-collection .pill-icon {
+  background: rgba(255, 92, 122, 0.16);
+  color: var(--stamp);
+}
+
+/* Titres plus marqués partout */
+.section-head h2,
+.archive-count,
+.modal-name {
+  font-weight: 900;
+  font-stretch: 115%;
+  letter-spacing: -0.02em;
+}
+
+.section {
+  border-bottom-color: var(--hair);
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-fan {
+    min-height: 300px;
+  }
+
+  .hero-fan .fiche {
+    width: 150px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-fan .fiche,
+  button.fiche {
+    transition: none;
+  }
+}
+
+/* ---------- Couleurs de classe : teintes douces plutôt qu'aplats ---------- */
+
+.class-chip,
+.fiche-class,
+.progress-letter,
+.empty-fiche-class {
+  background: color-mix(in srgb, var(--k) 18%, transparent);
+  color: color-mix(in srgb, var(--k) 70%, #fff);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--k) 45%, transparent);
+  outline: none;
+}
+
+.class-E .class-chip,
+.class-chip.class-E,
+.fiche.class-E .fiche-class,
+.class-E .progress-letter,
+.class-E .empty-fiche-class {
+  color: #c3c8d6;
+}
+
+.fiche-class {
+  backdrop-filter: blur(6px);
+}
+
+.fiche-inner {
+  border: 1px solid color-mix(in srgb, var(--k) 55%, transparent);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 -40cqw 60cqw -40cqw color-mix(in srgb, var(--k) 22%, transparent),
+    0 12px 28px -16px rgba(0, 0, 0, 0.8);
+}
+
+.fiche.class-B .fiche-inner {
+  box-shadow:
+    inset 0 -40cqw 60cqw -40cqw color-mix(in srgb, var(--k) 30%, transparent),
+    0 14px 34px -14px color-mix(in srgb, var(--k) 55%, transparent);
+}
+
+.fiche.class-A .fiche-inner {
+  border-color: color-mix(in srgb, var(--k) 75%, transparent);
+  box-shadow:
+    inset 0 -40cqw 60cqw -40cqw color-mix(in srgb, var(--k) 35%, transparent),
+    0 16px 40px -12px color-mix(in srgb, var(--k) 60%, transparent);
+}
+
+.dist-bar,
+.progress-fill {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--k) 55%, transparent), var(--k));
+}
+
+.class-E .dist-bar,
+.class-E .progress-fill {
+  background: linear-gradient(90deg, #3a3f50, #6b7186);
 }

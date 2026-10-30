@@ -25,9 +25,24 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # Récupère les 1000 personnages les plus populaires d'AniList.
-      # Si AniList ne répond pas, on garde les fiches déjà présentes dans le dépôt.
-      - run: npm run cards || echo "AniList indisponible, fiches actuelles conservées"
+      # Reprend la dernière liste de personnages téléchargée avec succès.
+      - id: cards-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: src/data/cards.json
+          key: cards-${{ github.run_id }}
+          restore-keys: cards-
+      # Met à jour les 1000 personnages depuis AniList, 4 minutes maximum.
+      # Si AniList est lent ou refuse, on garde la liste précédente et le site se publie quand même.
+      - id: cards
+        run: npm run cards
+        timeout-minutes: 4
+        continue-on-error: true
+      - if: steps.cards.outcome == 'success'
+        uses: actions/cache/save@v4
+        with:
+          path: src/data/cards.json
+          key: cards-${{ github.run_id }}
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

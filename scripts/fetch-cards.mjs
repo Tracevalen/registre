@@ -40,23 +40,30 @@ query ($page: Int, $perPage: Int) {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function fetchPage(page) {
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const res = await fetch("https://graphql.anilist.co", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({ query: QUERY, variables: { page, perPage: PER_PAGE } }),
-    });
-    if (res.status === 429) {
-      const wait = Number(res.headers.get("retry-after") ?? 60);
-      console.log(`  rate limit, pause ${wait}s…`);
-      await sleep(wait * 1000);
-      continue;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    try {
+      const res = await fetch("https://graphql.anilist.co", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ query: QUERY, variables: { page, perPage: PER_PAGE } }),
+        // Une requête qui ne répond pas en 20 s est abandonnée.
+        signal: AbortSignal.timeout(20_000),
+      });
+      if (res.status === 429) {
+        const wait = Math.min(Number(res.headers.get("retry-after") ?? 30), 30);
+        console.log(`  rate limit, pause ${wait}s…`);
+        await sleep(wait * 1000);
+        continue;
+      }
+      if (!res.ok) throw new Error(`AniList ${res.status}`);
+      const json = await res.json();
+      return json.data.Page.characters;
+    } catch (err) {
+      console.log(`  page ${page}, essai ${attempt + 1} raté : ${err.message}`);
+      await sleep(3000);
     }
-    if (!res.ok) throw new Error(`AniList ${res.status}: ${await res.text()}`);
-    const json = await res.json();
-    return json.data.Page.characters;
   }
-  throw new Error("AniList : trop de tentatives");
+  throw new Error("AniList ne répond pas : la liste précédente est conservée");
 }
 
 const characters = [];

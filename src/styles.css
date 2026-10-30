@@ -4825,3 +4825,26 @@ button.empty-fiche:hover {
 .reveal-sound:hover {
   color: var(--accent-2);
 }
+
+.opening-sound {
+  margin-left: auto;
+  margin-right: 16px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-2);
+  font: inherit;
+  cursor: pointer;
+}
+
+.opening-sound[aria-pressed="true"] {
+  color: var(--ink);
+}
+
+.opening-sound:hover {
+  color: var(--accent-2);
+}
+
+.opening-sound + .opening-close {
+  margin-left: 0;
+}

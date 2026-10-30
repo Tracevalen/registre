@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { Pull } from "../game/booster";
 import { RARITY_BY_ID, rarityRank } from "../game/rarities";
 import { PackReveal } from "./PackReveal";
+import * as sound from "../lib/sound";
 import { Dossier } from "./Dossier";
 import { Fiche } from "./Fiche";
 
@@ -39,6 +40,20 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose,
   }, [pull]);
   const bestCard = pull.cards[best];
 
+  const [muted, setMutedState] = useState(sound.isMuted);
+
+  // La musique démarre dès l'arrivée sur l'écran d'ouverture et s'arrête en fondu en le quittant.
+  useEffect(() => {
+    sound.playMusic();
+    return () => sound.fadeOutMusic(0.6);
+  }, []);
+
+  const toggleSound = () => {
+    sound.setMuted(!muted);
+    sound.syncMusicMute();
+    setMutedState(!muted);
+  };
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
@@ -67,6 +82,9 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose,
           {pull.batch ? `${pull.batch} dossiers ouverts` : `Dossier N°${String(pull.id).padStart(4, "0")}`}
         </span>
         <span>{stage === "fiches" ? `Déclassifiées ${revealedCount}/${pull.cards.length}` : "Scellé"}</span>
+        <button className="opening-sound" onClick={toggleSound} aria-pressed={!muted}>
+          {muted ? "Son coupé" : "Son activé"}
+        </button>
         <button className="opening-close" onClick={onClose}>
           Fermer ✕
         </button>

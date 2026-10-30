@@ -64,7 +64,6 @@ export function PackReveal({ card, secret, fresh, dossierNumber, batch, onDone }
   const [clue, setClue] = useState(0);
   const [burst, setBurst] = useState(0);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [muted, setMutedState] = useState(sound.isMuted);
   const r = RARITY_BY_ID[card.rarity];
   const color = secret ? "#ff3b47" : GLOW[card.rarity];
 
@@ -86,39 +85,10 @@ export function PackReveal({ card, secret, fresh, dossierNumber, batch, onDone }
     return () => clearTimeout(t);
   }, [phase, clue, clues.length, card.rarity]);
 
-  // Bande-son synchronisée sur chaque étape
+  // La musique (lancée à l'arrivée sur l'écran d'ouverture) s'éteint en fondu dès que la carte est révélée.
   useEffect(() => {
-    // La musique remplace la nappe synthétique ; on garde les impacts par-dessus.
-    if (phase === "charge") sound.playMusic();
-    if (phase === "burst") sound.burst();
-    if (phase === "spin") sound.spin(SPIN_MS / 1000);
-    if (phase === "show") sound.land(card.rarity);
-  }, [phase, card.rarity]);
-
-  // Une fois la carte posée, la musique s'éteint doucement.
-  useEffect(() => {
-    if (phase !== "show") return;
-    const t = setTimeout(() => sound.fadeOutMusic(1.5), 2500);
-    return () => clearTimeout(t);
+    if (phase === "show") sound.fadeOutMusic(1.8);
   }, [phase]);
-
-  useEffect(() => {
-    if (phase === "clue") sound.clue();
-  }, [phase, clue]);
-
-  useEffect(
-    () => () => {
-      sound.stopAll();
-      sound.fadeOutMusic(0.4);
-    },
-    [],
-  );
-
-  const toggleSound = () => {
-    sound.setMuted(!muted);
-    sound.syncMusicMute();
-    setMutedState(!muted);
-  };
 
   const skip = () => {
     if (phase === "show") return;
@@ -212,10 +182,6 @@ export function PackReveal({ card, secret, fresh, dossierNumber, batch, onDone }
           )}
         </div>
       )}
-
-      <button className="reveal-sound mono" onClick={toggleSound} aria-pressed={!muted}>
-        {muted ? "Son coupé" : "Son activé"}
-      </button>
 
       {phase !== "show" && (
         <button className="reveal-skip mono" onClick={skip}>

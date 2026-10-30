@@ -18,11 +18,11 @@ export function setMuted(muted: boolean) {
   }
 }
 
-// ---------- Musique de l'ouverture : boucle de 4 mesures de « Killcam » ----------
-// Lue avec la Web Audio API, qui enchaîne la boucle sans aucun blanc :
-// la musique tourne tant que le joueur n'a pas ouvert son dossier.
+// ---------- Musique de l'ouverture : « Killcam » à partir de 0:58 ----------
+// Le morceau continue naturellement (plus de 2 minutes) tant que le joueur n'a pas
+// ouvert son dossier, et ne reprend à 0:58 que s'il attend jusqu'à la fin.
 
-const MUSIC_URL = "./sons/ouverture.wav";
+const MUSIC_URL = "./sons/ouverture-suite.mp3";
 const MUSIC_VOLUME = 0.8;
 
 let ctx: AudioContext | null = null;

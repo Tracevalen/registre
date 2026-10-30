@@ -8,6 +8,7 @@ interface Props {
   pull: Pull;
   boostersLeft: number;
   onAgain: () => void;
+  onOpenAll: () => void;
   onClose: () => void;
   onShowArchive: () => void;
 }
@@ -17,9 +18,10 @@ type Stage = "sealed" | "unsealing" | "fiches";
 const UNSEAL_MS = 700;
 const SCAN_STAGGER_MS = 180;
 
-export function OpeningScreen({ pull, boostersLeft, onAgain, onClose, onShowArchive }: Props) {
-  const [stage, setStage] = useState<Stage>("sealed");
-  const [revealed, setRevealed] = useState<boolean[]>(() => pull.cards.map(() => false));
+export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose, onShowArchive }: Props) {
+  // « Tout ouvrir » saute le sceau et révèle toutes les fiches d'un coup.
+  const [stage, setStage] = useState<Stage>(pull.batch ? "fiches" : "sealed");
+  const [revealed, setRevealed] = useState<boolean[]>(() => pull.cards.map(() => Boolean(pull.batch)));
   const revealedCount = revealed.filter(Boolean).length;
   const done = revealedCount === pull.cards.length;
 
@@ -46,7 +48,9 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onClose, onShowArch
   return (
     <div className="opening" role="dialog" aria-modal aria-label="Ouverture d'un dossier">
       <header className="opening-bar mono">
-        <span>Dossier N°{String(pull.id).padStart(4, "0")}</span>
+        <span>
+          {pull.batch ? `${pull.batch} dossiers ouverts` : `Dossier N°${String(pull.id).padStart(4, "0")}`}
+        </span>
         <span>{stage === "fiches" ? `Déclassifiées ${revealedCount}/${pull.cards.length}` : "Scellé"}</span>
         <button className="opening-close" onClick={onClose}>
           Fermer ✕
@@ -113,7 +117,12 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onClose, onShowArch
               </button>
             ) : (
               <>
-                <button className="btn btn-primary" onClick={onAgain} disabled={boostersLeft <= 0}>
+                {boostersLeft > 1 && (
+                  <button className="btn btn-primary" onClick={onOpenAll}>
+                    Tout ouvrir ({boostersLeft})
+                  </button>
+                )}
+                <button className="btn btn-inverse" onClick={onAgain} disabled={boostersLeft <= 0}>
                   {boostersLeft > 0 ? `Dossier suivant (${boostersLeft})` : "Plus de dossier"}
                 </button>
                 <button className="btn btn-inverse" onClick={onShowArchive}>

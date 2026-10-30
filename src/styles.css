@@ -3114,3 +3114,699 @@ button.fiche:hover {
     animation: none;
   }
 }
+
+/* ==================================================================
+   CHARTE v0.2 — nuit bleu marine, accent orange, coins biseautés.
+   Ce bloc fait foi : il remplace les thèmes précédents.
+   ================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  --bg: #000a30;
+  --surface: #06134a;
+  --surface-2: #0b1d63;
+  --hair: #122166;
+  --line: #22358a;
+  --ink: #eef1ff;
+  --ink-2: #9aa6d8;
+  --ink-3: #5f6ca6;
+  --accent: #ff7a1a;
+  --accent-2: #ff9a4d;
+  --accent-soft: rgba(255, 122, 26, 0.14);
+  --stamp: #ff3b47;
+  --manila: #ffc94d;
+  --night: #000a30;
+  --night-2: #06134a;
+
+  --class-E: #7c88b8;
+  --class-D: #6fa0ff;
+  --class-C: #ff8fc8;
+  --class-B: #b48cff;
+  --class-A: #ffc94d;
+  --class-S: linear-gradient(115deg, #ff7a1a, #b48cff 30%, #ff8fc8 55%, #ffc94d 80%, #6fa0ff);
+
+  --display: "Chakra Petch", "Arial Narrow", system-ui, sans-serif;
+  --font: "Zen Kaku Gothic New", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+
+  --radius: 0;
+  --c: 12px;
+}
+
+.class-E {
+  --k: var(--class-E);
+  --k-ink: #0a1236;
+}
+.class-D {
+  --k: var(--class-D);
+  --k-ink: #071a45;
+}
+.class-C {
+  --k: var(--class-C);
+  --k-ink: #3a0623;
+}
+.class-B {
+  --k: var(--class-B);
+  --k-ink: #1c0b45;
+}
+.class-A {
+  --k: var(--class-A);
+  --k-ink: #3a2600;
+}
+.class-S {
+  --k: var(--class-S);
+  --k-ink: #000a30;
+}
+
+body {
+  background: var(--bg);
+  font-family: var(--font);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.header {
+  background: rgba(0, 10, 48, 0.88);
+  border-bottom: 1px solid var(--hair);
+}
+
+.wordmark::before {
+  background: var(--accent);
+  outline: none;
+}
+
+/* ---------- Une seule forme : le biseau ---------- */
+
+.btn,
+.field,
+.pill,
+.hero,
+.special,
+.affaire-hero,
+.affaire-teaser,
+.mission,
+.album,
+.shredder,
+.modal-panel,
+.link-item,
+.segmented,
+.view-toggle,
+.empty-fiche,
+.album-thumb,
+.affaire-photo,
+.affaire-suggest,
+.hint {
+  border-radius: 0;
+  clip-path: polygon(
+    var(--c) 0,
+    100% 0,
+    100% calc(100% - var(--c)),
+    calc(100% - var(--c)) 100%,
+    0 100%,
+    0 var(--c)
+  );
+}
+
+.btn,
+.field {
+  --c: 10px;
+}
+
+.pill,
+.album-thumb,
+.hint {
+  --c: 6px;
+}
+
+.class-chip,
+.fiche-class,
+.progress-letter,
+.empty-fiche-class,
+.copies,
+.nav-badge,
+.pill-icon {
+  border-radius: 0;
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+}
+
+/* ---------- Typographie ---------- */
+
+.hero-title,
+.special-title,
+.section-head h2,
+.archive-count,
+.big-count,
+.modal-name,
+.album-head h3,
+.link-item-title,
+.dist-letter,
+.wordmark {
+  font-family: var(--display);
+  font-stretch: normal;
+  letter-spacing: 0;
+}
+
+.hero-title,
+.special-title,
+.section-head h2,
+.modal-name,
+.wordmark {
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.hero-title {
+  font-size: clamp(44px, 7vw, 96px);
+  line-height: 0.92;
+}
+
+.fiche-name {
+  font-family: var(--display);
+  font-weight: 600;
+  font-stretch: normal;
+  text-transform: none;
+  font-size: 8.4cqw;
+  line-height: 1.1;
+}
+
+.btn {
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ---------- Boutons ---------- */
+
+.btn {
+  border: 0;
+  background: var(--surface-2);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--line);
+}
+
+.btn:not(:disabled):hover {
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+  color: var(--accent);
+}
+
+.btn-primary,
+.hero .btn-primary,
+.opening .btn-primary {
+  background: var(--accent);
+  border: 0;
+  color: var(--bg);
+  box-shadow: none;
+}
+
+.btn-primary:not(:disabled):hover,
+.hero .btn-primary:not(:disabled):hover,
+.opening .btn-primary:not(:disabled):hover {
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: none;
+}
+
+.btn-ghost,
+.btn-inverse {
+  background: var(--surface-2);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--line);
+}
+
+.link:hover {
+  color: var(--accent);
+}
+
+/* ---------- Puces de classe : aplat de la couleur ---------- */
+
+.class-chip,
+.fiche-class,
+.progress-letter,
+.empty-fiche-class {
+  background: var(--k);
+  color: var(--k-ink);
+  box-shadow: none;
+  outline: none;
+  backdrop-filter: none;
+  font-family: var(--display);
+  font-weight: 700;
+}
+
+.class-E .class-chip,
+.class-chip.class-E,
+.fiche.class-E .fiche-class,
+.class-E .progress-letter,
+.class-E .empty-fiche-class {
+  color: var(--k-ink);
+}
+
+.fiche-class-wide,
+.chip-wide {
+  width: auto;
+  min-width: 11cqw;
+  padding-inline: 1.6cqw;
+  font-size: 5cqw;
+  letter-spacing: 0.04em;
+}
+
+.chip-wide {
+  min-width: 0;
+  padding-inline: 6px;
+  font-size: 11px;
+}
+
+/* ---------- La fiche : cadre de la couleur de classe, biseauté ---------- */
+
+.fiche {
+  --fc: 6cqw;
+  position: relative;
+  padding: 0.9cqw;
+}
+
+.fiche::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--k);
+  clip-path: polygon(
+    var(--fc) 0,
+    100% 0,
+    100% calc(100% - var(--fc)),
+    calc(100% - var(--fc)) 100%,
+    0 100%,
+    0 var(--fc)
+  );
+}
+
+.fiche-inner {
+  position: relative;
+  border: 0;
+  border-radius: 0;
+  background: var(--surface);
+  box-shadow: none;
+  clip-path: polygon(
+    calc(var(--fc) - 0.5cqw) 0,
+    100% 0,
+    100% calc(100% - var(--fc) + 0.5cqw),
+    calc(100% - var(--fc) + 0.5cqw) 100%,
+    0 100%,
+    0 calc(var(--fc) - 0.5cqw)
+  );
+}
+
+.fiche.class-A .fiche-inner,
+.fiche.class-B .fiche-inner {
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.fiche.class-A .fiche-name {
+  color: var(--ink);
+}
+
+.fiche-head,
+.fiche-img,
+.fiche-foot {
+  border-color: var(--hair);
+}
+
+.fiche-foot {
+  border-top-style: dashed;
+}
+
+.fiche-img {
+  margin-inline: 2.4cqw;
+  background:
+    radial-gradient(
+        circle at 1px 1px,
+        color-mix(in srgb, var(--class-B) 40%, transparent) 1px,
+        transparent 1.6px
+      )
+      0 0 / 6px 6px,
+    linear-gradient(180deg, var(--surface-2), color-mix(in srgb, var(--class-B) 22%, var(--surface-2)));
+}
+
+.fiche.class-E .fiche-img img {
+  filter: saturate(0.35);
+  opacity: 1;
+}
+
+.fiche.class-D .fiche-img img {
+  filter: none;
+}
+
+/* Halo de lumière selon la classe (le filtre est sur la fiche, qui n'est pas découpée) */
+.fiche.class-C {
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--class-C) 30%, transparent));
+}
+
+.fiche.class-B .fiche-inner {
+  box-shadow:
+    inset 0 0 0 1cqw var(--surface),
+    inset 0 0 0 1.4cqw var(--class-B);
+}
+
+.fiche.class-A {
+  filter: drop-shadow(0 0 16px color-mix(in srgb, var(--class-A) 40%, transparent));
+}
+
+.fiche.class-S {
+  filter: drop-shadow(0 0 18px rgba(180, 140, 255, 0.45));
+}
+
+.fiche.class-S::before {
+  background-size: 300% 100%;
+}
+
+.fiche-lg.class-S::before,
+button.fiche.class-S:hover::before {
+  animation: iris 6s linear infinite;
+}
+
+@keyframes iris {
+  to {
+    background-position: 300% 0;
+  }
+}
+
+button.fiche:hover .fiche-inner,
+button.fiche:focus-visible .fiche-inner {
+  outline: none;
+}
+
+button.fiche:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* ---------- Prestige : bronze, argent, or ---------- */
+
+.fiche.prestige-1::before {
+  background: linear-gradient(135deg, #7a4a22, #e0a46a 45%, #8a5a2b 70%, #e8b47c);
+}
+
+.fiche.prestige-2::before {
+  background: linear-gradient(135deg, #8c96aa, #f4f7ff 45%, #9aa4b8 70%, #ffffff);
+}
+
+.fiche.prestige-3::before {
+  background: linear-gradient(135deg, #b8860b, #fff1a8 40%, #d9a520 65%, #ffe27a);
+  background-size: 250% 100%;
+  animation: iris 5s linear infinite;
+}
+
+.fiche.prestige-1 {
+  filter: drop-shadow(0 0 14px rgba(224, 164, 106, 0.55));
+}
+
+.fiche.prestige-2 {
+  filter: drop-shadow(0 0 18px rgba(220, 230, 255, 0.6));
+}
+
+.fiche.prestige-3 {
+  filter: drop-shadow(0 0 24px rgba(255, 216, 107, 0.75));
+}
+
+.fiche.prestige-1 .fiche-name {
+  color: #f0b77d;
+}
+
+.fiche.prestige-2 .fiche-name {
+  color: #e6ecff;
+  text-shadow: 0 0 10px rgba(230, 236, 255, 0.5);
+}
+
+.fiche.prestige-3 .fiche-name {
+  color: #ffd86b;
+  text-shadow: 0 0 12px rgba(255, 216, 107, 0.6);
+}
+
+.prestige-badge {
+  position: absolute;
+  left: 2cqw;
+  bottom: 2cqw;
+  padding: 0.8cqw 2.4cqw;
+  background: rgba(0, 10, 48, 0.8);
+  color: #ffd86b;
+  font-family: var(--display);
+  font-size: 4.6cqw;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  clip-path: polygon(1.5cqw 0, 100% 0, 100% calc(100% - 1.5cqw), calc(100% - 1.5cqw) 100%, 0 100%, 0 1.5cqw);
+}
+
+.prestige-1 .prestige-badge {
+  color: #f0b77d;
+}
+
+.prestige-2 .prestige-badge {
+  color: #e6ecff;
+}
+
+/* ---------- Doublons, fiches manquantes ---------- */
+
+.copies {
+  top: 6px;
+  right: 6px;
+  z-index: 2;
+  padding: 3px 8px;
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tag-dup {
+  margin-left: 8px;
+  padding: 1px 6px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.empty-fiche {
+  border: 0;
+  background: repeating-linear-gradient(135deg, var(--surface) 0 6px, var(--bg) 6px 12px);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink-3);
+}
+
+.empty-fiche-series {
+  border-top: 1px dashed var(--line);
+  color: var(--ink-2);
+}
+
+.empty-fiche.is-wanted {
+  border: 0;
+  background: repeating-linear-gradient(135deg, rgba(255, 122, 26, 0.1) 0 6px, var(--bg) 6px 12px);
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+  color: var(--accent);
+}
+
+button.empty-fiche:hover {
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+/* ---------- Panneaux ---------- */
+
+.hero {
+  border: 0;
+  box-shadow: inset 0 0 0 1px var(--line);
+  background:
+    radial-gradient(circle at 1px 1px, rgba(255, 122, 26, 0.12) 1px, transparent 1.5px) 0 0 / 14px 14px,
+    radial-gradient(600px 360px at 85% 50%, rgba(180, 140, 255, 0.18), transparent 70%),
+    var(--surface);
+}
+
+.hero-eyebrow {
+  color: var(--accent);
+}
+
+.special,
+.affaire-hero,
+.affaire-teaser {
+  border: 0;
+  box-shadow: inset 0 0 0 1px var(--line);
+  background: var(--surface);
+}
+
+.special:not(.is-used),
+.affaire-teaser:not(.is-done) {
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+  background:
+    radial-gradient(circle at 1px 1px, rgba(255, 122, 26, 0.1) 1px, transparent 1.5px) 0 0 / 14px 14px,
+    var(--surface);
+}
+
+.affaire-teaser-mark {
+  border-radius: 0;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.affaire-teaser-cta {
+  border-radius: 0;
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--display);
+  text-transform: uppercase;
+}
+
+.mission,
+.album,
+.shredder,
+.link-item {
+  border: 0;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+
+.mission.is-ready,
+.album.is-ready,
+.link-item.is-ready {
+  outline: none;
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+.mission-track,
+.progress-track,
+.header-grade-bar {
+  border-radius: 0;
+  background: var(--hair);
+}
+
+.mission-fill,
+.header-grade-bar span {
+  border-radius: 0;
+  background: var(--accent);
+}
+
+.dist-bar,
+.progress-fill {
+  border-radius: 0;
+  background: var(--k);
+}
+
+.class-E .dist-bar,
+.class-E .progress-fill {
+  background: var(--k);
+}
+
+.pill {
+  border: 0;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+
+.pill-boosters {
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.pill-boosters .pill-icon {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.field {
+  border: 0;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.field:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+.segmented button.is-active {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.segmented button.is-active .mono {
+  color: var(--bg);
+}
+
+.nav button.is-active {
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+.nav-badge {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.header-grade,
+.ink-count strong,
+.header-ink strong {
+  color: var(--accent);
+}
+
+.tag-new {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.modal {
+  background: rgba(0, 5, 25, 0.8);
+}
+
+.modal-panel {
+  border: 0;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.opening {
+  background-color: var(--night);
+}
+
+.dossier-body,
+.dossier-tab {
+  background: var(--surface-2);
+  color: var(--ink);
+  border-color: var(--accent);
+}
+
+.dossier-body {
+  border-radius: 0;
+  box-shadow: 0 24px 50px -20px rgba(255, 122, 26, 0.4);
+}
+
+.dossier-tab {
+  border-radius: 0;
+}
+
+.dossier-seal {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.hint-match {
+  background: rgba(255, 122, 26, 0.2);
+  color: #ffb27a;
+  box-shadow: inset 0 0 0 1px rgba(255, 122, 26, 0.6);
+}
+
+.hint-up,
+.hint-down {
+  background: rgba(111, 160, 255, 0.16);
+  color: #a9c6ff;
+  box-shadow: inset 0 0 0 1px rgba(111, 160, 255, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fiche::before {
+    animation: none !important;
+  }
+}

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { formatFans, formatNumber, type Card } from "../game/cards";
 import { REQUEST_COST, SHRED_INK, shreddable } from "../game/economy";
 import { RARITY_BY_ID } from "../game/rarities";
+import { canPrestige, MAX_PRESTIGE, PRESTIGE_NAME, prestigeCost } from "../game/prestige";
 import type { SaveData } from "../game/store";
 import { formatDate } from "../lib/format";
 import { Fiche } from "./Fiche";
@@ -13,9 +14,12 @@ interface Props {
   onShred: (c: Card) => void;
   onRequest: (c: Card) => void;
   onToggleWanted: (c: Card) => void;
+  onPrestige: (c: Card) => void;
 }
 
-export function FicheModal({ card, save, onClose, onShred, onRequest, onToggleWanted }: Props) {
+export function FicheModal({ card, save, onClose, onShred, onRequest, onToggleWanted, onPrestige }: Props) {
+  const level = save.prestige[card.id] ?? 0;
+  const nextCost = prestigeCost(level);
   const r = RARITY_BY_ID[card.rarity];
   const count = save.owned[card.id] ?? 0;
   const secret = save.secret[card.id] ?? 0;
@@ -41,7 +45,7 @@ export function FicheModal({ card, save, onClose, onShred, onRequest, onToggleWa
     >
       <div className="modal-panel" onClick={(e) => e.stopPropagation()}>
         {owned ? (
-          <Fiche card={card} className="fiche-lg" secret={secret > 0} />
+          <Fiche card={card} className="fiche-lg" secret={secret > 0} prestige={level} />
         ) : (
           <div className="fiche-lg modal-empty">
             <div className={`empty-fiche class-${card.rarity} ${wanted ? "is-wanted" : ""}`}>
@@ -79,8 +83,15 @@ export function FicheModal({ card, save, onClose, onShred, onRequest, onToggleWa
                 <dt>Exemplaires</dt>
                 <dd className="mono">
                   {count}
+                  {count > 1 && (
+                    <span className="tag-dup">
+                      {count - 1} doublon{count > 2 ? "s" : ""}
+                    </span>
+                  )}
                   {secret > 0 && <span className="tag-secret">dont {secret} Top secret</span>}
                 </dd>
+                <dt>Prestige</dt>
+                <dd>{level ? `★ ${PRESTIGE_NAME[level]} (niveau ${level}/${MAX_PRESTIGE})` : "Aucun"}</dd>
               </>
             )}
             {firstSeen && (
@@ -94,6 +105,15 @@ export function FicheModal({ card, save, onClose, onShred, onRequest, onToggleWa
           </dl>
 
           <div className="modal-actions">
+            {owned && level < MAX_PRESTIGE && (
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() => onPrestige(card)}
+                disabled={!canPrestige(save, card.id)}
+              >
+                Passer en {PRESTIGE_NAME[level + 1]} ({nextCost} doublon{nextCost > 1 ? "s" : ""})
+              </button>
+            )}
             {owned ? (
               <button className="btn btn-sm" onClick={() => onShred(card)} disabled={spare <= 0}>
                 {spare > 0

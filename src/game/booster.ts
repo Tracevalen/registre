@@ -13,6 +13,8 @@ export interface Pull {
   secret: boolean[];
   /** Fiches qui figuraient dans les avis de recherche. */
   wanted: Set<number>;
+  /** Nombre de dossiers ouverts d'un coup (« Tout ouvrir »). */
+  batch?: number;
 }
 
 function pick<T>(items: T[]): T {

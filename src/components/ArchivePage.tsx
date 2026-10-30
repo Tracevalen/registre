@@ -23,6 +23,7 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
   const [query, setQuery] = useState("");
   const [ownedOnly, setOwnedOnly] = useState(false);
   const [wantedOnly, setWantedOnly] = useState(false);
+  const [dupOnly, setDupOnly] = useState(false);
   const [sort, setSort] = useState<Sort>("number");
   const [view, setView] = useState<View>("grid");
 
@@ -35,6 +36,7 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
         (series === "all" || c.anime === series) &&
         (!ownedOnly || owned(c)) &&
         (!wantedOnly || save.wanted.includes(c.id)) &&
+        (!dupOnly || (save.owned[c.id] ?? 0) > 1) &&
         // Une fiche non archivée reste cherchable par série, pas par nom.
         (!q || c.anime.toLowerCase().includes(q) || (owned(c) && c.name.toLowerCase().includes(q))),
     );
@@ -43,7 +45,8 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
     if (sort === "recent")
       out.sort((a, b) => (save.firstSeen[b.id] ?? 0) - (save.firstSeen[a.id] ?? 0) || a.number - b.number);
     return out;
-  }, [rarity, series, query, ownedOnly, wantedOnly, sort, save]);
+  }, [rarity, series, query, ownedOnly, wantedOnly, dupOnly, sort, save]);
+  const dupCount = CARDS.filter((c) => (save.owned[c.id] ?? 0) > 1).length;
 
   const total = CARDS.filter((c) => save.owned[c.id]).length;
   const spare = CARDS.reduce(
@@ -116,6 +119,10 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
           Archivées seulement
         </label>
         <label className="check">
+          <input type="checkbox" checked={dupOnly} onChange={(e) => setDupOnly(e.target.checked)} />
+          Doublons ({dupCount})
+        </label>
+        <label className="check">
           <input type="checkbox" checked={wantedOnly} onChange={(e) => setWantedOnly(e.target.checked)} />
           Avis de recherche ({save.wanted.length})
         </label>
@@ -166,8 +173,17 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
           {list.map((c) =>
             save.owned[c.id] ? (
               <div key={c.id} className="grid-item">
-                <Fiche card={c} secret={(save.secret[c.id] ?? 0) > 0} onClick={() => onFocus(c)} />
-                {save.owned[c.id] > 1 && <span className="copies mono">×{save.owned[c.id]}</span>}
+                <Fiche
+                  card={c}
+                  secret={(save.secret[c.id] ?? 0) > 0}
+                  prestige={save.prestige[c.id] ?? 0}
+                  onClick={() => onFocus(c)}
+                />
+                {save.owned[c.id] > 1 && (
+                  <span className="copies" title={`${save.owned[c.id] - 1} doublon(s)`}>
+                    +{save.owned[c.id] - 1}
+                  </span>
+                )}
               </div>
             ) : (
               <button

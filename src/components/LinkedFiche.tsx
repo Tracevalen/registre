@@ -1,4 +1,4 @@
-import { formatLinkNumber, LINK_CLASS_NAME, type Link } from "../game/links";
+import { formatLinkNumber, type Link } from "../game/links";
 import { Barcode } from "./Barcode";
 
 interface Props {
@@ -17,8 +17,8 @@ export function LinkedFiche({ link, className = "", onClick }: Props) {
       <div className="fiche-inner">
         <header className="fiche-head">
           <span className="fiche-no">{formatLinkNumber(link.number)}</span>
-          <span className="fiche-class" title={`Classe ${link.rarity} — ${LINK_CLASS_NAME[link.rarity]}`}>
-            {link.rarity}
+          <span className="fiche-class fiche-class-wide" title={link.kind === "duo" ? "Duo" : "Trio"}>
+            {link.kind.toUpperCase()}
           </span>
         </header>
 
@@ -48,9 +48,7 @@ export function LinkedFiche({ link, className = "", onClick }: Props) {
 
         <footer className="fiche-foot">
           <Barcode value={link.number * 7919 + 100003} />
-          <span className="fiche-id">
-            {link.kind} · {LINK_CLASS_NAME[link.rarity]}
-          </span>
+          <span className="fiche-id">{link.kind === "duo" ? "Duo" : "Trio"} · liaison</span>
         </footer>
       </div>
     </Tag>

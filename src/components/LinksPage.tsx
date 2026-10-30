@@ -156,7 +156,7 @@ function LinkItem({ link, state, count, save, onFuse, onOpen, onFocusCard }: Ite
         {classified ? (
           <span className="class-chip class-E">?</span>
         ) : (
-          <span className={`class-chip class-${link.rarity}`}>{link.rarity}</span>
+          <span className="class-chip class-S chip-wide">{link.kind.toUpperCase()}</span>
         )}
       </header>
 
@@ -227,7 +227,7 @@ function FuseDialog({ link, save, onCancel, onConfirm }: DialogProps) {
     <div className="modal" onClick={onCancel} role="dialog" aria-modal aria-label={`Agrafer ${link.title}`}>
       <div className="modal-panel dialog" onClick={(e) => e.stopPropagation()}>
         <p className="kicker mono">
-          {formatLinkNumber(link.number)} · {link.kind} · classe {link.rarity}
+          {formatLinkNumber(link.number)} · {link.kind === "duo" ? "Duo" : "Trio"}
         </p>
         <h2 className="modal-name">Agrafer {link.title}&nbsp;?</h2>
         <p className="dialog-lede">Ces fiches seront consommées&nbsp;:</p>

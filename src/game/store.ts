@@ -7,6 +7,7 @@ import { rarityRank } from "./rarities";
 import { ALBUMS } from "./series";
 import { affaireReward, MAX_GUESSES, suspectOfDay } from "./affaire";
 import { GRADE_BOOSTERS, gradeIndex, XP } from "./grades";
+import { canPrestige, prestigeCost } from "./prestige";
 
 // Sauvegarde locale (navigateur). À remplacer par un backend quand il y aura des comptes.
 
@@ -64,6 +65,8 @@ export interface SaveData {
   albumsClaimed: string[];
   /** Expérience d'enquêteur, qui fait monter en grade. */
   xp: number;
+  /** id de carte → niveau de prestige (0 à 3) */
+  prestige: Record<number, number>;
 }
 
 const KEY = "registre-save-v1";
@@ -93,6 +96,7 @@ const fresh = (): SaveData => ({
   streak: { last: "", days: 0 },
   albumsClaimed: [],
   xp: 0,
+  prestige: {},
 });
 
 function load(): SaveData {
@@ -315,6 +319,22 @@ export function useSave() {
     });
   }, []);
 
+  /** Fusionne des doublons pour monter une fiche d'un niveau de prestige. */
+  const upgradePrestige = useCallback((card: Card) => {
+    setSave((s) => {
+      if (!canPrestige(s, card.id)) return s;
+      const level = s.prestige[card.id] ?? 0;
+      return gainXp(
+        {
+          ...s,
+          owned: { ...s.owned, [card.id]: s.owned[card.id] - prestigeCost(level) },
+          prestige: { ...s.prestige, [card.id]: level + 1 },
+        },
+        XP.fused,
+      );
+    });
+  }, []);
+
   /** Propose un personnage pour l'Affaire du jour. */
   const guessAffaire = useCallback((card: Card) => {
     setSave((s0) => {
@@ -357,6 +377,7 @@ export function useSave() {
     claim,
     claimAlbum,
     guessAffaire,
+    upgradePrestige,
     setKeepOne,
     reset,
     nextIn,

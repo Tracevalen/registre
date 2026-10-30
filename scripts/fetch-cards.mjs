@@ -83,6 +83,26 @@ const cards = characters.map((c, i) => {
   };
 });
 
+// Au moins une fiche Mythique (A) par série : le personnage le plus aimé de chaque
+// série qui compte au moins 3 fiches passe en classe A s'il ne l'est pas déjà.
+const MIN_SERIES_FOR_MYTHIC = 3;
+const bySeries = new Map();
+for (const card of cards) {
+  const list = bySeries.get(card.anime) ?? [];
+  list.push(card);
+  bySeries.set(card.anime, list);
+}
+let promoted = 0;
+for (const list of bySeries.values()) {
+  if (list.length < MIN_SERIES_FOR_MYTHIC) continue;
+  const top = list.reduce((a, b) => (b.favourites > a.favourites ? b : a));
+  if (top.rarity !== "A") {
+    top.rarity = "A";
+    promoted++;
+  }
+}
+console.log(`${promoted} fiches promues Mythiques (meilleur personnage de leur série)`);
+
 await mkdir(new URL("../src/data/", import.meta.url), { recursive: true });
 await writeFile(new URL("../src/data/cards.json", import.meta.url), JSON.stringify(cards, null, 2) + "\n");
 console.log(`${cards.length} cartes écrites dans src/data/cards.json`);

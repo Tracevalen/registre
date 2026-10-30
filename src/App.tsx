@@ -25,6 +25,7 @@ export default function App() {
     claim,
     claimAlbum,
     guessAffaire,
+    upgradePrestige,
     setKeepOne,
     reset,
     nextIn,
@@ -58,6 +59,35 @@ export default function App() {
     setPull({ id: save.opened + 1, cards, fresh, secret, wanted });
   };
 
+  /** Ouvre tous les dossiers en stock d'un coup, fiches déjà révélées. */
+  const openAll = () => {
+    const n = save.boosters;
+    if (n <= 0) return;
+    const cards: Card[] = [];
+    const secret: boolean[] = [];
+    const fresh = new Set<number>();
+    const seen = new Set(
+      Object.keys(save.owned)
+        .filter((id) => save.owned[Number(id)])
+        .map(Number),
+    );
+    let pity = save.pity;
+    for (let i = 0; i < n; i++) {
+      const batch = openBooster({ guaranteeA: pity + 1 >= PITY_LIMIT });
+      const batchSecret = rollSecrets(batch.length);
+      pity = batch.some((c) => c.rarity === "A") ? 0 : pity + 1;
+      for (const c of batch) {
+        if (!seen.has(c.id)) fresh.add(c.id);
+        seen.add(c.id);
+      }
+      spendBooster(batch, batchSecret);
+      cards.push(...batch);
+      secret.push(...batchSecret);
+    }
+    const wanted = new Set(cards.filter((c) => save.wanted.includes(c.id)).map((c) => c.id));
+    setPull({ id: save.opened + 1, cards, fresh, secret, wanted, batch: n });
+  };
+
   return (
     <>
       <Header
@@ -80,6 +110,7 @@ export default function App() {
             onOpen={() => open()}
             onOpenSpecial={() => open(true)}
             onShowAffaire={() => setPage("affaire")}
+            onOpenAll={openAll}
             onShowArchive={() => setPage("archive")}
             onFocus={setFocus}
             onClaim={claim}
@@ -107,6 +138,7 @@ export default function App() {
           pull={pull}
           boostersLeft={save.boosters}
           onAgain={() => open()}
+          onOpenAll={openAll}
           onClose={() => setPull(null)}
           onShowArchive={() => {
             setPull(null);
@@ -123,6 +155,7 @@ export default function App() {
           onShred={(c) => shred([c.id])}
           onRequest={request}
           onToggleWanted={(c) => toggleWanted(c.id)}
+          onPrestige={upgradePrestige}
         />
       )}
 

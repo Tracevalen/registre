@@ -15,6 +15,7 @@ interface Props {
   onOpen: () => void;
   onOpenSpecial: () => void;
   onShowAffaire: () => void;
+  onOpenAll: () => void;
   onShowArchive: () => void;
   onFocus: (c: Card) => void;
   onClaim: (missionId: string) => void;
@@ -26,6 +27,7 @@ export function HomePage({
   onOpen,
   onOpenSpecial,
   onShowAffaire,
+  onOpenAll,
   onShowArchive,
   onFocus,
   onClaim,
@@ -64,9 +66,15 @@ export function HomePage({
             <button className="btn btn-primary" onClick={onOpen} disabled={save.boosters <= 0}>
               {save.boosters > 0 ? "Ouvrir un dossier" : `Prochain dossier dans ${formatDuration(nextIn)}`}
             </button>
-            <button className="btn btn-ghost" onClick={onShowArchive}>
-              Voir ma collection
-            </button>
+            {save.boosters > 1 ? (
+              <button className="btn btn-ghost" onClick={onOpenAll}>
+                Tout ouvrir ({save.boosters})
+              </button>
+            ) : (
+              <button className="btn btn-ghost" onClick={onShowArchive}>
+                Voir ma collection
+              </button>
+            )}
           </div>
         </div>
 

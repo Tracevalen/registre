@@ -2,14 +2,14 @@
 // les fiches de leurs membres. Les fiches agrafées sont consommées.
 
 import { CARDS, type Card } from "./cards";
-import { RARITIES, rarityRank, type Rarity } from "./rarities";
+import { RARITIES, type Rarity } from "./rarities";
 
 /** Les dossiers liés ont une classe de plus que les fiches : S, hors classe. */
 export type LinkClass = Rarity | "S";
 
 export const LINK_CLASS_NAME: Record<LinkClass, string> = {
   ...(Object.fromEntries(RARITIES.map((r) => [r.id, r.name])) as Record<Rarity, string>),
-  S: "Hors classe",
+  S: "Duo",
 };
 
 const LINK_CLASS_ORDER: LinkClass[] = ["E", "D", "C", "B", "A", "S"];
@@ -79,16 +79,6 @@ const DEFS: LinkDef[] = [
 
 const CARD_BY_ID = new Map(CARDS.map((c) => [c.id, c]));
 
-/**
- * Classe d'un dossier lié : la meilleure classe de ses membres, plus un cran
- * pour un duo et deux crans pour un trio, plafonnée à S.
- */
-function linkClass(members: Card[]): LinkClass {
-  const best = Math.max(...members.map((c) => rarityRank(c.rarity)));
-  const bonus = members.length >= 3 ? 2 : 1;
-  return LINK_CLASS_ORDER[Math.min(best + bonus, LINK_CLASS_ORDER.length - 1)];
-}
-
 export const LINKS: Link[] = DEFS.flatMap((def, i) => {
   const members = def.members.map((id) => CARD_BY_ID.get(id));
   if (members.some((c) => !c)) {
@@ -104,7 +94,8 @@ export const LINKS: Link[] = DEFS.flatMap((def, i) => {
       kind: cards.length >= 3 ? "trio" : "duo",
       members: cards,
       anime: [...new Set(cards.map((c) => c.anime))].join(" · "),
-      rarity: linkClass(cards),
+      // Toutes les liaisons ont leur propre rareté : DUO ou TRIO.
+      rarity: "S" as LinkClass,
     },
   ];
 });

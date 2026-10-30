@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { formatLinkNumber, LINK_CLASS_NAME, type Link } from "../game/links";
+import { formatLinkNumber, type Link } from "../game/links";
 import { formatDate } from "../lib/format";
 import { LinkedFiche } from "./LinkedFiche";
 
@@ -32,8 +32,7 @@ export function LinkModal({ link, count, firstFused, fresh = false, onClose }: P
           <dl className="spec">
             <dt>Classe</dt>
             <dd>
-              <span className={`class-chip class-${link.rarity}`}>{link.rarity}</span>{" "}
-              {LINK_CLASS_NAME[link.rarity]}
+              <span className="class-chip class-S chip-wide">{link.kind.toUpperCase()}</span> Rareté liaison
             </dd>
             <dt>Type</dt>
             <dd>{link.kind === "duo" ? "Duo" : "Trio"}</dd>

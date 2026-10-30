@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { formatFans, formatNumber, type Card } from "../game/cards";
 import { RARITY_BY_ID } from "../game/rarities";
+import { PRESTIGE_NAME } from "../game/prestige";
 import { Barcode } from "./Barcode";
 
 interface Props {
@@ -9,17 +10,19 @@ interface Props {
   style?: CSSProperties;
   /** Exemplaire Top secret : la fiche porte un tampon rouge. */
   secret?: boolean;
+  /** Niveau de prestige : 1 bronze, 2 argent, 3 or. */
+  prestige?: number;
   onClick?: () => void;
 }
 
 /** Une carte = une fiche d'archive. Le traitement visuel dépend de la classe (E → A). */
-export function Fiche({ card, className = "", style, secret = false, onClick }: Props) {
+export function Fiche({ card, className = "", style, secret = false, prestige = 0, onClick }: Props) {
   const r = RARITY_BY_ID[card.rarity];
   const Tag = onClick ? "button" : "article";
 
   return (
     <Tag
-      className={`fiche class-${card.rarity} ${secret ? "is-secret" : ""} ${className}`}
+      className={`fiche class-${card.rarity} ${secret ? "is-secret" : ""} ${prestige ? `prestige-${prestige}` : ""} ${className}`}
       style={style}
       onClick={onClick}
     >
@@ -39,6 +42,7 @@ export function Fiche({ card, className = "", style, secret = false, onClick }: 
             referrerPolicy="no-referrer"
             draggable={false}
           />
+          {prestige > 0 && <span className="prestige-badge">★ {PRESTIGE_NAME[prestige]}</span>}
           {secret && <span className="secret-stamp">Top secret</span>}
         </div>
 

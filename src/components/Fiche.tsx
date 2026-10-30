@@ -7,16 +7,22 @@ interface Props {
   card: Card;
   className?: string;
   style?: CSSProperties;
+  /** Exemplaire Top secret : la fiche porte un tampon rouge. */
+  secret?: boolean;
   onClick?: () => void;
 }
 
 /** Une carte = une fiche d'archive. Le traitement visuel dépend de la classe (E → A). */
-export function Fiche({ card, className = "", style, onClick }: Props) {
+export function Fiche({ card, className = "", style, secret = false, onClick }: Props) {
   const r = RARITY_BY_ID[card.rarity];
   const Tag = onClick ? "button" : "article";
 
   return (
-    <Tag className={`fiche class-${card.rarity} ${className}`} style={style} onClick={onClick}>
+    <Tag
+      className={`fiche class-${card.rarity} ${secret ? "is-secret" : ""} ${className}`}
+      style={style}
+      onClick={onClick}
+    >
       <div className="fiche-inner">
         <header className="fiche-head">
           <span className="fiche-no">N°{formatNumber(card.number)}</span>
@@ -33,6 +39,7 @@ export function Fiche({ card, className = "", style, onClick }: Props) {
             referrerPolicy="no-referrer"
             draggable={false}
           />
+          {secret && <span className="secret-stamp">Top secret</span>}
         </div>
 
         <div className="fiche-body">

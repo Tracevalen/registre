@@ -1,6 +1,7 @@
 import { CARDS, CARDS_BY_RARITY, formatNumber, type Card } from "../game/cards";
 import { CARDS_PER_BOOSTER, formatOdds, slotOdds } from "../game/booster";
 import { RARITIES } from "../game/rarities";
+import { formatReward, missionsForDay } from "../game/missions";
 import { MAX_BOOSTERS, type SaveData } from "../game/store";
 import { formatDate, formatDuration, plural } from "../lib/format";
 import { Dossier } from "./Dossier";
@@ -11,9 +12,11 @@ interface Props {
   onOpen: () => void;
   onShowArchive: () => void;
   onFocus: (c: Card) => void;
+  onClaim: (missionId: string) => void;
 }
 
-export function HomePage({ save, nextIn, onOpen, onShowArchive, onFocus }: Props) {
+export function HomePage({ save, nextIn, onOpen, onShowArchive, onFocus, onClaim }: Props) {
+  const missions = missionsForDay(save.daily.day);
   const ownedCount = CARDS.filter((c) => save.owned[c.id]).length;
   const recent = CARDS.filter((c) => save.firstSeen[c.id])
     .sort((a, b) => save.firstSeen[b.id] - save.firstSeen[a.id])
@@ -56,6 +59,41 @@ export function HomePage({ save, nextIn, onOpen, onShowArchive, onFocus }: Props
             ))
           )}
         </div>
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <h2>Enquêtes du jour</h2>
+          <p className="mono">Nouvelles enquêtes à minuit</p>
+        </div>
+        <ul className="missions">
+          {missions.map((m) => {
+            const done = Math.min(save.daily.counts[m.counter] ?? 0, m.goal);
+            const claimed = save.daily.claimed.includes(m.id);
+            const ready = done >= m.goal && !claimed;
+            return (
+              <li key={m.id} className={`mission ${ready ? "is-ready" : ""} ${claimed ? "is-claimed" : ""}`}>
+                <div className="mission-text">
+                  <strong>{m.label}</strong>
+                  <span className="mono">{formatReward(m.reward)}</span>
+                </div>
+                <span className="mission-track" aria-hidden>
+                  <span className="mission-fill" style={{ width: `${(done / m.goal) * 100}%` }} />
+                </span>
+                <span className="mission-count mono">
+                  {done}/{m.goal}
+                </span>
+                {claimed ? (
+                  <span className="mission-stamp mono">Classée</span>
+                ) : (
+                  <button className="btn btn-sm btn-primary" disabled={!ready} onClick={() => onClaim(m.id)}>
+                    Récupérer
+                  </button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
       </section>
 
       <section className="section">

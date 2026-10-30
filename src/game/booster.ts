@@ -1,4 +1,5 @@
 import { CARDS_BY_RARITY, type Card } from "./cards";
+import { SECRET_CHANCE } from "./economy";
 import { RARITIES, type Rarity } from "./rarities";
 
 export const CARDS_PER_BOOSTER = 5;
@@ -8,6 +9,10 @@ export interface Pull {
   id: number;
   cards: Card[];
   fresh: Set<number>;
+  /** Fiches sorties en version Top secret, par emplacement. */
+  secret: boolean[];
+  /** Fiches qui figuraient dans les avis de recherche. */
+  wanted: Set<number>;
 }
 
 function pick<T>(items: T[]): T {
@@ -34,6 +39,9 @@ export function openBooster(): Card[] {
   }
   return cards;
 }
+
+/** Tire, pour chaque fiche, si elle sort en version Top secret. */
+export const rollSecrets = (n: number) => Array.from({ length: n }, () => Math.random() < SECRET_CHANCE);
 
 /** Probabilité d'une classe sur un emplacement normal, en %. */
 export function slotOdds(r: Rarity) {

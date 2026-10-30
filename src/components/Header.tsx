@@ -7,12 +7,13 @@ interface Props {
   page: Page;
   onNavigate: (p: Page) => void;
   boosters: number;
+  ink: number;
   nextIn: number;
   /** Nombre de dossiers liés prêts à être agrafés. */
   readyLinks: number;
 }
 
-export function Header({ page, onNavigate, boosters, nextIn, readyLinks }: Props) {
+export function Header({ page, onNavigate, boosters, ink, nextIn, readyLinks }: Props) {
   return (
     <header className="header">
       <button className="wordmark" onClick={() => onNavigate("home")}>
@@ -39,6 +40,9 @@ export function Header({ page, onNavigate, boosters, nextIn, readyLinks }: Props
           Dossiers <strong>{boosters}</strong>/{MAX_BOOSTERS}
         </span>
         {boosters < MAX_BOOSTERS && <span className="header-timer">+1 dans {formatDuration(nextIn)}</span>}
+        <span className="header-ink">
+          Encre <strong>{ink}</strong>
+        </span>
       </div>
     </header>
   );

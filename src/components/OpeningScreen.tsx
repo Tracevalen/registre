@@ -63,11 +63,11 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onClose, onShowArch
             {pull.cards.map((card, i) => (
               <div
                 key={i}
-                className={`pull-slot class-${card.rarity} ${revealed[i] ? "is-revealed" : ""}`}
+                className={`pull-slot class-${card.rarity} ${pull.secret[i] ? "is-secret" : ""} ${revealed[i] ? "is-revealed" : ""}`}
                 style={{ animationDelay: `${i * 80}ms` }}
               >
                 <div className="pull-card">
-                  <Fiche card={card} />
+                  <Fiche card={card} secret={pull.secret[i]} />
                   <button
                     className="cover"
                     onClick={() => reveal(i)}
@@ -95,6 +95,8 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onClose, onShowArch
                         Classe {card.rarity} · {RARITY_BY_ID[card.rarity].name}
                       </span>
                       {pull.fresh.has(card.id) && <span className="tag-new">Nouvelle</span>}
+                      {pull.secret[i] && <span className="tag-secret">Top secret</span>}
+                      {pull.wanted.has(card.id) && <span className="tag-wanted">Recherchée</span>}
                     </>
                   ) : (
                     <span>Cliquer pour déclassifier</span>

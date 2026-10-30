@@ -1,22 +1,28 @@
 /* ==================================================================
-   REGISTRE — identité « archive » : blanc, noir, un seul vert acide.
+   REGISTRE — identité « archive » : papier, bleu carbone, chemise kraft,
+   tampon rouge. Chaque classe a sa couleur d'encre.
    Grille stricte, typo grotesque (Archivo, largeur variable) + mono.
    ================================================================== */
 
 :root {
-  --bg: #f4f4f1;
+  --bg: #eceef2; /* papier d'archive, légèrement bleuté */
   --surface: #ffffff;
-  --ink: #0b0b0b;
-  --ink-2: #5e5e5a;
-  --hair: #d9d9d4;
-  --acid: #c8ff00;
+  --ink: #1b2348; /* bleu carbone */
+  --ink-2: #5a6180;
+  --hair: #d3d8e3;
+  --accent: #3550d8; /* encre de stylo, actions */
+  --accent-soft: #dfe5ff; /* surlignage au survol */
+  --stamp: #d1453b; /* tampon rouge */
+  --manila: #e8cf92; /* chemise kraft des dossiers */
+  --night: #121a38; /* bureau de nuit, écran d'ouverture */
+  --night-2: #1c2550;
 
-  /* Couleur de chaque classe : un dégradé de gris, et l'acide réservé à A. */
-  --class-E: #e3e3de;
-  --class-D: #a3a39d;
-  --class-C: #55554f;
-  --class-B: #0b0b0b;
-  --class-A: #c8ff00;
+  /* Couleur d'encre de chaque classe */
+  --class-E: #c5cad6;
+  --class-D: #2f9a77;
+  --class-C: #2f6fe0;
+  --class-B: #7a4ad6;
+  --class-A: #e2a52a;
 
   --font: "Archivo Variable", "Helvetica Neue", Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
@@ -30,7 +36,7 @@
 }
 .class-D {
   --k: var(--class-D);
-  --k-ink: var(--ink);
+  --k-ink: #fff;
 }
 .class-C {
   --k: var(--class-C);
@@ -123,8 +129,9 @@ p {
 }
 
 .btn-primary:not(:disabled):hover {
-  background: var(--acid);
-  color: var(--ink);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 
 .btn-inverse {
@@ -148,7 +155,7 @@ p {
 }
 
 .link:hover {
-  background: var(--acid);
+  background: var(--accent-soft);
 }
 
 /* ---------- En-tête ---------- */
@@ -185,7 +192,7 @@ p {
   content: "";
   width: 14px;
   height: 14px;
-  background: var(--acid);
+  background: var(--stamp);
   outline: 1.5px solid var(--ink);
 }
 
@@ -374,13 +381,13 @@ button.fiche:focus-visible .fiche-inner {
 
 /* E — courant : papier gris, photo désaturée */
 .fiche.class-E .fiche-inner {
-  background: #f7f7f4;
-  border-color: #b9b9b3;
-  color: #3a3a37;
+  background: #f6f7fa;
+  border-color: #b8bfd0;
+  color: #2b3358;
 }
 
 .fiche.class-E .fiche-class {
-  outline: 1px solid #3a3a37;
+  outline: 1px solid #2b3358;
   outline-offset: -1px;
 }
 
@@ -408,16 +415,16 @@ button.fiche:focus-visible .fiche-inner {
   color: var(--ink);
 }
 
-/* A — mythique : fiche acide avec reflet */
+/* A — mythique : fiche dorée avec reflet */
 .fiche.class-A .fiche-inner {
-  background: var(--acid);
+  background: var(--class-A);
   border: 1.5px solid var(--ink);
-  box-shadow: 0 14px 30px -14px rgba(120, 160, 0, 0.9);
+  box-shadow: 0 14px 30px -14px rgba(176, 120, 10, 0.85);
 }
 
 .fiche.class-A .fiche-class {
   background: var(--ink);
-  color: var(--acid);
+  color: var(--class-A);
 }
 
 .fiche.class-A .fiche-inner::after {
@@ -480,7 +487,7 @@ button.fiche:focus-visible .fiche-inner {
   width: 42%;
   height: 23px;
   padding: 4px 10px 0;
-  background: var(--surface);
+  background: var(--manila);
   border: 1.5px solid var(--ink);
   border-bottom: 0;
   font-size: 10px;
@@ -492,7 +499,7 @@ button.fiche:focus-visible .fiche-inner {
   display: flex;
   flex-direction: column;
   padding: 6cqw;
-  background: var(--surface);
+  background: var(--manila);
   border: 1.5px solid var(--ink);
   transition:
     transform 0.55s cubic-bezier(0.6, 0, 0.8, 0.4),
@@ -546,7 +553,8 @@ button.fiche:focus-visible .fiche-inner {
   align-items: center;
   height: 15cqw;
   padding: 0 7cqw;
-  background: var(--acid);
+  background: var(--stamp);
+  color: #fff;
   border: 1.5px solid var(--ink);
   transform: rotate(-5deg);
   font-size: 4.4cqw;
@@ -767,7 +775,7 @@ button.fiche:focus-visible .fiche-inner {
 }
 
 .class-A .progress-fill {
-  background: var(--acid);
+  background: var(--class-A);
   box-shadow: inset 0 0 0 1px var(--ink);
 }
 
@@ -815,11 +823,11 @@ button.fiche:focus-visible .fiche-inner {
 }
 
 .table tr.is-clickable:hover td {
-  background: var(--acid);
+  background: var(--accent-soft);
 }
 
 .table tr.is-missing td {
-  color: #9a9a95;
+  color: #9aa0b4;
 }
 
 .table-wrap {
@@ -910,7 +918,7 @@ button.fiche:focus-visible .fiche-inner {
 }
 
 .segmented button:hover {
-  background: var(--acid);
+  background: var(--accent-soft);
 }
 
 .segmented button.is-active {
@@ -919,7 +927,7 @@ button.fiche:focus-visible .fiche-inner {
 }
 
 .segmented button.is-active .mono {
-  color: #b5b5b0;
+  color: #b9bfd6;
 }
 
 .toolbar {
@@ -942,7 +950,7 @@ button.fiche:focus-visible .fiche-inner {
 }
 
 .field:focus-visible {
-  outline: 2px solid var(--acid);
+  outline: 2px solid var(--accent);
   outline-offset: 0;
 }
 
@@ -1020,8 +1028,8 @@ button.fiche:focus-visible .fiche-inner {
   aspect-ratio: 5 / 7;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  border: 1px dashed #9a9a95;
-  background: repeating-linear-gradient(-45deg, transparent 0 9px, rgba(11, 11, 11, 0.03) 9px 10px);
+  border: 1px dashed #9aa0b4;
+  background: repeating-linear-gradient(-45deg, transparent 0 9px, rgba(27, 35, 72, 0.03) 9px 10px);
   color: var(--ink-2);
 }
 
@@ -1065,7 +1073,7 @@ button.fiche:focus-visible .fiche-inner {
 
 .empty-fiche-series {
   padding: 3cqw 4cqw;
-  border-top: 1px dashed #9a9a95;
+  border-top: 1px dashed #9aa0b4;
   font-size: 4.8cqw;
   white-space: nowrap;
   overflow: hidden;
@@ -1091,7 +1099,7 @@ button.fiche:focus-visible .fiche-inner {
   padding-bottom: 40px;
   overflow-y: auto;
   color: var(--bg);
-  background-color: var(--ink);
+  background-color: var(--night);
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
@@ -1129,7 +1137,7 @@ button.fiche:focus-visible .fiche-inner {
 }
 
 .opening-close:hover {
-  color: var(--acid);
+  color: var(--manila);
 }
 
 .opening-dossier {
@@ -1195,7 +1203,7 @@ button.fiche:focus-visible .fiche-inner {
   justify-content: space-between;
   padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.22);
-  background: #161616;
+  background: var(--night-2);
   text-align: left;
   cursor: pointer;
   transition:
@@ -1217,7 +1225,7 @@ button.fiche:focus-visible .fiche-inner {
 .cover-lines i {
   display: block;
   height: 10px;
-  background: #2a2a2a;
+  background: #2a3463;
 }
 
 .cover-lines i:nth-child(1) {
@@ -1234,24 +1242,24 @@ button.fiche:focus-visible .fiche-inner {
 }
 
 .cover-label {
-  color: #8a8a85;
+  color: #8d93ab;
   font-size: 11px;
   line-height: 1.6;
 }
 
-/* Indice avant la révélation : B a un liseré blanc, A pulse en acide. */
+/* Indice avant la révélation : B a un liseré blanc, A pulse en or. */
 .pull-slot.class-B .cover {
   border: 1.5px solid var(--bg);
 }
 
 .pull-slot.class-A .cover {
-  border: 1.5px solid var(--acid);
+  border: 1.5px solid var(--class-A);
   animation: pulse 1.3s ease-in-out infinite;
 }
 
 @keyframes pulse {
   50% {
-    box-shadow: 0 0 0 6px rgba(200, 255, 0, 0.18);
+    box-shadow: 0 0 0 6px rgba(226, 165, 42, 0.25);
   }
 }
 
@@ -1277,8 +1285,8 @@ button.fiche:focus-visible .fiche-inner {
   top: 0;
   z-index: 2;
   height: 2px;
-  background: var(--acid);
-  box-shadow: 0 0 14px 2px rgba(200, 255, 0, 0.7);
+  background: #8ea6ff;
+  box-shadow: 0 0 14px 2px rgba(142, 166, 255, 0.7);
   opacity: 0;
   pointer-events: none;
 }
@@ -1318,7 +1326,7 @@ button.fiche:focus-visible .fiche-inner {
   min-height: 20px;
   margin-top: 12px;
   font-size: 11px;
-  color: #b5b5b0;
+  color: #b9bfd6;
 }
 
 .pull-slot.is-revealed .pull-caption {
@@ -1327,8 +1335,8 @@ button.fiche:focus-visible .fiche-inner {
 
 .tag-new {
   padding: 1px 6px;
-  background: var(--acid);
-  color: var(--ink);
+  background: var(--stamp);
+  color: #fff;
 }
 
 .opening-actions {
@@ -1340,9 +1348,9 @@ button.fiche:focus-visible .fiche-inner {
 }
 
 .opening .btn-primary {
-  background: var(--acid);
+  background: var(--manila);
   color: var(--ink);
-  border-color: var(--acid);
+  border-color: var(--manila);
 }
 
 .opening .btn-primary:not(:disabled):hover {
@@ -1360,7 +1368,7 @@ button.fiche:focus-visible .fiche-inner {
   place-items: center;
   padding: 24px 16px;
   overflow-y: auto;
-  background: rgba(11, 11, 11, 0.72);
+  background: rgba(27, 35, 72, 0.72);
   animation: fade-in 0.15s ease;
 }
 
@@ -1433,7 +1441,7 @@ button.fiche:focus-visible .fiche-inner {
 }
 
 .modal-close:hover {
-  background: var(--acid);
+  background: var(--accent-soft);
 }
 
 /* ---------- Responsive ---------- */
@@ -1537,9 +1545,9 @@ button.fiche:focus-visible .fiche-inner {
 
 /* ---------- Dossiers liés ---------- */
 
-/* S — hors classe : réservé aux dossiers liés, bande de scellé noir et acide */
+/* S — hors classe : réservé aux dossiers liés, bande de scellé or et rouge */
 :root {
-  --class-S: repeating-linear-gradient(-45deg, var(--acid) 0 5px, var(--ink) 5px 10px);
+  --class-S: repeating-linear-gradient(-45deg, var(--class-A) 0 5px, var(--stamp) 5px 10px);
 }
 
 .class-S {
@@ -1547,13 +1555,13 @@ button.fiche:focus-visible .fiche-inner {
   --k-ink: var(--ink);
 }
 
-/* Puce S : lettre acide sur noir, cadre de scellé */
+/* Puce S : lettre dorée sur carbone, cadre de scellé rouge */
 .class-chip.class-S {
   background: var(--ink);
-  color: var(--acid);
+  color: var(--class-A);
   outline: none;
   box-shadow:
-    0 0 0 2px var(--acid),
+    0 0 0 2px var(--stamp),
     0 0 0 3px var(--ink);
 }
 
@@ -1569,9 +1577,9 @@ button.fiche:focus-visible .fiche-inner {
   min-width: 18px;
   height: 18px;
   padding: 0 4px;
-  background: var(--acid);
-  color: var(--ink);
-  outline: 1px solid var(--ink);
+  background: var(--stamp);
+  color: #fff;
+  outline: none;
   font-size: 11px;
   font-weight: 600;
 }
@@ -1608,7 +1616,7 @@ button.fiche:focus-visible .fiche-inner {
   width: 6.5cqw;
   height: 17cqw;
   fill: none;
-  stroke: #8a8a85;
+  stroke: #8d93ab;
   stroke-width: 2.4;
   stroke-linecap: round;
   transform: rotate(-6deg);
@@ -1632,29 +1640,29 @@ button.fiche:focus-visible .fiche-inner {
   bottom: 5cqw;
   padding: 1.2cqw 2.4cqw;
   border: 0.8cqw solid currentColor;
-  background: var(--acid);
-  color: var(--ink);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--stamp);
   font-family: var(--mono);
   font-size: 4.4cqw;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   transform: rotate(-7deg);
-  box-shadow: 0 0 0 0.6cqw var(--acid);
-}
-
-.fiche.class-A .linked-stamp {
-  background: var(--ink);
-  color: var(--acid);
   box-shadow: none;
 }
 
-/* S — fiche noire, encre acide, bord de scellé */
+.fiche.class-A .linked-stamp {
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--stamp);
+  box-shadow: none;
+}
+
+/* S — fiche carbone, encre dorée, bord de scellé */
 .fiche.class-S .fiche-inner {
   background: var(--ink);
-  color: var(--acid);
+  color: var(--class-A);
   border: 0;
-  box-shadow: 0 16px 34px -14px rgba(120, 160, 0, 0.95);
+  box-shadow: 0 16px 34px -14px rgba(176, 120, 10, 0.9);
 }
 
 .fiche.class-S .fiche-inner::before {
@@ -1683,7 +1691,7 @@ button.fiche:focus-visible .fiche-inner {
 }
 
 .fiche.class-S .fiche-class {
-  background: var(--acid);
+  background: var(--class-A);
   color: var(--ink);
 }
 
@@ -1760,13 +1768,13 @@ button.fiche:focus-visible .fiche-inner {
 
 .link-item.is-classified:not(.is-archived) {
   border-style: dashed;
-  border-color: #9a9a95;
-  background: repeating-linear-gradient(-45deg, transparent 0 9px, rgba(11, 11, 11, 0.03) 9px 10px);
+  border-color: #9aa0b4;
+  background: repeating-linear-gradient(-45deg, transparent 0 9px, rgba(27, 35, 72, 0.03) 9px 10px);
   color: var(--ink-2);
 }
 
 .link-item.is-ready {
-  outline: 3px solid var(--acid);
+  outline: 3px solid var(--accent);
   outline-offset: -1px;
 }
 
@@ -1844,8 +1852,8 @@ button.fiche:focus-visible .fiche-inner {
 
 .link-piece-thumb.is-missing {
   border-style: dashed;
-  border-color: #9a9a95;
-  background: repeating-linear-gradient(-45deg, transparent 0 4px, rgba(11, 11, 11, 0.08) 4px 5px);
+  border-color: #9aa0b4;
+  background: repeating-linear-gradient(-45deg, transparent 0 4px, rgba(27, 35, 72, 0.08) 4px 5px);
   cursor: default;
 }
 
@@ -1881,8 +1889,8 @@ button.fiche:focus-visible .fiche-inner {
 
 .link-pieces li.is-ok .link-piece-count {
   padding: 1px 5px;
-  background: var(--acid);
-  color: var(--ink);
+  background: var(--class-D);
+  color: #fff;
 }
 
 .link-item-foot {
@@ -1935,8 +1943,9 @@ button.fiche:focus-visible .fiche-inner {
 .dialog-warning {
   margin-top: 16px;
   padding: 10px 12px;
-  background: var(--ink);
-  color: var(--acid);
+  background: #fdecea;
+  color: var(--stamp);
+  border-left: 3px solid var(--stamp);
   line-height: 1.5;
 }
 
@@ -1954,5 +1963,236 @@ button.fiche:focus-visible .fiche-inner {
 
   .modal-panel.dialog {
     padding: 28px 20px 20px;
+  }
+}
+
+/* ==================================================================
+   Encre, broyeuse, Top secret, avis de recherche, enquêtes du jour
+   ================================================================== */
+
+.header-ink strong {
+  color: var(--accent);
+}
+
+/* Exemplaire Top secret : tampon rouge en travers du portrait */
+.fiche-img {
+  position: relative;
+}
+
+.secret-stamp {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  padding: 1.6cqw 4cqw;
+  border: 1cqw double var(--stamp);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--stamp);
+  font-family: var(--mono);
+  font-size: 6cqw;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: translate(-50%, -50%) rotate(-12deg);
+  pointer-events: none;
+}
+
+.fiche.is-secret .fiche-inner {
+  outline: 0.8cqw solid var(--stamp);
+  outline-offset: -0.8cqw;
+}
+
+.pull-slot.is-secret .cover {
+  border: 1.5px solid var(--stamp);
+}
+
+.tag-secret,
+.tag-wanted {
+  margin-left: 8px;
+  padding: 1px 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.tag-secret {
+  border: 1px solid var(--stamp);
+  color: var(--stamp);
+}
+
+.opening .tag-secret {
+  background: var(--stamp);
+  color: #fff;
+}
+
+.tag-wanted {
+  background: var(--manila);
+  color: var(--ink);
+}
+
+/* Fiches non archivées : cliquables pour l'avis de recherche ou la demande d'accès */
+button.empty-fiche {
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.empty-fiche:hover {
+  border-style: solid;
+  border-color: var(--accent);
+}
+
+.empty-fiche.is-wanted {
+  border: 1.5px solid var(--ink);
+  background: var(--manila);
+  color: var(--ink);
+}
+
+.modal-empty {
+  container-type: inline-size;
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 24px 0 8px;
+}
+
+.btn.is-on {
+  background: var(--manila);
+}
+
+.modal-hint {
+  margin-bottom: 16px;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+/* Broyeuse */
+.shredder {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+  margin: 8px 0 24px;
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-left: 4px solid var(--accent);
+}
+
+.shredder p {
+  max-width: 62ch;
+  margin-top: 4px;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.shredder-side {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ink-count {
+  color: var(--ink-2);
+}
+
+.ink-count strong {
+  color: var(--accent);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* Enquêtes du jour */
+.missions {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mission {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(80px, 200px) auto 120px;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--hair);
+}
+
+.mission.is-ready {
+  border-color: var(--accent);
+  box-shadow: inset 4px 0 0 var(--accent);
+}
+
+.mission.is-claimed {
+  background: transparent;
+  color: var(--ink-2);
+}
+
+.mission-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mission-text .mono {
+  color: var(--ink-2);
+}
+
+.mission-track {
+  height: 6px;
+  background: var(--hair);
+}
+
+.mission-fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s;
+}
+
+.mission-count {
+  text-align: right;
+}
+
+.mission .btn {
+  width: 100%;
+}
+
+.mission-stamp {
+  justify-self: center;
+  padding: 3px 8px;
+  border: 2px solid var(--class-D);
+  color: var(--class-D);
+  font-weight: 600;
+  transform: rotate(-6deg);
+}
+
+@media (max-width: 640px) {
+  .mission {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 16px;
+  }
+
+  .mission-track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .mission .btn,
+  .mission-stamp {
+    grid-column: 1 / -1;
+  }
+
+  .header-ink {
+    display: none;
   }
 }

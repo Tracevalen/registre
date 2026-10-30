@@ -6,13 +6,14 @@ import { OpeningScreen } from "./components/OpeningScreen";
 import { FicheModal } from "./components/FicheModal";
 import { LinksPage } from "./components/LinksPage";
 import { LinkModal } from "./components/LinkModal";
-import { openBooster, type Pull } from "./game/booster";
+import { openBooster, rollSecrets, type Pull } from "./game/booster";
 import type { Card } from "./game/cards";
 import { canFuse, LINKS, type Link } from "./game/links";
 import { useSave } from "./game/store";
 
 export default function App() {
-  const { save, spendBooster, fuse, setKeepOne, reset, nextIn } = useSave();
+  const { save, spendBooster, fuse, shred, request, toggleWanted, claim, setKeepOne, reset, nextIn } =
+    useSave();
   const [page, setPage] = useState<Page>("home");
   const [pull, setPull] = useState<Pull | null>(null);
   const [focus, setFocus] = useState<Card | null>(null);
@@ -29,9 +30,11 @@ export default function App() {
   const open = () => {
     if (save.boosters <= 0) return;
     const cards = openBooster();
+    const secret = rollSecrets(cards.length);
     const fresh = new Set(cards.filter((c) => !save.owned[c.id]).map((c) => c.id));
-    spendBooster(cards.map((c) => c.id));
-    setPull({ id: save.opened + 1, cards, fresh });
+    const wanted = new Set(cards.filter((c) => save.wanted.includes(c.id)).map((c) => c.id));
+    spendBooster(cards, secret);
+    setPull({ id: save.opened + 1, cards, fresh, secret, wanted });
   };
 
   return (
@@ -40,6 +43,7 @@ export default function App() {
         page={page}
         onNavigate={setPage}
         boosters={save.boosters}
+        ink={save.ink}
         nextIn={nextIn}
         readyLinks={readyLinks}
       />
@@ -52,9 +56,10 @@ export default function App() {
             onOpen={open}
             onShowArchive={() => setPage("archive")}
             onFocus={setFocus}
+            onClaim={claim}
           />
         ) : page === "archive" ? (
-          <ArchivePage save={save} onFocus={setFocus} onReset={reset} />
+          <ArchivePage save={save} onFocus={setFocus} onShredAll={() => shred()} onReset={reset} />
         ) : (
           <LinksPage
             save={save}
@@ -83,9 +88,11 @@ export default function App() {
       {focus && (
         <FicheModal
           card={focus}
-          count={save.owned[focus.id] ?? 0}
-          firstSeen={save.firstSeen[focus.id]}
+          save={save}
           onClose={() => setFocus(null)}
+          onShred={(c) => shred([c.id])}
+          onRequest={request}
+          onToggleWanted={(c) => toggleWanted(c.id)}
         />
       )}
 

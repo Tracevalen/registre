@@ -4958,3 +4958,38 @@ button.empty-fiche:hover {
     bottom: max(16px, env(safe-area-inset-bottom, 0px));
   }
 }
+
+/* Rien ne doit élargir l'écran d'ouverture au-delà de l'écran du téléphone */
+.opening {
+  overflow-x: hidden;
+}
+
+.opening-bar {
+  min-width: 0;
+  max-width: 100vw;
+}
+
+.opening-bar > * {
+  flex: none;
+  white-space: nowrap;
+}
+
+.opening-bar > span:first-child {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 640px) {
+  .opening-dossier {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    padding-inline: 16px;
+  }
+
+  .opening-dossier .dossier {
+    width: min(260px, 70vw);
+  }
+}

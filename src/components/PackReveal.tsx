@@ -88,20 +88,35 @@ export function PackReveal({ card, secret, fresh, dossierNumber, batch, onDone }
 
   // Bande-son synchronisée sur chaque étape
   useEffect(() => {
-    if (phase === "charge") sound.charge(CHARGE_MS[card.rarity] / 1000);
+    // La musique remplace la nappe synthétique ; on garde les impacts par-dessus.
+    if (phase === "charge") sound.playMusic();
     if (phase === "burst") sound.burst();
     if (phase === "spin") sound.spin(SPIN_MS / 1000);
     if (phase === "show") sound.land(card.rarity);
   }, [phase, card.rarity]);
 
+  // Une fois la carte posée, la musique s'éteint doucement.
   useEffect(() => {
-    if (phase === "clue") sound.clue(clue);
+    if (phase !== "show") return;
+    const t = setTimeout(() => sound.fadeOutMusic(1.5), 2500);
+    return () => clearTimeout(t);
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase === "clue") sound.clue();
   }, [phase, clue]);
 
-  useEffect(() => () => sound.stopAll(), []);
+  useEffect(
+    () => () => {
+      sound.stopAll();
+      sound.fadeOutMusic(0.4);
+    },
+    [],
+  );
 
   const toggleSound = () => {
     sound.setMuted(!muted);
+    sound.syncMusicMute();
     setMutedState(!muted);
   };
 

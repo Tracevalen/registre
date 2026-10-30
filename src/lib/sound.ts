@@ -70,15 +70,6 @@ function out(node: AudioNode) {
   node.connect(r);
 }
 
-/** Notes de l'accord final selon la rareté : plus c'est rare, plus c'est grand. */
-const CHORD: Record<Rarity, number[]> = {
-  E: [220, 277.2, 329.6],
-  D: [246.9, 311.1, 370],
-  C: [261.6, 329.6, 392, 523.3],
-  B: [293.7, 370, 440, 587.3, 740],
-  A: [329.6, 415.3, 493.9, 659.3, 830.6, 987.8],
-};
-
 let stopCharge: (() => void) | null = null;
 
 /** Montée en tension : souffle qui monte, nappe grave et battements qui accélèrent. */
@@ -168,7 +159,7 @@ export function burst() {
 }
 
 /** Apparition d'un indice : souffle rapide et coup de tambour. */
-export function clue(index: number) {
+export function clue() {
   const { ctx: c } = audio();
   const t = c.currentTime;
   const n = noise(c, 0.5);
@@ -185,18 +176,6 @@ export function clue(index: number) {
   out(g);
   n.start(t);
   kick(t + 0.3, 0.8);
-  // Une note qui monte à chaque indice
-  const o = c.createOscillator();
-  o.type = "triangle";
-  o.frequency.value = [392, 523.3, 659.3][index % 3];
-  const og = c.createGain();
-  og.gain.setValueAtTime(0.001, t + 0.3);
-  og.gain.exponentialRampToValueAtTime(0.18, t + 0.32);
-  og.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
-  o.connect(og);
-  out(og);
-  o.start(t + 0.3);
-  o.stop(t + 1.5);
 }
 
 /** La carte tourne : arpège scintillant qui monte. */
@@ -220,35 +199,66 @@ export function spin(seconds: number) {
   });
 }
 
-/** La carte atterrit : impact et grand accord, plus riche pour les fiches rares. */
+/** La carte atterrit : impact et coup de cymbale, plus long pour les fiches rares. */
 export function land(rarity: Rarity) {
   const { ctx: c } = audio();
   const t = c.currentTime;
   kick(t, 1);
-  CHORD[rarity].forEach((f, i) => {
-    for (const detune of [-7, 7]) {
-      const o = c.createOscillator();
-      o.type = "sawtooth";
-      o.frequency.value = f;
-      o.detune.value = detune;
-      const lp = c.createBiquadFilter();
-      lp.type = "lowpass";
-      lp.frequency.setValueAtTime(800, t);
-      lp.frequency.exponentialRampToValueAtTime(4000, t + 0.3);
-      const g = c.createGain();
-      g.gain.setValueAtTime(0.001, t + i * 0.03);
-      g.gain.exponentialRampToValueAtTime(0.07, t + i * 0.03 + 0.05);
-      g.gain.exponentialRampToValueAtTime(0.001, t + 3.5);
-      o.connect(lp).connect(g);
-      out(g);
-      o.start(t);
-      o.stop(t + 3.6);
-    }
-  });
+  const tail = { E: 0.8, D: 1, C: 1.4, B: 1.9, A: 2.6 }[rarity];
+  const n = noise(c, tail + 0.2);
+  const hp = c.createBiquadFilter();
+  hp.type = "highpass";
+  hp.frequency.value = 5000;
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.35, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + tail);
+  n.connect(hp).connect(g);
+  out(g);
+  n.start(t);
 }
 
 /** Coupe tout son en cours (fermeture de l'écran, bouton Passer). */
 export function stopAll() {
   stopCharge?.();
   stopCharge = null;
+}
+
+// ---------- Musique de l'ouverture (extrait de « Killcam », 0:58 à 1:08) ----------
+
+let music: HTMLAudioElement | null = null;
+let fadeTimer: ReturnType<typeof setInterval> | undefined;
+const MUSIC_VOLUME = 0.8;
+
+/** Lance la musique depuis le début de l'extrait. */
+export function playMusic() {
+  clearInterval(fadeTimer);
+  if (!music) {
+    music = new Audio("./sons/ouverture.mp3");
+    music.preload = "auto";
+  }
+  music.currentTime = 0;
+  music.volume = isMuted() ? 0 : MUSIC_VOLUME;
+  void music.play().catch(() => {
+    /* lecture refusée par le navigateur : l'animation continue sans musique */
+  });
+}
+
+/** Baisse la musique jusqu'au silence, puis l'arrête. */
+export function fadeOutMusic(seconds = 1.2) {
+  const m = music;
+  if (!m || m.paused) return;
+  clearInterval(fadeTimer);
+  const step = m.volume / (seconds * 20);
+  fadeTimer = setInterval(() => {
+    m.volume = Math.max(0, m.volume - step);
+    if (m.volume <= 0) {
+      clearInterval(fadeTimer);
+      m.pause();
+    }
+  }, 50);
+}
+
+/** Applique le bouton « Son coupé » à la musique en cours. */
+export function syncMusicMute() {
+  if (music) music.volume = isMuted() ? 0 : MUSIC_VOLUME;
 }

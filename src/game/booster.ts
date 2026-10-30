@@ -59,6 +59,22 @@ export function openBooster({ guaranteeA = false, pool }: BoosterOptions = {}): 
   return cards;
 }
 
+/**
+ * Range les fiches d'un tirage de la plus rare à la plus courante (Mythique d'abord).
+ * À classe égale, les Top secret passent devant, puis les plus populaires.
+ */
+export function sortByRarity(cards: Card[], secret: boolean[]) {
+  const order = cards
+    .map((card, i) => ({ card, secret: secret[i] }))
+    .sort(
+      (a, b) =>
+        rarityRank(b.card.rarity) - rarityRank(a.card.rarity) ||
+        Number(b.secret) - Number(a.secret) ||
+        b.card.favourites - a.card.favourites,
+    );
+  return { cards: order.map((o) => o.card), secret: order.map((o) => o.secret) };
+}
+
 /** Tire, pour chaque fiche, si elle sort en version Top secret. */
 export const rollSecrets = (n: number) => Array.from({ length: n }, () => Math.random() < SECRET_CHANCE);
 

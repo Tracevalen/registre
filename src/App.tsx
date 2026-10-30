@@ -6,7 +6,7 @@ import { OpeningScreen } from "./components/OpeningScreen";
 import { FicheModal } from "./components/FicheModal";
 import { LinksPage } from "./components/LinksPage";
 import { LinkModal } from "./components/LinkModal";
-import { openBooster, PITY_LIMIT, rollSecrets, type Pull } from "./game/booster";
+import { openBooster, PITY_LIMIT, rollSecrets, sortByRarity, type Pull } from "./game/booster";
 import type { Card } from "./game/cards";
 import { canFuse, LINKS, type Link } from "./game/links";
 import { ALBUMS, specialSeries } from "./game/series";
@@ -56,7 +56,7 @@ export default function App() {
     const fresh = new Set(cards.filter((c) => !save.owned[c.id]).map((c) => c.id));
     const wanted = new Set(cards.filter((c) => save.wanted.includes(c.id)).map((c) => c.id));
     spendBooster(cards, secret, special);
-    setPull({ id: save.opened + 1, cards, fresh, secret, wanted });
+    setPull({ id: save.opened + 1, ...sortByRarity(cards, secret), fresh, wanted });
   };
 
   /** Ouvre tous les dossiers en stock d'un coup, fiches déjà révélées. */
@@ -85,7 +85,7 @@ export default function App() {
       secret.push(...batchSecret);
     }
     const wanted = new Set(cards.filter((c) => save.wanted.includes(c.id)).map((c) => c.id));
-    setPull({ id: save.opened + 1, cards, fresh, secret, wanted, batch: n });
+    setPull({ id: save.opened + 1, ...sortByRarity(cards, secret), fresh, wanted, batch: n });
   };
 
   return (

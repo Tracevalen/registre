@@ -2829,3 +2829,288 @@ button.fiche:hover {
     width: 100%;
   }
 }
+
+/* ---------- Affaire du jour, grades ---------- */
+
+.nav-dot {
+  width: 8px;
+  height: 8px;
+  margin-left: 6px;
+  border-radius: 999px;
+  background: var(--stamp);
+  box-shadow: 0 0 0 3px rgba(255, 92, 122, 0.25);
+}
+
+.header-grade {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-2);
+}
+
+.header-grade-bar {
+  width: 48px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--hair);
+  overflow: hidden;
+}
+
+.header-grade-bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.pill-grade .pill-icon {
+  background: rgba(139, 123, 255, 0.18);
+  color: var(--accent-2);
+}
+
+.affaire-teaser {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 92, 122, 0.35);
+  border-radius: 18px;
+  background:
+    radial-gradient(400px 160px at 0% 50%, rgba(255, 92, 122, 0.18), transparent 70%), var(--surface);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.affaire-teaser.is-done {
+  border-color: var(--hair);
+  background: var(--surface);
+}
+
+.affaire-teaser-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(255, 92, 122, 0.16);
+  color: var(--stamp);
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.affaire-teaser-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.affaire-teaser-text span {
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.affaire-teaser-cta {
+  flex: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--stamp);
+  color: #fff;
+  font-weight: 700;
+}
+
+.affaire-teaser.is-done .affaire-teaser-cta {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.affaire {
+  padding-top: 28px;
+}
+
+.affaire-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(20px, 4vw, 48px);
+  padding: clamp(20px, 4vw, 40px);
+  border: 1px solid rgba(255, 92, 122, 0.3);
+  border-radius: 24px;
+  background:
+    radial-gradient(500px 300px at 0% 50%, rgba(255, 92, 122, 0.2), transparent 70%),
+    linear-gradient(180deg, #151826, #0e1019);
+}
+
+.affaire-photo {
+  position: relative;
+  width: clamp(140px, 22vw, 230px);
+  aspect-ratio: 5 / 7;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface-2);
+}
+
+.affaire-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  transform: scale(1.12);
+  transition: filter 0.6s ease;
+}
+
+.affaire-stamp {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  padding: 4px 10px;
+  border: 2px solid var(--stamp);
+  background: rgba(11, 12, 18, 0.7);
+  color: var(--stamp);
+  font-weight: 600;
+  white-space: nowrap;
+  transform: translate(-50%, -50%) rotate(-10deg);
+}
+
+.affaire-search {
+  position: relative;
+  max-width: 460px;
+  margin-top: 24px;
+}
+
+.affaire-search .field {
+  width: 100%;
+  height: 52px;
+  font-size: 16px;
+}
+
+.affaire-suggest {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-2);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.8);
+}
+
+.affaire-suggest button {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.affaire-suggest button:hover,
+.affaire-suggest button:focus-visible {
+  background: var(--accent-soft);
+}
+
+.affaire-suggest span {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.affaire-table {
+  display: grid;
+  gap: 8px;
+  margin-top: 24px;
+  overflow-x: auto;
+}
+
+.affaire-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.4fr) minmax(120px, 1.6fr) 80px 120px 80px;
+  gap: 8px;
+  align-items: stretch;
+  min-width: 600px;
+}
+
+.affaire-head {
+  color: var(--ink-2);
+}
+
+.affaire-name {
+  align-self: center;
+  font-weight: 700;
+}
+
+.hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 10px 8px;
+  border-radius: 10px;
+  font-family: var(--mono);
+  font-size: 13px;
+  text-align: center;
+  animation: flip 0.4s ease both;
+}
+
+.hint-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hint-match {
+  background: rgba(47, 208, 140, 0.2);
+  color: #7ff0bd;
+  box-shadow: inset 0 0 0 1px rgba(47, 208, 140, 0.5);
+}
+
+.hint-up,
+.hint-down {
+  background: rgba(255, 196, 77, 0.16);
+  color: #ffd98a;
+  box-shadow: inset 0 0 0 1px rgba(255, 196, 77, 0.4);
+}
+
+.hint-miss {
+  background: var(--surface);
+  color: var(--ink-2);
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+
+@keyframes flip {
+  from {
+    opacity: 0;
+    transform: rotateX(80deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .affaire-hero {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .header-grade {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint {
+    animation: none;
+  }
+}

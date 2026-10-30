@@ -5,6 +5,8 @@ import { canFuse, type Link } from "./links";
 import { dayKey, missionsForDay, type Counter } from "./missions";
 import { rarityRank } from "./rarities";
 import { ALBUMS } from "./series";
+import { affaireReward, MAX_GUESSES, suspectOfDay } from "./affaire";
+import { GRADE_BOOSTERS, gradeIndex, XP } from "./grades";
 
 // Sauvegarde locale (navigateur). À remplacer par un backend quand il y aura des comptes.
 
@@ -17,6 +19,8 @@ export interface Daily {
   claimed: string[];
   /** Dossier spécial du jour déjà ouvert. */
   special: boolean;
+  /** Affaire du jour : identifiants des personnages proposés. */
+  affaire: { guesses: number[]; done: boolean; won: boolean };
 }
 
 /** Série de connexion : jours consécutifs avec au moins une visite. */
@@ -58,11 +62,19 @@ export interface SaveData {
   streak: Streak;
   /** Albums complets dont la récompense a été récupérée. */
   albumsClaimed: string[];
+  /** Expérience d'enquêteur, qui fait monter en grade. */
+  xp: number;
 }
 
 const KEY = "registre-save-v1";
 
-const freshDaily = (t: number): Daily => ({ day: dayKey(t), counts: {}, claimed: [], special: false });
+const freshDaily = (t: number): Daily => ({
+  day: dayKey(t),
+  counts: {},
+  claimed: [],
+  special: false,
+  affaire: { guesses: [], done: false, won: false },
+});
 
 const fresh = (): SaveData => ({
   owned: {},
@@ -80,6 +92,7 @@ const fresh = (): SaveData => ({
   pity: 0,
   streak: { last: "", days: 0 },
   albumsClaimed: [],
+  xp: 0,
 });
 
 function load(): SaveData {
@@ -132,6 +145,13 @@ function bump(s: SaveData, counter: Counter, n = 1): SaveData {
 }
 
 const CARD_BY_ID = new Map(CARDS.map((c) => [c.id, c]));
+
+/** Ajoute de l'expérience ; chaque nouveau grade offre des dossiers. */
+function gainXp(s: SaveData, n: number): SaveData {
+  const xp = s.xp + n;
+  const levels = gradeIndex(xp) - gradeIndex(s.xp);
+  return { ...s, xp, boosters: s.boosters + Math.max(0, levels) * GRADE_BOOSTERS };
+}
 
 export function useSave() {
   const [save, setSave] = useState(() => recharge(load(), Date.now()));
@@ -186,7 +206,7 @@ export function useSave() {
       next = bump(next, "opened");
       next = bump(next, "fresh", freshCount);
       next = bump(next, "rare", cards.filter((c) => rarityRank(c.rarity) >= rarityRank("C")).length);
-      return next;
+      return gainXp(next, XP.opened + freshCount * XP.freshCard);
     });
   }, []);
 
@@ -200,15 +220,18 @@ export function useSave() {
         owned[c.id] -= 1;
         if ((secret[c.id] ?? 0) > owned[c.id]) secret[c.id] = owned[c.id];
       }
-      return bump(
-        {
-          ...s,
-          owned,
-          secret,
-          linked: { ...s.linked, [link.id]: (s.linked[link.id] ?? 0) + 1 },
-          linkedFirst: { ...s.linkedFirst, [link.id]: s.linkedFirst[link.id] ?? Date.now() },
-        },
-        "fused",
+      return gainXp(
+        bump(
+          {
+            ...s,
+            owned,
+            secret,
+            linked: { ...s.linked, [link.id]: (s.linked[link.id] ?? 0) + 1 },
+            linkedFirst: { ...s.linkedFirst, [link.id]: s.linkedFirst[link.id] ?? Date.now() },
+          },
+          "fused",
+        ),
+        XP.fused,
       );
     });
   }, []);
@@ -262,12 +285,15 @@ export function useSave() {
       const s = rollDay(s0, Date.now());
       const m = missionsForDay(s.daily.day).find((x) => x.id === missionId);
       if (!m || s.daily.claimed.includes(m.id) || (s.daily.counts[m.counter] ?? 0) < m.goal) return s0;
-      return {
-        ...s,
-        boosters: s.boosters + (m.reward.boosters ?? 0),
-        ink: s.ink + (m.reward.ink ?? 0),
-        daily: { ...s.daily, claimed: [...s.daily.claimed, m.id] },
-      };
+      return gainXp(
+        {
+          ...s,
+          boosters: s.boosters + (m.reward.boosters ?? 0),
+          ink: s.ink + (m.reward.ink ?? 0),
+          daily: { ...s.daily, claimed: [...s.daily.claimed, m.id] },
+        },
+        XP.mission,
+      );
     });
   }, []);
 
@@ -277,12 +303,41 @@ export function useSave() {
       const album = ALBUMS.find((a) => a.series === series);
       if (!album || s.albumsClaimed.includes(series)) return s;
       if (!album.cards.every((c) => (s.owned[c.id] ?? 0) > 0)) return s;
-      return {
-        ...s,
-        ink: s.ink + album.reward,
-        boosters: s.boosters + album.bonusBoosters,
-        albumsClaimed: [...s.albumsClaimed, series],
-      };
+      return gainXp(
+        {
+          ...s,
+          ink: s.ink + album.reward,
+          boosters: s.boosters + album.bonusBoosters,
+          albumsClaimed: [...s.albumsClaimed, series],
+        },
+        XP.album,
+      );
+    });
+  }, []);
+
+  /** Propose un personnage pour l'Affaire du jour. */
+  const guessAffaire = useCallback((card: Card) => {
+    setSave((s0) => {
+      const s = rollDay(s0, Date.now());
+      const a = s.daily.affaire;
+      if (a.done || a.guesses.includes(card.id)) return s0;
+      const target = suspectOfDay(s.daily.day);
+      const guesses = [...a.guesses, card.id];
+      const won = card.id === target.id;
+      const done = won || guesses.length >= MAX_GUESSES;
+      let next: SaveData = { ...s, daily: { ...s.daily, affaire: { guesses, done, won } } };
+      if (won) {
+        next = gainXp(
+          {
+            ...next,
+            ink: next.ink + affaireReward(guesses.length),
+            owned: { ...next.owned, [target.id]: (next.owned[target.id] ?? 0) + 1 },
+            firstSeen: { ...next.firstSeen, [target.id]: next.firstSeen[target.id] ?? Date.now() },
+          },
+          XP.affaire,
+        );
+      }
+      return next;
     });
   }, []);
 
@@ -301,6 +356,7 @@ export function useSave() {
     toggleWanted,
     claim,
     claimAlbum,
+    guessAffaire,
     setKeepOne,
     reset,
     nextIn,

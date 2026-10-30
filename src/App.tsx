@@ -12,6 +12,7 @@ import { canFuse, LINKS, type Link } from "./game/links";
 import { ALBUMS, specialSeries } from "./game/series";
 import { useSave } from "./game/store";
 import { AlbumsPage } from "./components/AlbumsPage";
+import { AffairePage } from "./components/AffairePage";
 
 export default function App() {
   const {
@@ -23,6 +24,7 @@ export default function App() {
     toggleWanted,
     claim,
     claimAlbum,
+    guessAffaire,
     setKeepOne,
     reset,
     nextIn,
@@ -66,6 +68,8 @@ export default function App() {
         nextIn={nextIn}
         readyLinks={readyLinks}
         readyAlbums={readyAlbums}
+        affaireOpen={!save.daily.affaire.done}
+        xp={save.xp}
       />
 
       <main className="main">
@@ -75,10 +79,13 @@ export default function App() {
             nextIn={nextIn}
             onOpen={() => open()}
             onOpenSpecial={() => open(true)}
+            onShowAffaire={() => setPage("affaire")}
             onShowArchive={() => setPage("archive")}
             onFocus={setFocus}
             onClaim={claim}
           />
+        ) : page === "affaire" ? (
+          <AffairePage save={save} onGuess={guessAffaire} onFocus={setFocus} />
         ) : page === "albums" ? (
           <AlbumsPage save={save} onFocus={setFocus} onClaim={claimAlbum} />
         ) : page === "archive" ? (

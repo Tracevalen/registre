@@ -3,6 +3,8 @@ import { CARDS_PER_BOOSTER, formatOdds, PITY_LIMIT, slotOdds } from "../game/boo
 import { RARITIES } from "../game/rarities";
 import { formatReward, missionsForDay } from "../game/missions";
 import { specialSeries } from "../game/series";
+import { MAX_GUESSES } from "../game/affaire";
+import { gradeInfo, XP } from "../game/grades";
 import { DAILY_INK, MAX_BOOSTERS, STREAK_BOOSTERS, STREAK_GOAL, type SaveData } from "../game/store";
 import { formatDate, formatDuration, plural } from "../lib/format";
 import { Fiche } from "./Fiche";
@@ -12,15 +14,27 @@ interface Props {
   nextIn: number;
   onOpen: () => void;
   onOpenSpecial: () => void;
+  onShowAffaire: () => void;
   onShowArchive: () => void;
   onFocus: (c: Card) => void;
   onClaim: (missionId: string) => void;
 }
 
-export function HomePage({ save, nextIn, onOpen, onOpenSpecial, onShowArchive, onFocus, onClaim }: Props) {
+export function HomePage({
+  save,
+  nextIn,
+  onOpen,
+  onOpenSpecial,
+  onShowAffaire,
+  onShowArchive,
+  onFocus,
+  onClaim,
+}: Props) {
   const special = specialSeries(save.daily.day);
   const specialHave = special.cards.filter((c) => save.owned[c.id]).length;
   const pityLeft = Math.max(1, PITY_LIMIT - save.pity);
+  const grade = gradeInfo(save.xp);
+  const affaire = save.daily.affaire;
   const streakDay = ((save.streak.days - 1) % STREAK_GOAL) + 1;
   const missions = missionsForDay(save.daily.day);
   const ownedCount = CARDS.filter((c) => save.owned[c.id]).length;
@@ -95,6 +109,13 @@ export function HomePage({ save, nextIn, onOpen, onOpenSpecial, onShowArchive, o
           </strong>
           <span>série de connexion</span>
         </li>
+        <li className="pill pill-grade">
+          <span className="pill-icon">◈</span>
+          <strong>{grade.current.name}</strong>
+          <span>
+            {grade.next ? `${grade.next.xp - save.xp} XP avant ${grade.next.name}` : "grade maximal"}
+          </span>
+        </li>
         <li className="pill pill-collection">
           <span className="pill-icon">◆</span>
           <strong>
@@ -117,6 +138,23 @@ export function HomePage({ save, nextIn, onOpen, onOpenSpecial, onShowArchive, o
           {save.daily.special ? "Déjà ouvert, nouveau dossier demain" : "Ouvrir le dossier spécial"}
         </button>
       </section>
+
+      <button className={`affaire-teaser ${affaire.done ? "is-done" : ""}`} onClick={onShowAffaire}>
+        <span className="affaire-teaser-mark" aria-hidden>
+          ?
+        </span>
+        <span className="affaire-teaser-text">
+          <strong>Affaire du jour</strong>
+          <span>
+            {affaire.done
+              ? affaire.won
+                ? `Résolue en ${affaire.guesses.length}/${MAX_GUESSES}. Reviens demain pour un nouveau suspect.`
+                : "Non résolue. Nouveau suspect demain."
+              : `Identifie le personnage mystère en ${MAX_GUESSES} essais et gagne sa fiche, de l'encre et ${XP.affaire} XP.`}
+          </span>
+        </span>
+        <span className="affaire-teaser-cta">{affaire.done ? "Voir" : "Enquêter"}</span>
+      </button>
 
       <p className="streak-note mono">
         +{DAILY_INK} encre à chaque première visite du jour · +{STREAK_BOOSTERS} dossiers tous les{" "}

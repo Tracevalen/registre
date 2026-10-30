@@ -3116,7 +3116,7 @@ button.fiche:hover {
 }
 
 /* ==================================================================
-   CHARTE v0.2 — nuit bleu marine, accent orange, coins biseautés.
+   CHARTE v0.2 — nuit bleu marine, accent violet, coins biseautés.
    Ce bloc fait foi : il remplace les thèmes précédents.
    ================================================================== */
 
@@ -3131,9 +3131,10 @@ button.fiche:hover {
   --ink: #eef1ff;
   --ink-2: #9aa6d8;
   --ink-3: #5f6ca6;
-  --accent: #ff7a1a;
-  --accent-2: #ff9a4d;
-  --accent-soft: rgba(255, 122, 26, 0.14);
+  --accent: #9b5cff;
+  --accent-2: #b48cff;
+  --accent-soft: rgba(155, 92, 255, 0.16);
+  --on-accent: #ffffff;
   --stamp: #ff3b47;
   --manila: #ffc94d;
   --night: #000a30;
@@ -3142,9 +3143,9 @@ button.fiche:hover {
   --class-E: #7c88b8;
   --class-D: #6fa0ff;
   --class-C: #ff8fc8;
-  --class-B: #b48cff;
+  --class-B: #00e8c6;
   --class-A: #ffc94d;
-  --class-S: linear-gradient(115deg, #ff7a1a, #b48cff 30%, #ff8fc8 55%, #ffc94d 80%, #6fa0ff);
+  --class-S: linear-gradient(115deg, #00e8c6, #b48cff 30%, #ff8fc8 55%, #ffc94d 80%, #6fa0ff);
 
   --display: "Chakra Petch", "Arial Narrow", system-ui, sans-serif;
   --font: "Zen Kaku Gothic New", system-ui, sans-serif;
@@ -3168,7 +3169,7 @@ button.fiche:hover {
 }
 .class-B {
   --k: var(--class-B);
-  --k-ink: #1c0b45;
+  --k-ink: #00302a;
 }
 .class-A {
   --k: var(--class-A);
@@ -3186,7 +3187,7 @@ body {
 
 ::selection {
   background: var(--accent);
-  color: var(--bg);
+  color: var(--on-accent);
 }
 
 .header {
@@ -3320,7 +3321,7 @@ body {
 .opening .btn-primary {
   background: var(--accent);
   border: 0;
-  color: var(--bg);
+  color: var(--on-accent);
   box-shadow: none;
 }
 
@@ -3445,11 +3446,19 @@ body {
   background:
     radial-gradient(
         circle at 1px 1px,
-        color-mix(in srgb, var(--class-B) 40%, transparent) 1px,
+        color-mix(in srgb, var(--k-solid, var(--k)) 40%, transparent) 1px,
         transparent 1.6px
       )
       0 0 / 6px 6px,
-    linear-gradient(180deg, var(--surface-2), color-mix(in srgb, var(--class-B) 22%, var(--surface-2)));
+    linear-gradient(
+      180deg,
+      var(--surface-2),
+      color-mix(in srgb, var(--k-solid, var(--k)) 22%, var(--surface-2))
+    );
+}
+
+.fiche.class-S {
+  --k-solid: #b48cff;
 }
 
 .fiche.class-E .fiche-img img {
@@ -3578,7 +3587,7 @@ button.fiche:focus-visible {
   z-index: 2;
   padding: 3px 8px;
   background: var(--accent);
-  color: var(--bg);
+  color: var(--on-accent);
   font-family: var(--display);
   font-size: 13px;
   font-weight: 700;
@@ -3608,7 +3617,7 @@ button.fiche:focus-visible {
 
 .empty-fiche.is-wanted {
   border: 0;
-  background: repeating-linear-gradient(135deg, rgba(255, 122, 26, 0.1) 0 6px, var(--bg) 6px 12px);
+  background: repeating-linear-gradient(135deg, rgba(155, 92, 255, 0.1) 0 6px, var(--bg) 6px 12px);
   box-shadow: inset 0 0 0 1.5px var(--accent);
   color: var(--accent);
 }
@@ -3623,7 +3632,7 @@ button.empty-fiche:hover {
   border: 0;
   box-shadow: inset 0 0 0 1px var(--line);
   background:
-    radial-gradient(circle at 1px 1px, rgba(255, 122, 26, 0.12) 1px, transparent 1.5px) 0 0 / 14px 14px,
+    radial-gradient(circle at 1px 1px, rgba(155, 92, 255, 0.12) 1px, transparent 1.5px) 0 0 / 14px 14px,
     radial-gradient(600px 360px at 85% 50%, rgba(180, 140, 255, 0.18), transparent 70%),
     var(--surface);
 }
@@ -3644,7 +3653,7 @@ button.empty-fiche:hover {
 .affaire-teaser:not(.is-done) {
   box-shadow: inset 0 0 0 1.5px var(--accent);
   background:
-    radial-gradient(circle at 1px 1px, rgba(255, 122, 26, 0.1) 1px, transparent 1.5px) 0 0 / 14px 14px,
+    radial-gradient(circle at 1px 1px, rgba(155, 92, 255, 0.1) 1px, transparent 1.5px) 0 0 / 14px 14px,
     var(--surface);
 }
 
@@ -3657,7 +3666,7 @@ button.empty-fiche:hover {
 .affaire-teaser-cta {
   border-radius: 0;
   background: var(--accent);
-  color: var(--bg);
+  color: var(--on-accent);
   font-family: var(--display);
   text-transform: uppercase;
 }
@@ -3730,11 +3739,11 @@ button.empty-fiche:hover {
 
 .segmented button.is-active {
   background: var(--accent);
-  color: var(--bg);
+  color: var(--on-accent);
 }
 
 .segmented button.is-active .mono {
-  color: var(--bg);
+  color: var(--on-accent);
 }
 
 .nav button.is-active {
@@ -3743,7 +3752,7 @@ button.empty-fiche:hover {
 
 .nav-badge {
   background: var(--accent);
-  color: var(--bg);
+  color: var(--on-accent);
 }
 
 .header-grade,
@@ -3754,7 +3763,7 @@ button.empty-fiche:hover {
 
 .tag-new {
   background: var(--accent);
-  color: var(--bg);
+  color: var(--on-accent);
 }
 
 .modal {
@@ -3780,7 +3789,7 @@ button.empty-fiche:hover {
 
 .dossier-body {
   border-radius: 0;
-  box-shadow: 0 24px 50px -20px rgba(255, 122, 26, 0.4);
+  box-shadow: 0 24px 50px -20px rgba(155, 92, 255, 0.4);
 }
 
 .dossier-tab {
@@ -3789,13 +3798,13 @@ button.empty-fiche:hover {
 
 .dossier-seal {
   background: var(--accent);
-  color: var(--bg);
+  color: var(--on-accent);
 }
 
 .hint-match {
-  background: rgba(255, 122, 26, 0.2);
-  color: #ffb27a;
-  box-shadow: inset 0 0 0 1px rgba(255, 122, 26, 0.6);
+  background: rgba(155, 92, 255, 0.24);
+  color: #d4bcff;
+  box-shadow: inset 0 0 0 1px rgba(155, 92, 255, 0.65);
 }
 
 .hint-up,

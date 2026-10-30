@@ -116,7 +116,19 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose,
                 style={{ animationDelay: `${i * 80}ms` }}
               >
                 <div className="pull-card">
-                  <Fiche card={card} secret={pull.secret[i]} />
+                  <Fiche
+                    card={card}
+                    secret={pull.secret[i]}
+                    tag={
+                      revealed[i]
+                        ? i === best
+                          ? "Meilleure fiche"
+                          : pull.fresh.has(card.id)
+                            ? "Nouvelle"
+                            : undefined
+                        : undefined
+                    }
+                  />
                   <button
                     className="cover"
                     onClick={() => reveal(i)}
@@ -140,10 +152,8 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose,
                 <div className="pull-caption mono">
                   {revealed[i] ? (
                     <>
-                      <span>
-                        Classe {card.rarity} · {RARITY_BY_ID[card.rarity].name}
-                      </span>
-                      {pull.fresh.has(card.id) && <span className="tag-new">Nouvelle</span>}
+                      <span>{RARITY_BY_ID[card.rarity].name}</span>
+                      {i === best && pull.fresh.has(card.id) && <span className="tag-new">Nouvelle</span>}
                       {pull.secret[i] && <span className="tag-secret">Top secret</span>}
                       {pull.wanted.has(card.id) && <span className="tag-wanted">Recherchée</span>}
                     </>

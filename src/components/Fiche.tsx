@@ -1,8 +1,7 @@
 import type { CSSProperties } from "react";
-import { formatFans, formatNumber, type Card } from "../game/cards";
+import { CARDS, formatNumber, type Card } from "../game/cards";
 import { RARITY_BY_ID } from "../game/rarities";
 import { PRESTIGE_NAME } from "../game/prestige";
-import { Barcode } from "./Barcode";
 
 interface Props {
   card: Card;
@@ -12,11 +11,15 @@ interface Props {
   secret?: boolean;
   /** Niveau de prestige : 1 bronze, 2 argent, 3 or. */
   prestige?: number;
+  /** Étiquette posée sur le coin de la carte (« Nouvelle », « Meilleure fiche »…). */
+  tag?: string;
   onClick?: () => void;
 }
 
-/** Une carte = une fiche d'archive. Le traitement visuel dépend de la classe (E → A). */
-export function Fiche({ card, className = "", style, secret = false, prestige = 0, onClick }: Props) {
+const TOTAL = formatNumber(CARDS.length);
+
+/** Une carte compacte : nom et classe en haut, grand portrait numéroté, série en bas. */
+export function Fiche({ card, className = "", style, secret = false, prestige = 0, tag, onClick }: Props) {
   const r = RARITY_BY_ID[card.rarity];
   const Tag = onClick ? "button" : "article";
 
@@ -28,7 +31,9 @@ export function Fiche({ card, className = "", style, secret = false, prestige = 
     >
       <div className="fiche-inner">
         <header className="fiche-head">
-          <span className="fiche-no">N°{formatNumber(card.number)}</span>
+          <h3 className="fiche-name" title={card.name}>
+            {card.name}
+          </h3>
           <span className="fiche-class" title={`Classe ${r.id} — ${r.name}`}>
             {r.id}
           </span>
@@ -44,25 +49,16 @@ export function Fiche({ card, className = "", style, secret = false, prestige = 
           />
           {prestige > 0 && <span className="prestige-badge">★ {PRESTIGE_NAME[prestige]}</span>}
           {secret && <span className="secret-stamp">Top secret</span>}
-        </div>
-
-        <div className="fiche-body">
-          <h3 className="fiche-name">{card.name}</h3>
-          <dl className="fiche-data">
-            <dt>Série</dt>
-            <dd>{card.anime}</dd>
-            <dt>Fans</dt>
-            <dd>{formatFans(card.favourites)}</dd>
-          </dl>
-        </div>
-
-        <footer className="fiche-foot">
-          <Barcode value={card.id} />
-          <span className="fiche-id">
-            {String(card.id).padStart(7, "0")} · {r.name}
+          <span className="fiche-no">
+            #{formatNumber(card.number)}/{TOTAL}
           </span>
+        </div>
+
+        <footer className="fiche-series" title={card.anime}>
+          {card.anime}
         </footer>
       </div>
+      {tag && <span className={`fiche-tag ${tag === "Meilleure fiche" ? "is-best" : ""}`}>{tag}</span>}
     </Tag>
   );
 }

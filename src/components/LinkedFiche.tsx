@@ -1,5 +1,4 @@
 import { formatLinkNumber, type Link } from "../game/links";
-import { Barcode } from "./Barcode";
 
 interface Props {
   link: Link;
@@ -16,10 +15,10 @@ export function LinkedFiche({ link, className = "", onClick }: Props) {
       <Paperclip />
       <div className="fiche-inner">
         <header className="fiche-head">
-          <span className="fiche-no">{formatLinkNumber(link.number)}</span>
-          <span className="fiche-class fiche-class-wide" title={link.kind === "duo" ? "Duo" : "Trio"}>
-            {link.kind.toUpperCase()}
-          </span>
+          <h3 className="fiche-name" title={link.title}>
+            {link.title}
+          </h3>
+          <span className="fiche-class fiche-class-wide">{link.kind.toUpperCase()}</span>
         </header>
 
         <div className={`fiche-img linked-imgs n-${link.members.length}`}>
@@ -34,21 +33,11 @@ export function LinkedFiche({ link, className = "", onClick }: Props) {
             />
           ))}
           <span className="linked-stamp">Affaire liée</span>
+          <span className="fiche-no">{formatLinkNumber(link.number)}</span>
         </div>
 
-        <div className="fiche-body">
-          <h3 className="fiche-name">{link.title}</h3>
-          <dl className="fiche-data">
-            <dt>Série</dt>
-            <dd>{link.anime}</dd>
-            <dt>Pièces</dt>
-            <dd>{link.members.length} fiches agrafées</dd>
-          </dl>
-        </div>
-
-        <footer className="fiche-foot">
-          <Barcode value={link.number * 7919 + 100003} />
-          <span className="fiche-id">{link.kind === "duo" ? "Duo" : "Trio"} · liaison</span>
+        <footer className="fiche-series" title={link.anime}>
+          {link.anime}
         </footer>
       </div>
     </Tag>

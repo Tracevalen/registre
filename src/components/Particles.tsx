@@ -19,6 +19,9 @@ interface Spark {
   size: number;
 }
 
+/** Résolution plafonnée : sur téléphone, un canvas en 3x plein écran fait ramer. */
+const ratio = () => Math.min(window.devicePixelRatio || 1, 1.5);
+
 /** Étincelles sur canvas : braises qui montent, et explosion au moment de la révélation. */
 export function Particles({ color, burst, ambient = 0.5 }: Props) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -32,8 +35,8 @@ export function Particles({ color, burst, ambient = 0.5 }: Props) {
     if (!canvas || !ctx) return;
     let raf = 0;
     const resize = () => {
-      canvas.width = canvas.clientWidth * devicePixelRatio;
-      canvas.height = canvas.clientHeight * devicePixelRatio;
+      canvas.width = canvas.clientWidth * ratio();
+      canvas.height = canvas.clientHeight * ratio();
     };
     resize();
     window.addEventListener("resize", resize);
@@ -42,9 +45,9 @@ export function Particles({ color, burst, ambient = 0.5 }: Props) {
       const { color: c, ambient: a } = settings.current;
       const w = canvas.width;
       const h = canvas.height;
-      const s = devicePixelRatio;
+      const s = ratio();
       // Braises qui montent du bas de l'écran
-      if (Math.random() < a) {
+      if (Math.random() < a * Math.min(1, w / (900 * s))) {
         sparks.current.push({
           x: Math.random() * w,
           y: h + 10,
@@ -65,10 +68,12 @@ export function Particles({ color, burst, ambient = 0.5 }: Props) {
         p.vy += 0.02 * s;
         p.vx *= 0.99;
         const alpha = 1 - p.life / p.max;
-        ctx.globalAlpha = alpha;
         ctx.fillStyle = c;
-        ctx.shadowColor = c;
-        ctx.shadowBlur = 12 * s;
+        ctx.globalAlpha = alpha * 0.25;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = alpha;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
@@ -88,10 +93,11 @@ export function Particles({ color, burst, ambient = 0.5 }: Props) {
     if (!burst) return;
     const canvas = ref.current;
     if (!canvas) return;
-    const s = devicePixelRatio;
+    const s = ratio();
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
-    for (let i = 0; i < 160; i++) {
+    const count = canvas.clientWidth < 600 ? 80 : 150;
+    for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
       const speed = (3 + Math.random() * 9) * s;
       sparks.current.push({

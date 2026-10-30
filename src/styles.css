@@ -3893,3 +3893,63 @@ button.empty-fiche:hover {
   color: var(--accent-2);
   border-color: currentColor;
 }
+
+/* ---------- Filtres à cocher : puces biseautées au lieu de cases ---------- */
+
+.check {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink-2);
+  font-size: 13px;
+  white-space: nowrap;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  transition:
+    background 0.15s,
+    color 0.15s,
+    box-shadow 0.15s;
+}
+
+/* La case native reste accessible au clavier mais n'est plus affichée */
+.check input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+}
+
+/* Petit témoin carré à gauche du libellé */
+.check::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: var(--ink-3);
+  transition: background 0.15s;
+}
+
+.check:hover {
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--accent-2);
+}
+
+.check:has(input:checked) {
+  background: var(--accent-soft);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+.check:has(input:checked)::before {
+  background: var(--accent);
+}
+
+.check:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}

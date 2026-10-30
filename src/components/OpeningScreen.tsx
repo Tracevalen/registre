@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Pull } from "../game/booster";
 import { RARITY_BY_ID, rarityRank } from "../game/rarities";
-import { Walkout } from "./Walkout";
+import { PackReveal } from "./PackReveal";
 import { Dossier } from "./Dossier";
 import { Fiche } from "./Fiche";
 
@@ -14,19 +14,14 @@ interface Props {
   onShowArchive: () => void;
 }
 
-type Stage = "sealed" | "unsealing" | "flare" | "walkout" | "fiches";
+type Stage = "sealed" | "unsealing" | "reveal" | "fiches";
 
 const UNSEAL_MS = 700;
-/** Durée de la montée en lumière avant l'ouverture, plus longue pour les gros tirages. */
-const FLARE_MS = { E: 1100, D: 1300, C: 1600, B: 2200, A: 2800 } as const;
-
-const reducedMotion = () =>
-  typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 const SCAN_STAGGER_MS = 180;
 
 export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose, onShowArchive }: Props) {
   // « Tout ouvrir » saute le sceau : lumière, walkout de la meilleure fiche, puis toutes les fiches révélées.
-  const [stage, setStage] = useState<Stage>(pull.batch ? "flare" : "sealed");
+  const [stage, setStage] = useState<Stage>(pull.batch ? "reveal" : "sealed");
   const [revealed, setRevealed] = useState<boolean[]>(() => pull.cards.map(() => Boolean(pull.batch)));
   const revealedCount = revealed.filter(Boolean).length;
   const done = revealedCount === pull.cards.length;
@@ -52,14 +47,10 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose,
 
   useEffect(() => {
     if (stage === "unsealing") {
-      const t = setTimeout(() => setStage(reducedMotion() ? "fiches" : "flare"), UNSEAL_MS);
+      const t = setTimeout(() => setStage("reveal"), UNSEAL_MS);
       return () => clearTimeout(t);
     }
-    if (stage === "flare") {
-      const t = setTimeout(() => setStage("walkout"), FLARE_MS[bestCard.rarity]);
-      return () => clearTimeout(t);
-    }
-  }, [stage, bestCard.rarity]);
+  }, [stage]);
 
   const reveal = (i: number) => setRevealed((r) => r.map((v, j) => v || j === i));
 
@@ -81,23 +72,13 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose,
         </button>
       </header>
 
-      {stage === "flare" ? (
-        <div
-          className={`flare class-${bestCard.rarity} ${pull.secret[best] ? "is-secret" : ""}`}
-          style={{ animationDuration: `${FLARE_MS[bestCard.rarity]}ms` }}
-          onClick={() => setStage("walkout")}
-        >
-          <span className="flare-rays" aria-hidden />
-          <span className="flare-core" aria-hidden />
-          <div className="flare-dossier">
-            <Dossier number={pull.id} />
-          </div>
-        </div>
-      ) : stage === "walkout" ? (
-        <Walkout
+      {stage === "reveal" ? (
+        <PackReveal
           card={bestCard}
           secret={pull.secret[best]}
           fresh={pull.fresh.has(bestCard.id)}
+          dossierNumber={pull.id}
+          batch={pull.batch}
           onDone={() => {
             reveal(best);
             setStage("fiches");

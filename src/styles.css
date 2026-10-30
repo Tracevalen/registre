@@ -4240,15 +4240,6 @@ button.empty-fiche:hover {
   color: var(--accent-2);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .flare *,
-  .walkout *,
-  .flare,
-  .walkout {
-    animation: none !important;
-  }
-}
-
 /* La montée en lumière suit la durée choisie selon la rareté (réglée sur .flare) */
 .flare-core,
 .flare-dossier {
@@ -4377,4 +4368,440 @@ button.empty-fiche:hover {
   .walkout-beams i {
     animation: none;
   }
+}
+
+/* ==================================================================
+   Révélation 3D du pack : tension, explosion, indices, carte qui tourne
+   ================================================================== */
+
+.reveal {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: calc(100vh - 60px);
+  margin: auto 0;
+  overflow: hidden;
+  perspective: 1100px;
+  background:
+    radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--glow) 22%, transparent), transparent 60%),
+    radial-gradient(ellipse at 50% 120%, color-mix(in srgb, var(--glow) 30%, transparent), transparent 55%),
+    #000514;
+}
+
+.particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Sol en grille qui défile, en perspective */
+.reveal-floor {
+  position: absolute;
+  left: -50%;
+  right: -50%;
+  bottom: -10%;
+  height: 70%;
+  background:
+    linear-gradient(color-mix(in srgb, var(--glow) 45%, transparent) 1px, transparent 1px) 0 0 / 60px 60px,
+    linear-gradient(90deg, color-mix(in srgb, var(--glow) 45%, transparent) 1px, transparent 1px) 0 0 / 60px
+      60px;
+  transform: rotateX(72deg);
+  transform-origin: bottom center;
+  mask-image: linear-gradient(to top, #000 10%, transparent 85%);
+  animation: floor-run 1.2s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes floor-run {
+  to {
+    background-position:
+      0 60px,
+      0 60px;
+  }
+}
+
+.reveal-halo {
+  position: absolute;
+  width: 70vmin;
+  height: 70vmin;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--glow) 55%, transparent), transparent 65%);
+  filter: blur(20px);
+  animation: halo-pulse 1.6s ease-in-out infinite;
+}
+
+.phase-charge .reveal-halo {
+  animation: halo-charge var(--charge) ease-in forwards;
+}
+
+@keyframes halo-pulse {
+  50% {
+    transform: scale(1.12);
+    opacity: 0.8;
+  }
+}
+
+@keyframes halo-charge {
+  from {
+    transform: scale(0.4);
+    opacity: 0.3;
+  }
+  to {
+    transform: scale(1.8);
+    opacity: 1;
+  }
+}
+
+/* Le dossier flotte en 3D, puis tremble de plus en plus fort */
+.reveal-pack {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transform-style: preserve-3d;
+}
+
+.reveal-pack-inner {
+  transform-style: preserve-3d;
+  animation:
+    pack-float 2.4s ease-in-out infinite,
+    pack-shake var(--charge) ease-in forwards;
+}
+
+.reveal-pack .dossier {
+  pointer-events: none;
+  box-shadow: 0 40px 80px -30px color-mix(in srgb, var(--glow) 80%, transparent);
+}
+
+.reveal-batch {
+  padding: 4px 12px;
+  background: color-mix(in srgb, var(--glow) 25%, transparent);
+  color: var(--ink);
+}
+
+@keyframes pack-float {
+  0%,
+  100% {
+    transform: rotateY(-18deg) rotateX(6deg) translateY(0);
+  }
+  50% {
+    transform: rotateY(18deg) rotateX(-4deg) translateY(-14px);
+  }
+}
+
+@keyframes pack-shake {
+  0%,
+  55% {
+    translate: 0 0;
+  }
+  60%,
+  70%,
+  80%,
+  90% {
+    translate: -4px 2px;
+    scale: 1.03;
+  }
+  65%,
+  75%,
+  85%,
+  95% {
+    translate: 5px -3px;
+    scale: 1.06;
+  }
+  100% {
+    translate: 0 0;
+    scale: 1.12;
+  }
+}
+
+/* Flash de l'explosion (au repos il est invisible) */
+.reveal-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  opacity: 0;
+  background: radial-gradient(
+    circle,
+    #fff 0%,
+    color-mix(in srgb, var(--glow) 70%, #fff) 35%,
+    transparent 75%
+  );
+  animation: burst-flash 0.45s ease-out;
+}
+
+@keyframes burst-flash {
+  0% {
+    opacity: 1;
+    transform: scale(0.3);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+
+/* Indices : panneaux qui basculent en 3D */
+.clue3d {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 28px 40px;
+  text-align: center;
+  transform-style: preserve-3d;
+  animation: clue-flip 1.8s cubic-bezier(0.2, 1, 0.3, 1) both;
+}
+
+@keyframes clue-flip {
+  0% {
+    opacity: 0;
+    transform: rotateX(-85deg) translateZ(-200px) scale(0.8);
+  }
+  22% {
+    opacity: 1;
+    transform: rotateX(0) translateZ(0) scale(1);
+  }
+  82% {
+    opacity: 1;
+    transform: rotateY(-6deg) translateZ(40px) scale(1.03);
+  }
+  100% {
+    opacity: 0;
+    transform: rotateX(80deg) translateZ(-150px) scale(0.85);
+  }
+}
+
+.clue3d-label {
+  padding: 4px 14px;
+  background: color-mix(in srgb, var(--glow) 25%, transparent);
+  color: color-mix(in srgb, var(--glow) 55%, #fff);
+  font-size: 14px;
+  letter-spacing: 0.24em;
+}
+
+.clue3d-cover {
+  width: clamp(130px, 24vmin, 210px);
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  transform: rotateY(-14deg) translateZ(30px);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--glow) 75%, transparent),
+    0 30px 70px -10px color-mix(in srgb, var(--glow) 70%, transparent);
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+}
+
+.clue3d-symbol {
+  font-size: clamp(120px, 26vmin, 220px);
+  line-height: 1;
+  color: color-mix(in srgb, var(--glow) 65%, #fff);
+  text-shadow:
+    0 0 30px color-mix(in srgb, var(--glow) 90%, transparent),
+    0 0 90px color-mix(in srgb, var(--glow) 60%, transparent);
+}
+
+.clue3d-value {
+  max-width: 18ch;
+  font-family: var(--display);
+  font-size: clamp(34px, 6.5vw, 72px);
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+  text-wrap: balance;
+  color: #fff;
+  text-shadow: 0 0 40px color-mix(in srgb, var(--glow) 80%, transparent);
+}
+
+.clue3d-steps {
+  display: flex;
+  gap: 6px;
+}
+
+.clue3d-steps i {
+  width: 30px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.clue3d-steps i.is-on {
+  background: var(--glow);
+}
+
+/* La carte : deux faces, qui tourne et atterrit face visible */
+.reveal-card-zone {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  padding: 24px 16px;
+}
+
+.card3d-tilt {
+  transform-style: preserve-3d;
+  transition: transform 0.2s ease-out;
+}
+
+.card3d {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.card3d.is-spinning {
+  animation: card-spin 2.3s cubic-bezier(0.15, 0.6, 0.25, 1) both;
+}
+
+.card3d.is-landed {
+  animation: card-idle 3s ease-in-out infinite;
+}
+
+@keyframes card-spin {
+  0% {
+    transform: translateZ(-900px) rotateY(0) rotateZ(-12deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  85% {
+    transform: translateZ(60px) rotateY(1060deg) rotateZ(0);
+  }
+  100% {
+    transform: translateZ(0) rotateY(1080deg);
+  }
+}
+
+@keyframes card-idle {
+  0%,
+  100% {
+    transform: translateY(0) rotateY(1080deg);
+  }
+  50% {
+    transform: translateY(-10px) rotateY(1080deg);
+  }
+}
+
+.card3d-face {
+  backface-visibility: hidden;
+}
+
+.card3d-front {
+  position: relative;
+}
+
+.card3d-back {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  transform: rotateY(180deg);
+  background:
+    repeating-linear-gradient(
+      45deg,
+      color-mix(in srgb, var(--glow) 25%, transparent) 0 2px,
+      transparent 2px 12px
+    ),
+    linear-gradient(160deg, #0b1d63, #000a30);
+  box-shadow: inset 0 0 0 3px var(--glow);
+  clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+}
+
+.card3d-back-mark {
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.card3d-back-class {
+  font-family: var(--display);
+  font-size: 90px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--glow);
+  text-shadow: 0 0 30px var(--glow);
+}
+
+/* Reflet holographique qui balaie la carte */
+.card3d-foil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.35) 45%,
+    color-mix(in srgb, var(--glow) 40%, transparent) 50%,
+    transparent 62%
+  );
+  background-size: 250% 100%;
+  mix-blend-mode: screen;
+  animation: foil-sweep 2.6s ease-in-out infinite;
+}
+
+@keyframes foil-sweep {
+  0% {
+    background-position: 130% 0;
+  }
+  100% {
+    background-position: -30% 0;
+  }
+}
+
+.reveal-info {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  text-align: center;
+  animation: info-in 0.6s ease-out both;
+}
+
+@keyframes info-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+.reveal-name {
+  font-family: var(--display);
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 30px color-mix(in srgb, var(--glow) 80%, transparent);
+}
+
+.reveal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  color: var(--ink-2);
+}
+
+.reveal-skip {
+  position: absolute;
+  z-index: 5;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: 24px;
+  padding: 8px 14px;
+  border: 0;
+  background: rgba(0, 10, 48, 0.7);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.reveal-skip:hover {
+  color: var(--accent-2);
 }

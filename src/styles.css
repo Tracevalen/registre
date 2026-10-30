@@ -3819,3 +3819,77 @@ button.empty-fiche:hover {
     animation: none !important;
   }
 }
+
+/* ---------- Corrections : éléments qui supposaient un fond clair ---------- */
+
+.opening {
+  color: var(--ink);
+}
+
+.opening-bar {
+  background: rgba(0, 10, 48, 0.92);
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--hair);
+  backdrop-filter: blur(8px);
+}
+
+.opening-close {
+  color: var(--ink);
+}
+
+.opening-close:hover {
+  color: var(--accent-2);
+}
+
+.cover:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.pull-slot.class-B .cover {
+  border-color: var(--class-B);
+}
+
+.view-toggle button.is-active {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.redacted {
+  background: var(--ink-3);
+}
+
+/* Fiches DUO / TRIO : même fond nuit que les autres, cadre irisé */
+.fiche.class-S .fiche-inner {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: none;
+}
+
+.fiche.class-S .fiche-inner::before {
+  display: none;
+}
+
+.fiche.class-S .fiche-inner::after {
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.18) 50%, transparent 62%);
+  background-size: 260% 100%;
+}
+
+.fiche.class-S .fiche-head {
+  padding-top: 3cqw;
+}
+
+.fiche.class-S .fiche-foot {
+  padding-bottom: 2.5cqw;
+}
+
+.fiche.class-S .fiche-class {
+  background: var(--class-S);
+  color: var(--bg);
+}
+
+.linked-stamp,
+.fiche.class-A .linked-stamp {
+  background: rgba(0, 10, 48, 0.75);
+  color: var(--accent-2);
+  border-color: currentColor;
+}

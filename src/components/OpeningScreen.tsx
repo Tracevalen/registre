@@ -1,58 +1,41 @@
-import { useEffect, useMemo, useState } from "react";
-import type { Pull } from "../game/booster";
+import { useEffect, useState } from "react";
+import { bestIndex, type Pull } from "../game/booster";
 import { RARITY_BY_ID, rarityRank } from "../game/rarities";
-import { PackReveal } from "./PackReveal";
 import * as sound from "../lib/sound";
-import { Dossier } from "./Dossier";
 import { Fiche } from "./Fiche";
+import { PackReveal } from "./PackReveal";
 
 interface Props {
   pull: Pull;
-  boostersLeft: number;
-  onAgain: () => void;
-  onOpenAll: () => void;
   onClose: () => void;
-  onShowArchive: () => void;
+  onShowCollection: () => void;
 }
 
-type Stage = "sealed" | "unsealing" | "reveal" | "fiches";
+type Stage = "reveal" | "summary" | "all";
 
-const UNSEAL_MS = 700;
-const SCAN_STAGGER_MS = 180;
-
-export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose, onShowArchive }: Props) {
-  // « Tout ouvrir » saute le sceau : lumière, walkout de la meilleure fiche, puis toutes les fiches révélées.
-  const [stage, setStage] = useState<Stage>(pull.batch ? "reveal" : "sealed");
-  const [revealed, setRevealed] = useState<boolean[]>(() => pull.cards.map(() => Boolean(pull.batch)));
-  const revealedCount = revealed.filter(Boolean).length;
-  const done = revealedCount === pull.cards.length;
-
-  // La meilleure fiche du dossier donne la couleur de la lumière et déclenche le walkout (B, A ou Top secret).
-  const best = useMemo(() => {
-    let b = 0;
-    pull.cards.forEach((c, i) => {
-      const cur = pull.cards[b];
-      const score = rarityRank(c.rarity) * 2 + (pull.secret[i] ? 1 : 0);
-      const bestScore = rarityRank(cur.rarity) * 2 + (pull.secret[b] ? 1 : 0);
-      if (score > bestScore || (score === bestScore && c.favourites > cur.favourites)) b = i;
-    });
-    return b;
-  }, [pull]);
-  const bestCard = pull.cards[best];
-
+/**
+ * Ouverture booster par booster : la révélation de la meilleure carte, puis le résumé
+ * du booster (grande carte et les 4 autres). « Tout passer » montre toutes les cartes d'un coup.
+ */
+export function OpeningScreen({ pull, onClose, onShowCollection }: Props) {
+  const [index, setIndex] = useState(0);
+  const [stage, setStage] = useState<Stage>("reveal");
   const [muted, setMutedState] = useState(sound.isMuted);
+  const total = pull.groups.length;
+  const group = pull.groups[index];
+  const best = bestIndex(group);
+  const bestCard = group.cards[best];
+  const last = index === total - 1;
 
-  // La musique démarre dès l'arrivée sur l'écran d'ouverture et s'arrête en fondu en le quittant.
+  // La musique tourne pendant toutes les ouvertures, et s'éteint au dernier booster révélé.
   useEffect(() => {
     sound.playMusic();
     return () => sound.fadeOutMusic(0.6);
   }, []);
 
-  const toggleSound = () => {
-    sound.setMuted(!muted);
-    sound.syncMusicMute();
-    setMutedState(!muted);
-  };
+  useEffect(() => {
+    if (stage === "all" || (stage === "summary" && last)) sound.fadeOutMusic(1.8);
+  }, [stage, last]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -60,133 +43,138 @@ export function OpeningScreen({ pull, boostersLeft, onAgain, onOpenAll, onClose,
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  useEffect(() => {
-    if (stage === "unsealing") {
-      const t = setTimeout(() => setStage("reveal"), UNSEAL_MS);
-      return () => clearTimeout(t);
-    }
-  }, [stage]);
-
-  const reveal = (i: number) => setRevealed((r) => r.map((v, j) => v || j === i));
-
-  const revealAll = () => {
-    revealed.forEach((isRevealed, i) => {
-      if (!isRevealed) setTimeout(() => reveal(i), i * SCAN_STAGGER_MS);
-    });
+  const toggleSound = () => {
+    sound.setMuted(!muted);
+    sound.syncMusicMute();
+    setMutedState(!muted);
   };
 
+  const next = () => {
+    setIndex(index + 1);
+    setStage("reveal");
+  };
+
+  const tagFor = (cardId: number, isBest: boolean) =>
+    pull.fresh.has(cardId) ? "Nouveau" : isBest ? "Meilleure carte" : undefined;
+
+  const allCards = pull.groups
+    .flatMap((g) => g.cards.map((card, i) => ({ card, secret: g.secret[i] })))
+    .sort(
+      (a, b) => rarityRank(b.card.rarity) - rarityRank(a.card.rarity) || Number(b.secret) - Number(a.secret),
+    );
+
   return (
-    <div className="opening" role="dialog" aria-modal aria-label="Ouverture d'un dossier">
-      <header className="opening-bar mono">
+    <div className="opening" role="dialog" aria-modal aria-label="Ouverture de boosters">
+      <header className="opening-bar">
         <span>
-          {pull.batch ? `${pull.batch} dossiers ouverts` : `Dossier N°${String(pull.id).padStart(4, "0")}`}
+          {stage === "all" ? `${total} booster${total > 1 ? "s" : ""}` : `Booster ${index + 1} sur ${total}`}
         </span>
-        <span>{stage === "fiches" ? `Déclassifiées ${revealedCount}/${pull.cards.length}` : "Scellé"}</span>
         <button className="opening-sound" onClick={toggleSound} aria-pressed={!muted}>
           {muted ? "Son coupé" : "Son activé"}
         </button>
         <button className="opening-close" onClick={onClose}>
-          Fermer ✕
+          Fermer
         </button>
       </header>
 
-      {stage === "reveal" ? (
+      {stage === "reveal" && (
         <PackReveal
+          key={index}
           card={bestCard}
-          secret={pull.secret[best]}
+          secret={group.secret[best]}
           fresh={pull.fresh.has(bestCard.id)}
-          dossierNumber={pull.id}
-          batch={pull.batch}
-          onDone={() => {
-            reveal(best);
-            setStage("fiches");
-          }}
+          dossierNumber={pull.id + index}
+          onDone={() => setStage("summary")}
         />
-      ) : stage !== "fiches" ? (
-        <div className={`opening-dossier is-${stage}`}>
-          <Dossier number={pull.id} onUnseal={stage === "sealed" ? () => setStage("unsealing") : undefined} />
-        </div>
-      ) : (
-        <>
-          <div className="pull">
-            {pull.cards.map((card, i) => (
-              <div
-                key={i}
-                className={`pull-slot class-${card.rarity} ${pull.secret[i] ? "is-secret" : ""} ${revealed[i] ? "is-revealed" : ""}`}
-                style={{ animationDelay: `${i * 80}ms` }}
-              >
-                <div className="pull-card">
-                  <Fiche
-                    card={card}
-                    secret={pull.secret[i]}
-                    tag={
-                      revealed[i]
-                        ? i === best
-                          ? "Meilleure fiche"
-                          : pull.fresh.has(card.id)
-                            ? "Nouvelle"
-                            : undefined
-                        : undefined
-                    }
-                  />
-                  <button
-                    className="cover"
-                    onClick={() => reveal(i)}
-                    disabled={revealed[i]}
-                    aria-label={`Déclassifier la fiche ${i + 1}`}
-                  >
-                    <span className="cover-lines" aria-hidden>
-                      <i />
-                      <i />
-                      <i />
-                      <i />
-                    </span>
-                    <span className="cover-label mono">
-                      Fiche {i + 1}/{pull.cards.length}
-                      <br />
-                      Classe ?
-                    </span>
-                  </button>
-                  <span className="scanline" aria-hidden />
-                </div>
-                <div className="pull-caption mono">
-                  {revealed[i] ? (
-                    <>
-                      <span>{RARITY_BY_ID[card.rarity].name}</span>
-                      {i === best && pull.fresh.has(card.id) && <span className="tag-new">Nouvelle</span>}
-                      {pull.secret[i] && <span className="tag-secret">Top secret</span>}
-                      {pull.wanted.has(card.id) && <span className="tag-wanted">Recherchée</span>}
-                    </>
-                  ) : (
-                    <span>Cliquer pour déclassifier</span>
-                  )}
-                </div>
-              </div>
-            ))}
+      )}
+
+      {stage === "summary" && (
+        <section className="summary">
+          <div className="summary-head">
+            <h2>
+              Booster {index + 1} sur {total}
+            </h2>
+            <p>{group.cards.length} cartes obtenues</p>
           </div>
 
-          <div className="opening-actions">
-            {!done ? (
-              <button className="btn btn-inverse" onClick={revealAll}>
-                Tout déclassifier
-              </button>
-            ) : (
-              <>
-                {boostersLeft > 1 && (
-                  <button className="btn btn-primary" onClick={onOpenAll}>
-                    Tout ouvrir ({boostersLeft})
-                  </button>
-                )}
-                <button className="btn btn-inverse" onClick={onAgain} disabled={boostersLeft <= 0}>
-                  {boostersLeft > 0 ? `Dossier suivant (${boostersLeft})` : "Plus de dossier"}
-                </button>
-                <button className="btn btn-inverse" onClick={onShowArchive}>
-                  Voir l'archive
-                </button>
-              </>
+          <div className="summary-best">
+            <Fiche
+              card={bestCard}
+              secret={group.secret[best]}
+              tag={tagFor(bestCard.id, false)}
+              className="fiche-lg"
+            />
+            <p className="summary-name">{bestCard.name}</p>
+            <p className="summary-sub">{bestCard.anime}</p>
+            <span className={`rarity-pill class-${bestCard.rarity}`}>
+              {RARITY_BY_ID[bestCard.rarity].name}
+            </span>
+          </div>
+
+          <div className="summary-rest">
+            {group.cards.map((card, i) =>
+              i === best ? null : (
+                <div key={i} className="summary-small">
+                  <Fiche
+                    card={card}
+                    secret={group.secret[i]}
+                    tag={pull.fresh.has(card.id) ? "Nouveau" : undefined}
+                  />
+                  <span
+                    className={`rarity-dot class-${card.rarity}`}
+                    title={RARITY_BY_ID[card.rarity].name}
+                  />
+                </div>
+              ),
             )}
           </div>
-        </>
+
+          <div className="summary-actions">
+            {last ? (
+              <button className="btn btn-primary btn-wide" onClick={onClose} autoFocus>
+                Terminer
+              </button>
+            ) : (
+              <button className="btn btn-primary btn-wide" onClick={next} autoFocus>
+                Booster suivant
+              </button>
+            )}
+            {!last && (
+              <button className="btn btn-wide" onClick={() => setStage("all")}>
+                Tout passer
+              </button>
+            )}
+            {last && (
+              <button className="btn btn-wide" onClick={onShowCollection}>
+                Voir ma collection
+              </button>
+            )}
+          </div>
+        </section>
+      )}
+
+      {stage === "all" && (
+        <section className="summary">
+          <div className="summary-head">
+            <h2>{allCards.length} cartes obtenues</h2>
+            <p>
+              {total} booster{total > 1 ? "s" : ""}, de la plus rare à la plus commune
+            </p>
+          </div>
+          <div className="summary-grid">
+            {allCards.map(({ card, secret }, i) => (
+              <Fiche key={i} card={card} secret={secret} tag={tagFor(card.id, i === 0)} />
+            ))}
+          </div>
+          <div className="summary-actions">
+            <button className="btn btn-primary btn-wide" onClick={onClose} autoFocus>
+              Terminer
+            </button>
+            <button className="btn btn-wide" onClick={onShowCollection}>
+              Voir ma collection
+            </button>
+          </div>
+        </section>
       )}
     </div>
   );

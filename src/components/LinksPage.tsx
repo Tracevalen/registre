@@ -56,13 +56,13 @@ export function LinksPage({ save, onFuse, onOpenLink, onFocusCard, onKeepOneChan
     <div className="archive links">
       <div className="archive-head">
         <div>
-          <p className="kicker mono">Dossiers liés</p>
+          <p className="kicker mono">Duos &amp; trios</p>
           <h1 className="archive-count">
             {String(counts.archived).padStart(3, "0")}
             <span>/{LINKS.length}</span>
           </h1>
         </div>
-        <div className="segmented" role="group" aria-label="Filtrer les dossiers liés">
+        <div className="segmented" role="group" aria-label="Filtrer les fusions">
           {FILTERS.map((f) => (
             <button key={f.id} className={filter === f.id ? "is-active" : ""} onClick={() => setFilter(f.id)}>
               <strong>{f.label}</strong>
@@ -74,13 +74,13 @@ export function LinksPage({ save, onFuse, onOpenLink, onFocusCard, onKeepOneChan
 
       <div className="links-intro">
         <p>
-          Agrafe les fiches de deux ou trois personnages pour ouvrir leur dossier lié. Les fiches agrafées
-          sont consommées. Un duo prend une classe de plus que sa meilleure fiche, un trio en prend deux. Une
-          recette apparaît dès que tu as archivé l'une de ses pièces.
+          Fusionne deux ou trois cartes qui vont ensemble (un duo de héros, une trilogie) pour obtenir leur
+          carte Duo ou Trio. Les cartes fusionnées sont consommées. Une recette apparaît dès que tu as obtenu
+          l'une de ses pièces.
         </p>
         <label className="check">
           <input type="checkbox" checked={save.keepOne} onChange={(e) => onKeepOneChange(e.target.checked)} />
-          Toujours garder un exemplaire de chaque fiche
+          Toujours garder un exemplaire de chaque carte
         </label>
       </div>
 
@@ -123,15 +123,15 @@ const STATE_ORDER: Record<LinkState, number> = { ready: 0, detected: 1, classifi
 const FILTERS: { id: Filter; label: string }[] = [
   { id: "all", label: "Tout" },
   { id: "ready", label: "Prêts" },
-  { id: "detected", label: "Détectés" },
-  { id: "archived", label: "Agrafés" },
+  { id: "detected", label: "Repérés" },
+  { id: "archived", label: "Fusionnés" },
 ];
 
 const EMPTY: Record<Filter, string> = {
-  all: "Aucun dossier lié.",
+  all: "Aucune fusion.",
   ready: "Aucune fusion possible pour l'instant. Garde tes doublons.",
-  detected: "Aucune recette détectée. Ouvre des dossiers pour en trouver.",
-  archived: "Aucun dossier agrafé pour l'instant.",
+  detected: "Aucune recette détectée. Ouvre des boosters pour en trouver.",
+  archived: "Aucune fusion pour l'instant.",
 };
 
 interface ItemProps {
@@ -178,7 +178,7 @@ function LinkItem({ link, state, count, save, onFuse, onOpen, onFocusCard }: Ite
               <span className="link-piece-name">
                 {seen ? c.name : classified ? <span className="redacted inline" /> : "Pièce manquante"}
                 <span className="link-piece-sub mono">
-                  {seen ? `N°${formatNumber(c.number)}` : classified ? "Classifié" : c.anime}
+                  {seen ? `N°${formatNumber(c.number)}` : classified ? "Mystère" : c.anime}
                 </span>
               </span>
               <span className="link-piece-count mono">
@@ -192,15 +192,15 @@ function LinkItem({ link, state, count, save, onFuse, onOpen, onFocusCard }: Ite
       <footer className="link-item-foot">
         {count > 0 && (
           <button className="link mono" onClick={onOpen}>
-            Agrafé ×{count} · voir
+            Fusionné ×{count} · voir
           </button>
         )}
         {state === "ready" ? (
           <button className="btn btn-primary btn-sm" onClick={onFuse}>
-            Agrafer
+            Fusionner
           </button>
         ) : (
-          !count && <span className="mono link-item-status">{classified ? "Classifié" : "Détecté"}</span>
+          !count && <span className="mono link-item-status">{classified ? "Mystère" : "Repéré"}</span>
         )}
       </footer>
     </article>
@@ -246,7 +246,7 @@ function FuseDialog({ link, save, onCancel, onConfirm }: DialogProps) {
         </ul>
         {lastCopies.length > 0 && (
           <p className="dialog-warning mono">
-            Dernier exemplaire de {lastCopies.map((c) => c.name).join(", ")}. La fiche quittera ton archive.
+            Dernier exemplaire de {lastCopies.map((c) => c.name).join(", ")}. La carte quittera ta collection.
           </p>
         )}
         <div className="dialog-actions">
@@ -254,7 +254,7 @@ function FuseDialog({ link, save, onCancel, onConfirm }: DialogProps) {
             Annuler
           </button>
           <button className="btn btn-primary" onClick={onConfirm} autoFocus>
-            Agrafer
+            Fusionner
           </button>
         </div>
       </div>

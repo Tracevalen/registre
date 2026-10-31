@@ -11,7 +11,7 @@ interface Props {
   secret?: boolean;
   /** Niveau de prestige : 1 bronze, 2 argent, 3 or. */
   prestige?: number;
-  /** Étiquette posée sur le coin de la carte (« Nouvelle », « Meilleure fiche »…). */
+  /** Étiquette posée sur le coin de la carte (« Nouveau », « Meilleure carte »…). */
   tag?: string;
   onClick?: () => void;
 }
@@ -55,10 +55,12 @@ export function Fiche({ card, className = "", style, secret = false, prestige = 
         </div>
 
         <footer className="fiche-series" title={card.anime}>
-          {card.anime}
+          {card.kind === "game"
+            ? [card.studio, card.year].filter(Boolean).join(" · ") || card.anime
+            : card.anime}
         </footer>
       </div>
-      {tag && <span className={`fiche-tag ${tag === "Meilleure fiche" ? "is-best" : ""}`}>{tag}</span>}
+      {tag && <span className={`fiche-tag ${tag === "Meilleure carte" ? "is-best" : ""}`}>{tag}</span>}
     </Tag>
   );
 }

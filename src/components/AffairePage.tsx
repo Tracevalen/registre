@@ -68,16 +68,16 @@ export function AffairePage({ save, onGuess, onFocus }: Props) {
         </div>
 
         <div className="affaire-copy">
-          <p className="hero-eyebrow">Affaire du jour · même suspect pour tout le monde</p>
+          <p className="hero-eyebrow">Enquête du jour · même énigme pour tout le monde</p>
           <h1 className="special-title">
-            {done ? (won ? target.name : `C'était ${target.name}`) : "Qui est le suspect ?"}
+            {done ? (won ? target.name : `C'était ${target.name}`) : "Quelle est la carte mystère ?"}
           </h1>
           <p className="special-lede">
             {done
               ? won
-                ? `Affaire classée en ${guesses.length} essai${guesses.length > 1 ? "s" : ""}. Sa fiche rejoint ton archive, avec ${affaireReward(guesses.length)} encre.`
-                : "Affaire non résolue. Nouveau suspect demain à minuit."
-              : `Propose un personnage : chaque essai donne des indices et précise le portrait. Il te reste ${left} essai${left > 1 ? "s" : ""}.`}
+                ? `Trouvée en ${guesses.length} essai${guesses.length > 1 ? "s" : ""}. Sa carte rejoint ta collection, avec ${affaireReward(guesses.length)} encre.`
+                : "Pas trouvée cette fois. Nouvelle énigme demain à minuit."
+              : `Propose un jeu ou un personnage : chaque essai donne des indices et précise le portrait. Il te reste ${left} essai${left > 1 ? "s" : ""}.`}
           </p>
 
           {!done ? (
@@ -112,7 +112,7 @@ export function AffairePage({ save, onGuess, onFocus }: Props) {
               </button>
               {won && (
                 <button className="btn btn-ghost" onClick={() => onFocus(target)}>
-                  Voir sa fiche
+                  Voir sa carte
                 </button>
               )}
             </div>
@@ -123,9 +123,9 @@ export function AffairePage({ save, onGuess, onFocus }: Props) {
       <div className="affaire-table" role="table" aria-label="Indices de l'enquête">
         <div className="affaire-row affaire-head mono" role="row">
           <span>Proposition</span>
-          <span>Série</span>
-          <span>Classe</span>
-          <span>Fans</span>
+          <span>Saga</span>
+          <span>Rareté</span>
+          <span>Popularité</span>
           <span>Initiale</span>
         </div>
         {clues.length === 0 && <p className="empty mono">Aucune proposition pour l'instant.</p>}
@@ -147,8 +147,8 @@ export function AffairePage({ save, onGuess, onFocus }: Props) {
       </div>
 
       <p className="streak-note mono">
-        Vert : identique · Jaune : le suspect est plus haut (↑) ou plus bas (↓) · Noir : différent. Classes de{" "}
-        {RARITY_BY_ID.C.name.toLowerCase()} à {RARITY_BY_ID.A.name.toLowerCase()} uniquement.
+        Vert : identique · Jaune : la carte mystère est plus haut (↑) ou plus bas (↓) · Noir : différent.
+        Raretés de {RARITY_BY_ID.C.name.toLowerCase()} à {RARITY_BY_ID.A.name.toLowerCase()} uniquement.
       </p>
     </div>
   );

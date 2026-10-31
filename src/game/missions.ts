@@ -12,26 +12,26 @@ export interface Mission {
 }
 
 const POOL: Mission[] = [
-  { id: "open-3", label: "Ouvrir 3 dossiers", counter: "opened", goal: 3, reward: { ink: 15 } },
-  { id: "open-6", label: "Ouvrir 6 dossiers", counter: "opened", goal: 6, reward: { boosters: 1 } },
-  { id: "fresh-3", label: "Archiver 3 nouvelles fiches", counter: "fresh", goal: 3, reward: { ink: 20 } },
+  { id: "open-3", label: "Ouvrir 3 boosters", counter: "opened", goal: 3, reward: { ink: 15 } },
+  { id: "open-6", label: "Ouvrir 6 boosters", counter: "opened", goal: 6, reward: { boosters: 1 } },
+  { id: "fresh-3", label: "Obtenir 3 nouvelles cartes", counter: "fresh", goal: 3, reward: { ink: 20 } },
   {
     id: "rare-1",
-    label: "Obtenir une fiche de classe C ou mieux",
+    label: "Obtenir une carte Épique ou mieux",
     counter: "rare",
     goal: 1,
     reward: { ink: 15 },
   },
   {
     id: "rare-3",
-    label: "Obtenir 3 fiches de classe C ou mieux",
+    label: "Obtenir 3 cartes Épiques ou mieux",
     counter: "rare",
     goal: 3,
     reward: { boosters: 1 },
   },
   { id: "shred-5", label: "Broyer 5 doublons", counter: "shredded", goal: 5, reward: { ink: 10 } },
   { id: "shred-15", label: "Broyer 15 doublons", counter: "shredded", goal: 15, reward: { boosters: 1 } },
-  { id: "fuse-1", label: "Agrafer un dossier lié", counter: "fused", goal: 1, reward: { boosters: 1 } },
+  { id: "fuse-1", label: "Réussir une fusion", counter: "fused", goal: 1, reward: { boosters: 1 } },
   { id: "request-1", label: "Faire une demande d'accès", counter: "requested", goal: 1, reward: { ink: 10 } },
 ];
 
@@ -64,7 +64,7 @@ export function missionsForDay(day: string): Mission[] {
 
 export function formatReward(r: Mission["reward"]) {
   const parts: string[] = [];
-  if (r.boosters) parts.push(`+${r.boosters} dossier${r.boosters > 1 ? "s" : ""}`);
+  if (r.boosters) parts.push(`+${r.boosters} booster${r.boosters > 1 ? "s" : ""}`);
   if (r.ink) parts.push(`+${r.ink} encre`);
   return parts.join(", ");
 }

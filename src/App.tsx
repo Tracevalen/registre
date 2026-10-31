@@ -1,12 +1,19 @@
 import { useState } from "react";
-import { Header, type Page } from "./components/Header";
+import { BottomNav, CollectionTabs, isCollection, SoonPage, TopBar, type Page } from "./components/Nav";
 import { HomePage } from "./components/HomePage";
 import { ArchivePage } from "./components/ArchivePage";
 import { OpeningScreen } from "./components/OpeningScreen";
 import { FicheModal } from "./components/FicheModal";
 import { LinksPage } from "./components/LinksPage";
 import { LinkModal } from "./components/LinkModal";
-import { openBooster, PITY_LIMIT, rollSecrets, sortByRarity, type Pull } from "./game/booster";
+import {
+  openBooster,
+  PITY_LIMIT,
+  rollSecrets,
+  sortByRarity,
+  type BoosterGroup,
+  type Pull,
+} from "./game/booster";
 import type { Card } from "./game/cards";
 import { canFuse, LINKS, type Link } from "./game/links";
 import { ALBUMS, specialSeries } from "./game/series";
@@ -47,24 +54,11 @@ export default function App() {
     (a) => !save.albumsClaimed.includes(a.series) && a.cards.every((c) => save.owned[c.id]),
   ).length;
 
-  const open = (special = false) => {
-    if (special ? save.daily.special : save.boosters <= 0) return;
-    const cards = special
-      ? openBooster({ pool: specialSeries(save.daily.day).cards })
-      : openBooster({ guaranteeA: save.pity + 1 >= PITY_LIMIT });
-    const secret = rollSecrets(cards.length);
-    const fresh = new Set(cards.filter((c) => !save.owned[c.id]).map((c) => c.id));
-    const wanted = new Set(cards.filter((c) => save.wanted.includes(c.id)).map((c) => c.id));
-    spendBooster(cards, secret, special);
-    setPull({ id: save.opened + 1, ...sortByRarity(cards, secret), fresh, wanted });
-  };
-
-  /** Ouvre tous les dossiers en stock d'un coup, fiches déjà révélées. */
-  const openAll = () => {
-    const n = save.boosters;
-    if (n <= 0) return;
-    const cards: Card[] = [];
-    const secret: boolean[] = [];
+  /** Ouvre `count` boosters d'un coup (ou le booster spécial du jour). */
+  const open = (count = 1, special = false) => {
+    const n = special ? 1 : Math.min(count, save.boosters);
+    if (special ? save.daily.special : n <= 0) return;
+    const groups: BoosterGroup[] = [];
     const fresh = new Set<number>();
     const seen = new Set(
       Object.keys(save.owned)
@@ -73,46 +67,43 @@ export default function App() {
     );
     let pity = save.pity;
     for (let i = 0; i < n; i++) {
-      const batch = openBooster({ guaranteeA: pity + 1 >= PITY_LIMIT });
-      const batchSecret = rollSecrets(batch.length);
-      pity = batch.some((c) => c.rarity === "A") ? 0 : pity + 1;
-      for (const c of batch) {
+      const cards = special
+        ? openBooster({ pool: specialSeries(save.daily.day).cards })
+        : openBooster({ guaranteeA: pity + 1 >= PITY_LIMIT });
+      const secret = rollSecrets(cards.length);
+      pity = cards.some((c) => c.rarity === "A") ? 0 : pity + 1;
+      for (const c of cards) {
         if (!seen.has(c.id)) fresh.add(c.id);
         seen.add(c.id);
       }
-      spendBooster(batch, batchSecret);
-      cards.push(...batch);
-      secret.push(...batchSecret);
+      spendBooster(cards, secret, special);
+      groups.push(sortByRarity(cards, secret));
     }
-    const wanted = new Set(cards.filter((c) => save.wanted.includes(c.id)).map((c) => c.id));
-    setPull({ id: save.opened + 1, ...sortByRarity(cards, secret), fresh, wanted, batch: n });
+    const all = groups.flatMap((g) => g.cards);
+    const wanted = new Set(all.filter((c) => save.wanted.includes(c.id)).map((c) => c.id));
+    setPull({ id: save.opened + 1, groups, fresh, wanted });
   };
 
   return (
     <>
-      <Header
-        page={page}
-        onNavigate={setPage}
-        boosters={save.boosters}
-        ink={save.ink}
-        nextIn={nextIn}
-        readyLinks={readyLinks}
-        readyAlbums={readyAlbums}
-        affaireOpen={!save.daily.affaire.done}
-        xp={save.xp}
-      />
+      <TopBar boosters={save.boosters} ink={save.ink} xp={save.xp} onHome={() => setPage("home")} />
 
       <main className="main">
+        {isCollection(page) && (
+          <CollectionTabs
+            page={page}
+            onNavigate={setPage}
+            readyAlbums={readyAlbums}
+            readyLinks={readyLinks}
+          />
+        )}
         {page === "home" ? (
           <HomePage
             save={save}
             nextIn={nextIn}
-            onOpen={() => open()}
-            onOpenSpecial={() => open(true)}
+            onOpen={(n) => open(n)}
+            onOpenSpecial={() => open(1, true)}
             onShowAffaire={() => setPage("affaire")}
-            onOpenAll={openAll}
-            onShowArchive={() => setPage("archive")}
-            onFocus={setFocus}
             onClaim={claim}
           />
         ) : page === "affaire" ? (
@@ -121,7 +112,7 @@ export default function App() {
           <AlbumsPage save={save} onFocus={setFocus} onClaim={claimAlbum} />
         ) : page === "archive" ? (
           <ArchivePage save={save} onFocus={setFocus} onShredAll={() => shred()} onReset={reset} />
-        ) : (
+        ) : page === "links" ? (
           <LinksPage
             save={save}
             onFuse={fuseLink}
@@ -129,18 +120,27 @@ export default function App() {
             onFocusCard={setFocus}
             onKeepOneChange={setKeepOne}
           />
+        ) : page === "market" ? (
+          <SoonPage
+            title="Marché"
+            text="Échanger et vendre ses doublons contre de l'encre, entre joueurs. Il arrive avec les comptes (connexion Discord)."
+          />
+        ) : (
+          <SoonPage
+            title="Amis"
+            text="Voir la collection de tes amis, comparer vos cartes et le classement. Il arrive avec les comptes (connexion Discord)."
+          />
         )}
       </main>
+
+      <BottomNav page={page} onNavigate={setPage} collectionBadge={readyAlbums + readyLinks} />
 
       {pull && (
         <OpeningScreen
           key={pull.id}
           pull={pull}
-          boostersLeft={save.boosters}
-          onAgain={() => open()}
-          onOpenAll={openAll}
           onClose={() => setPull(null)}
-          onShowArchive={() => {
+          onShowCollection={() => {
             setPull(null);
             setPage("archive");
           }}

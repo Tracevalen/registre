@@ -67,14 +67,14 @@ export function AlbumsPage({ save, onFocus, onClaim }: Props) {
       </div>
 
       <p className="links-intro-text">
-        Complète toutes les fiches d'une série pour boucler son album. Chaque album rapporte 10 encre par
-        fiche, et les albums de 5 fiches ou plus offrent aussi des dossiers.
+        Complète toutes les cartes d'une saga pour boucler son album. Chaque album rapporte 10 encre par
+        carte, et les albums de 5 cartes ou plus offrent aussi des boosters.
       </p>
 
       {list.length === 0 ? (
         <p className="empty mono">
           {filter === "started"
-            ? "Aucun album commencé. Ouvre des dossiers pour en lancer un."
+            ? "Aucun album commencé. Ouvre des boosters pour en lancer un."
             : "Aucun album ici."}
         </p>
       ) : (
@@ -110,7 +110,7 @@ export function AlbumsPage({ save, onFocus, onClaim }: Props) {
                       <button
                         className={`album-thumb is-missing class-${c.rarity}`}
                         onClick={() => onFocus(c)}
-                        aria-label={`Fiche classe ${c.rarity} non archivée`}
+                        aria-label={`Carte de rareté ${c.rarity} pas encore obtenue`}
                       >
                         <span>{c.rarity}</span>
                       </button>
@@ -122,7 +122,7 @@ export function AlbumsPage({ save, onFocus, onClaim }: Props) {
                 <span className="mono">
                   +{album.reward} encre
                   {album.bonusBoosters > 0 &&
-                    ` · +${album.bonusBoosters} dossier${album.bonusBoosters > 1 ? "s" : ""}`}
+                    ` · +${album.bonusBoosters} booster${album.bonusBoosters > 1 ? "s" : ""}`}
                 </span>
                 {claimed ? (
                   <span className="mission-stamp mono">Bouclé</span>

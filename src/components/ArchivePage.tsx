@@ -20,6 +20,7 @@ const SERIES = [...new Set(CARDS.map((c) => c.anime))].sort((a, b) => a.localeCo
 export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
   const [rarity, setRarity] = useState<Rarity | "all">("all");
   const [series, setSeries] = useState("all");
+  const [kind, setKind] = useState<"all" | "game" | "character">("all");
   const [query, setQuery] = useState("");
   const [ownedOnly, setOwnedOnly] = useState(false);
   const [wantedOnly, setWantedOnly] = useState(false);
@@ -34,6 +35,7 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
       (c) =>
         (rarity === "all" || c.rarity === rarity) &&
         (series === "all" || c.anime === series) &&
+        (kind === "all" || c.kind === kind) &&
         (!ownedOnly || owned(c)) &&
         (!wantedOnly || save.wanted.includes(c.id)) &&
         (!dupOnly || (save.owned[c.id] ?? 0) > 1) &&
@@ -45,7 +47,7 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
     if (sort === "recent")
       out.sort((a, b) => (save.firstSeen[b.id] ?? 0) - (save.firstSeen[a.id] ?? 0) || a.number - b.number);
     return out;
-  }, [rarity, series, query, ownedOnly, wantedOnly, dupOnly, sort, save]);
+  }, [rarity, series, kind, query, ownedOnly, wantedOnly, dupOnly, sort, save]);
   const dupCount = CARDS.filter((c) => (save.owned[c.id] ?? 0) > 1).length;
 
   const total = CARDS.filter((c) => save.owned[c.id]).length;
@@ -61,13 +63,13 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
     <div className="archive">
       <div className="archive-head">
         <div>
-          <p className="kicker mono">Archive</p>
+          <p className="kicker mono">Collection</p>
           <h1 className="archive-count">
             {String(total).padStart(3, "0")}
             <span>/{CARDS.length}</span>
           </h1>
         </div>
-        <div className="segmented" role="group" aria-label="Filtrer par classe">
+        <div className="segmented" role="group" aria-label="Filtrer par rareté">
           <button className={rarity === "all" ? "is-active" : ""} onClick={() => setRarity("all")}>
             <strong>Tout</strong>
             <span className="mono">
@@ -97,26 +99,31 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
         <input
           className="field field-search"
           type="search"
-          placeholder="Rechercher un nom ou une série"
+          placeholder="Rechercher un nom, un jeu ou une saga"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
         <select className="field" value={series} onChange={(e) => setSeries(e.target.value)}>
-          <option value="all">Toutes les séries</option>
+          <option value="all">Toutes les sagas</option>
           {SERIES.map((s) => (
             <option key={s} value={s}>
               {s}
             </option>
           ))}
         </select>
+        <select className="field" value={kind} onChange={(e) => setKind(e.target.value as typeof kind)}>
+          <option value="all">Jeux et personnages</option>
+          <option value="game">Jeux</option>
+          <option value="character">Personnages</option>
+        </select>
         <select className="field" value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
           <option value="number">Tri · numéro</option>
-          <option value="rarity">Tri · classe</option>
+          <option value="rarity">Tri · rareté</option>
           <option value="recent">Tri · récentes</option>
         </select>
         <label className="check">
           <input type="checkbox" checked={ownedOnly} onChange={(e) => setOwnedOnly(e.target.checked)} />
-          Archivées seulement
+          Obtenues seulement
         </label>
         <label className="check">
           <input type="checkbox" checked={dupOnly} onChange={(e) => setDupOnly(e.target.checked)} />
@@ -140,8 +147,8 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
         <div>
           <strong>Broyeuse</strong>
           <p>
-            Tes doublons deviennent de l'encre. Avec l'encre, tu demandes l'accès à n'importe quelle fiche. Un
-            exemplaire de chaque fiche est toujours gardé, et les Top secret ne sont jamais broyés.
+            Tes doublons deviennent de l'encre. Avec l'encre, tu demandes l'accès à n'importe quelle carte. Un
+            exemplaire de chaque carte est toujours gardé, et les Top secret ne sont jamais broyés.
           </p>
         </div>
         <div className="shredder-side">
@@ -199,7 +206,7 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
                   <span className="redacted" />
                   <span className="redacted short" />
                   <span className="empty-fiche-label mono">
-                    {save.wanted.includes(c.id) ? "Avis de recherche" : "Non archivée"}
+                    {save.wanted.includes(c.id) ? "Avis de recherche" : "Pas encore obtenue"}
                   </span>
                 </div>
                 <div className="empty-fiche-series">{c.anime}</div>
@@ -213,10 +220,10 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
             <thead>
               <tr>
                 <th>N°</th>
-                <th>Classe</th>
+                <th>Rareté</th>
                 <th>Nom</th>
-                <th>Série</th>
-                <th className="num">Fans</th>
+                <th>Saga</th>
+                <th className="num">Popularité</th>
                 <th className="num">Ex.</th>
               </tr>
             </thead>

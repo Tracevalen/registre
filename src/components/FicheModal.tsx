@@ -41,7 +41,7 @@ export function FicheModal({ card, save, onClose, onShred, onRequest, onToggleWa
       onClick={onClose}
       role="dialog"
       aria-modal
-      aria-label={owned ? card.name : "Fiche non archivée"}
+      aria-label={owned ? card.name : "Carte pas encore obtenue"}
     >
       <div className="modal-panel" onClick={(e) => e.stopPropagation()}>
         {owned ? (
@@ -57,7 +57,7 @@ export function FicheModal({ card, save, onClose, onShred, onRequest, onToggleWa
                 <span className="redacted" />
                 <span className="redacted short" />
                 <span className="empty-fiche-label mono">
-                  {wanted ? "Avis de recherche" : "Non archivée"}
+                  {wanted ? "Avis de recherche" : "Pas encore obtenue"}
                 </span>
               </div>
               <div className="empty-fiche-series">{card.anime}</div>
@@ -66,20 +66,24 @@ export function FicheModal({ card, save, onClose, onShred, onRequest, onToggleWa
         )}
 
         <div className="modal-info">
-          <p className="kicker mono">Fiche N°{formatNumber(card.number)}</p>
-          <h2 className="modal-name">{owned ? card.name : "Identité classifiée"}</h2>
+          <p className="kicker mono">Carte N°{formatNumber(card.number)}</p>
+          <h2 className="modal-name">{owned ? card.name : "Carte mystère"}</h2>
           {owned && card.nativeName && <p className="modal-native">{card.nativeName}</p>}
           <dl className="spec">
-            <dt>Classe</dt>
+            <dt>Rareté</dt>
             <dd>
-              <span className={`class-chip class-${card.rarity}`}>{r.id}</span> {r.name}
+              <span className={`rarity-pill class-${card.rarity}`}>{r.name}</span>
             </dd>
-            <dt>Série</dt>
-            <dd>{card.anime}</dd>
+            <dt>Saga</dt>
+            <dd>
+              {card.kind === "game"
+                ? [card.anime, card.studio, card.year].filter(Boolean).join(" · ")
+                : card.anime}
+            </dd>
             {owned && (
               <>
-                <dt>Fans AniList</dt>
-                <dd className="mono">{formatFans(card.favourites)}</dd>
+                <dt>Popularité</dt>
+                <dd className="mono">{formatFans(card.favourites)} votes IGDB</dd>
                 <dt>Exemplaires</dt>
                 <dd className="mono">
                   {count}
@@ -96,7 +100,7 @@ export function FicheModal({ card, save, onClose, onShred, onRequest, onToggleWa
             )}
             {firstSeen && (
               <>
-                <dt>Archivée le</dt>
+                <dt>Obtenue le</dt>
                 <dd className="mono">{formatDate(firstSeen)}</dd>
               </>
             )}
@@ -140,13 +144,13 @@ export function FicheModal({ card, save, onClose, onShred, onRequest, onToggleWa
           </div>
           {!owned && save.ink < cost && (
             <p className="modal-hint">
-              Il te manque {cost - save.ink} encre. Broie tes doublons depuis l'archive pour en gagner.
+              Il te manque {cost - save.ink} encre. Broie tes doublons depuis ta collection pour en gagner.
             </p>
           )}
 
           {owned && (
             <a className="link mono" href={card.url} target="_blank" rel="noreferrer">
-              Source AniList ↗
+              Fiche IGDB ↗
             </a>
           )}
         </div>

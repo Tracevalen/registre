@@ -4,17 +4,33 @@ import { RARITIES, rarityRank, type Rarity } from "./rarities";
 
 export const CARDS_PER_BOOSTER = 5;
 
-/** Un dossier ouvert : ses fiches et celles qui sont nouvelles pour le joueur. */
+/** Un booster ouvert : ses 5 cartes, de la plus rare à la plus courante. */
+export interface BoosterGroup {
+  cards: Card[];
+  /** Cartes sorties en version Top secret, par emplacement. */
+  secret: boolean[];
+}
+
+/** Une ouverture : un ou plusieurs boosters ouverts d'un coup. */
 export interface Pull {
   id: number;
-  cards: Card[];
+  groups: BoosterGroup[];
+  /** Cartes que le joueur n'avait pas encore. */
   fresh: Set<number>;
-  /** Fiches sorties en version Top secret, par emplacement. */
-  secret: boolean[];
-  /** Fiches qui figuraient dans les avis de recherche. */
+  /** Cartes qui figuraient dans les avis de recherche. */
   wanted: Set<number>;
-  /** Nombre de dossiers ouverts d'un coup (« Tout ouvrir »). */
-  batch?: number;
+}
+
+/** Indice de la meilleure carte d'un booster (rareté, puis Top secret, puis popularité). */
+export function bestIndex(group: BoosterGroup) {
+  let b = 0;
+  group.cards.forEach((c, i) => {
+    const cur = group.cards[b];
+    const score = rarityRank(c.rarity) * 2 + (group.secret[i] ? 1 : 0);
+    const bestScore = rarityRank(cur.rarity) * 2 + (group.secret[b] ? 1 : 0);
+    if (score > bestScore || (score === bestScore && c.favourites > cur.favourites)) b = i;
+  });
+  return b;
 }
 
 function pick<T>(items: T[]): T {

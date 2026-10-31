@@ -25,18 +25,18 @@ export function LinkModal({ link, count, firstFused, fresh = false, onClose }: P
         <LinkedFiche link={link} className={`fiche-lg ${fresh ? "is-fresh" : ""}`} />
         <div className="modal-info">
           <p className="kicker mono">
-            Dossier lié {formatLinkNumber(link.number)}
+            Fusion {formatLinkNumber(link.number)}
             {fresh && <span className="tag-new">Agrafé</span>}
           </p>
           <h2 className="modal-name">{link.title}</h2>
           <dl className="spec">
-            <dt>Classe</dt>
+            <dt>Rareté</dt>
             <dd>
               <span className="class-chip class-S chip-wide">{link.kind.toUpperCase()}</span> Rareté liaison
             </dd>
             <dt>Type</dt>
             <dd>{link.kind === "duo" ? "Duo" : "Trio"}</dd>
-            <dt>Série</dt>
+            <dt>Saga</dt>
             <dd>{link.anime}</dd>
             <dt>Pièces</dt>
             <dd>{link.members.map((c) => c.name).join(", ")}</dd>
@@ -44,7 +44,7 @@ export function LinkModal({ link, count, firstFused, fresh = false, onClose }: P
             <dd className="mono">{count}</dd>
             {firstFused && (
               <>
-                <dt>Agrafé le</dt>
+                <dt>Fusionné le</dt>
                 <dd className="mono">{formatDate(firstFused)}</dd>
               </>
             )}

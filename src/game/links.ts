@@ -1,5 +1,5 @@
-// Dossiers liés : des duos et des trios qu'on obtient uniquement en agrafant
-// les fiches de leurs membres. Les fiches agrafées sont consommées.
+// Fusions : des duos et des trios qu'on obtient uniquement en fusionnant
+// les cartes de leurs membres. Les cartes fusionnées sont consommées.
 
 import { CARDS, type Card } from "./cards";
 import { RARITIES, type Rarity } from "./rarities";
@@ -26,65 +26,191 @@ export interface Link {
   rarity: LinkClass;
 }
 
+/** Un membre : identifiant de la carte, nom exact, ou plusieurs orthographes possibles. */
+type Member = number | string | string[];
+
 interface LinkDef {
   id: string;
   title: string;
-  /** Identifiants AniList des personnages, présents dans cards.json. */
-  members: number[];
+  members: Member[];
 }
 
-// Liste tenue à la main : AniList ne fournit pas les paires de personnages.
+// Liste tenue à la main : les bases ne fournissent pas les paires de personnages.
+// Une liaison dont un membre manque dans cards.json est simplement ignorée.
+// Membres : identifiant de la base, nom exact, ou liste de noms possibles.
 const DEFS: LinkDef[] = [
+  // Jeux vidéo : suites et trilogies, repérées par le nom exact du jeu
+  { id: "portal", title: "Portal 1 & 2", members: ["Portal", "Portal 2"] },
+  { id: "half-life", title: "Half-Life 1 & 2", members: ["Half-Life", "Half-Life 2"] },
+  {
+    id: "rdr",
+    title: "Red Dead Redemption 1 & 2",
+    members: ["Red Dead Redemption", "Red Dead Redemption 2"],
+  },
+  { id: "tlou", title: "The Last of Us I & II", members: ["The Last of Us", "The Last of Us Part II"] },
+  { id: "gow", title: "God of War & Ragnarök", members: ["God of War", "God of War Ragnarök"] },
+  {
+    id: "witcher",
+    title: "The Witcher 2 & 3",
+    members: ["The Witcher 2: Assassins of Kings", "The Witcher 3: Wild Hunt"],
+  },
+  { id: "bioshock", title: "BioShock & Infinite", members: ["BioShock", "BioShock Infinite"] },
+  { id: "l4d", title: "Left 4 Dead 1 & 2", members: ["Left 4 Dead", "Left 4 Dead 2"] },
+  { id: "borderlands", title: "Borderlands 1 & 2", members: ["Borderlands", "Borderlands 2"] },
+  {
+    id: "elder-scrolls",
+    title: "Oblivion & Skyrim",
+    members: ["The Elder Scrolls IV: Oblivion", "The Elder Scrolls V: Skyrim"],
+  },
+  { id: "arkham", title: "Arkham Asylum & City", members: ["Batman: Arkham Asylum", "Batman: Arkham City"] },
+  {
+    id: "uncharted",
+    title: "Uncharted 2 & 4",
+    members: ["Uncharted 2: Among Thieves", "Uncharted 4: A Thief's End"],
+  },
+  {
+    id: "mass-effect",
+    title: "Trilogie Mass Effect",
+    members: ["Mass Effect", "Mass Effect 2", "Mass Effect 3"],
+  },
+  {
+    id: "dark-souls",
+    title: "Trilogie Dark Souls",
+    members: ["Dark Souls", "Dark Souls II", "Dark Souls III"],
+  },
+  {
+    id: "gta",
+    title: "San Andreas, IV & V",
+    members: ["Grand Theft Auto: San Andreas", "Grand Theft Auto IV", "Grand Theft Auto V"],
+  },
+  {
+    id: "fallout",
+    title: "Fallout 3, New Vegas & 4",
+    members: ["Fallout 3", "Fallout: New Vegas", "Fallout 4"],
+  },
+  // Professeur Layton
+  { id: "layton-luke", title: "Layton & Luke", members: ["Professor Hershel Layton", "Luke Triton"] },
+  {
+    id: "layton-trio",
+    title: "Trilogie Layton",
+    members: [
+      "Professor Layton and the Curious Village",
+      "Professor Layton and the Diabolical Box",
+      "Professor Layton and the Unwound Future",
+    ],
+  },
+  // Personnages de jeux vidéo. Plusieurs orthographes possibles : la première trouvée dans cards.json est prise.
   // Duos
-  { id: "gon-killua", title: "Gon & Killua", members: [30, 27] },
-  { id: "luffy-zoro", title: "Luffy & Zoro", members: [40, 62] },
-  { id: "naruto-sasuke", title: "Naruto & Sasuke", members: [17, 13] },
-  { id: "freres-uchiha", title: "Les frères Uchiha", members: [14, 13] },
-  { id: "levi-erwin", title: "Levi & Erwin", members: [45627, 46496] },
-  { id: "tanjirou-nezuko", title: "Tanjirou & Nezuko", members: [126071, 127518] },
-  { id: "light-l", title: "Light & L", members: [80, 71] },
-  { id: "freres-elric", title: "Les frères Elric", members: [11, 12] },
-  { id: "gojou-getou", title: "Gojou & Getou", members: [127691, 133699] },
-  { id: "itadori-toudou", title: "Itadori & Toudou", members: [127212, 137975] },
-  { id: "hinata-kageyama", title: "Hinata & Kageyama", members: [64769, 64771] },
-  { id: "deku-bakugou", title: "Deku & Bakugou", members: [89028, 88892] },
-  { id: "reigen-mob", title: "Reigen & Mob", members: [89334, 89616] },
-  { id: "guts-griffith", title: "Guts & Griffith", members: [422, 424] },
-  { id: "okabe-kurisu", title: "Okabe & Kurisu", members: [35252, 34470] },
-  { id: "kaguya-shirogane", title: "Kaguya & Shirogane", members: [120649, 121101] },
-  { id: "ichigo-rukia", title: "Ichigo & Rukia", members: [5, 6] },
-  { id: "gintoki-kagura", title: "Gintoki & Kagura", members: [672, 674] },
-  { id: "lelouch-cc", title: "Lelouch & C.C.", members: [417, 1111] },
-  { id: "gokuu-vegeta", title: "Gokuu & Vegeta", members: [246, 913] },
-  { id: "saitama-genos", title: "Saitama & Genos", members: [73935, 73979] },
-  { id: "dazai-chuuya", title: "Dazai & Chuuya", members: [89198, 89853] },
-  { id: "miyamura-hori", title: "Miyamura & Hori", members: [66173, 66171] },
-  { id: "thorfinn-askeladd", title: "Thorfinn & Askeladd", members: [10138, 13020] },
-  { id: "mai-sakuta", title: "Mai & Sakuta", members: [127222, 127221] },
-  { id: "kamina-simon", title: "Kamina & Simon", members: [2075, 2257] },
-  { id: "gyro-johnny", title: "Gyro & Johnny", members: [11772, 19492] },
+  {
+    id: "joel-ellie",
+    title: "Joel & Ellie",
+    members: [
+      ["Joel", "Joel Miller"],
+      ["Ellie", "Ellie Williams"],
+    ],
+  },
+  { id: "kratos-atreus", title: "Kratos & Atreus", members: ["Kratos", "Atreus"] },
+  {
+    id: "geralt-ciri",
+    title: "Geralt & Ciri",
+    members: [
+      ["Geralt of Rivia", "Geralt"],
+      ["Ciri", "Cirilla Fiona Elen Riannon"],
+    ],
+  },
+  { id: "arthur-john", title: "Arthur & John", members: ["Arthur Morgan", "John Marston"] },
+  {
+    id: "drake-sully",
+    title: "Nathan Drake & Sully",
+    members: ["Nathan Drake", ["Victor Sullivan", "Sully"]],
+  },
+  { id: "ratchet-clank", title: "Ratchet & Clank", members: ["Ratchet", "Clank"] },
+  { id: "jak-daxter", title: "Jak & Daxter", members: ["Jak", "Daxter"] },
+  {
+    id: "sonic-tails",
+    title: "Sonic & Tails",
+    members: [
+      ["Sonic the Hedgehog", "Sonic"],
+      ['Miles "Tails" Prower', "Tails", "Miles Prower"],
+    ],
+  },
+  { id: "crash-coco", title: "Crash & Coco", members: ["Crash Bandicoot", "Coco Bandicoot"] },
+  { id: "banjo-kazooie", title: "Banjo & Kazooie", members: ["Banjo", "Kazooie"] },
+  { id: "chell-glados", title: "Chell & GLaDOS", members: ["Chell", "GLaDOS"] },
+  {
+    id: "chief-cortana",
+    title: "Master Chief & Cortana",
+    members: [["Master Chief", "John-117", "Master Chief Petty Officer John-117"], "Cortana"],
+  },
+  { id: "ryu-ken", title: "Ryu & Ken", members: ["Ryu", ["Ken Masters", "Ken"]] },
+  { id: "scorpion-subzero", title: "Scorpion & Sub-Zero", members: ["Scorpion", "Sub-Zero"] },
+  { id: "mishima", title: "Les Mishima", members: ["Kazuya Mishima", "Heihachi Mishima"] },
+  {
+    id: "leon-claire",
+    title: "Leon & Claire",
+    members: [["Leon S. Kennedy", "Leon Scott Kennedy", "Leon Kennedy"], "Claire Redfield"],
+  },
+  { id: "chris-jill", title: "Chris & Jill", members: ["Chris Redfield", "Jill Valentine"] },
+  { id: "snake-otacon", title: "Snake & Otacon", members: ["Solid Snake", ["Otacon", "Hal Emmerich"]] },
+  { id: "dante-vergil", title: "Dante & Vergil", members: ["Dante", "Vergil"] },
+  { id: "cloud-sephiroth", title: "Cloud & Sephiroth", members: ["Cloud Strife", "Sephiroth"] },
+  { id: "tidus-yuna", title: "Tidus & Yuna", members: ["Tidus", "Yuna"] },
+  {
+    id: "ezio-altair",
+    title: "Ezio & Altaïr",
+    members: [
+      ["Ezio Auditore da Firenze", "Ezio Auditore"],
+      ["Altaïr Ibn-La'Ahad", "Altair Ibn-La'Ahad", "Altaïr"],
+    ],
+  },
+  {
+    id: "phoenix-edgeworth",
+    title: "Phoenix Wright & Miles Edgeworth",
+    members: ["Phoenix Wright", "Miles Edgeworth"],
+  },
+  { id: "joker-morgana", title: "Joker & Morgana", members: [["Joker", "Ren Amamiya"], "Morgana"] },
   // Trios
-  { id: "equipe-kakashi", title: "Équipe Kakashi", members: [17, 13, 85] },
-  { id: "premiere-annee", title: "Première année de Tokyo", members: [127212, 126635, 133700] },
-  { id: "shiganshina", title: "Trio de Shiganshina", members: [40882, 40881, 46494] },
-  { id: "equipe-tanjirou", title: "Tanjirou, Inosuke & Zenitsu", members: [126071, 129130, 129131] },
-  { id: "famille-forger", title: "La famille Forger", members: [138102, 138100, 138101] },
-  { id: "groupe-frieren", title: "Le groupe de Frieren", members: [176754, 183965, 184313] },
-  { id: "kessoku-band", title: "Kessoku Band", members: [257562, 261674, 264529] },
-  { id: "groupe-kazuma", title: "Le groupe de Kazuma", members: [89364, 89362, 89361] },
-  { id: "grace-field", title: "Les enfants de Grace Field", members: [121725, 121700, 121724] },
-  { id: "chainsaw-trio", title: "Denji, Power & Aki", members: [130102, 137079, 137081] },
-  { id: "quintuplees", title: "Les sœurs Nakano", members: [126375, 126373, 126372] },
+  {
+    id: "layton-famille",
+    title: "Layton, Luke & Emmy",
+    members: ["Professor Hershel Layton", "Luke Triton", "Emmy Altava"],
+  },
+  { id: "kingdom-hearts", title: "Sora, Donald & Dingo", members: ["Sora", "Donald Duck", "Goofy"] },
+  {
+    id: "gta-v",
+    title: "Michael, Franklin & Trevor",
+    members: ["Michael De Santa", "Franklin Clinton", "Trevor Philips"],
+  },
+  {
+    id: "grove-street",
+    title: "Grove Street",
+    members: [
+      ["Carl Johnson", "CJ"],
+      ["Big Smoke", "Melvin Harris"],
+      ["Ryder", "Lance Wilson"],
+    ],
+  },
 ];
 
 const CARD_BY_ID = new Map(CARDS.map((c) => [c.id, c]));
+const norm = (s: string) =>
+  s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+const CARD_BY_NAME = new Map<string, Card>();
+// Les cartes sont rangées par popularité : en cas d'homonymes, on garde le plus populaire.
+for (const c of CARDS) if (!CARD_BY_NAME.has(norm(c.name))) CARD_BY_NAME.set(norm(c.name), c);
+
+const resolve = (m: Member) =>
+  typeof m === "number"
+    ? CARD_BY_ID.get(m)
+    : (Array.isArray(m) ? m : [m]).map((n) => CARD_BY_NAME.get(norm(n))).find(Boolean);
 
 export const LINKS: Link[] = DEFS.flatMap((def, i) => {
-  const members = def.members.map((id) => CARD_BY_ID.get(id));
-  if (members.some((c) => !c)) {
-    console.warn(`Dossier lié « ${def.id} » ignoré : un membre est absent de cards.json.`);
-    return [];
-  }
+  const members = def.members.map(resolve);
+  if (members.some((c) => !c)) return [];
   const cards = members as Card[];
   return [
     {

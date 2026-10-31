@@ -69,7 +69,8 @@ export interface SaveData {
   prestige: Record<number, number>;
 }
 
-const KEY = "registre-save-v1";
+// Nouvelle clé : les cartes d'anime ont été remplacées par des jeux vidéo, la collection repart de zéro.
+const KEY = "registre-jeux-v1";
 
 const freshDaily = (t: number): Daily => ({
   day: dayKey(t),

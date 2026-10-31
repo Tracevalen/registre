@@ -1,10 +1,9 @@
 import { useEffect, useState, type PointerEvent } from "react";
 import { formatFans, type Card } from "../game/cards";
 import { RARITY_BY_ID, type Rarity } from "../game/rarities";
-import { Dossier } from "./Dossier";
+import { BoosterPack } from "./BoosterPack";
 import { Fiche } from "./Fiche";
 import { Particles } from "./Particles";
-import * as sound from "../lib/sound";
 
 interface Props {
   card: Card;
@@ -12,7 +11,6 @@ interface Props {
   fresh: boolean;
   /** Numéro affiché sur le dossier, ou nombre de dossiers ouverts d'un coup. */
   dossierNumber: number;
-  batch?: number;
   onDone: () => void;
 }
 
@@ -41,18 +39,23 @@ const GENDER: Record<string, { value: string; symbol: string }> = {
   "non-binary": { value: "Non-binaire", symbol: "⚧" },
 };
 
-/** Ordre des indices : sexe, puis style de l'œuvre, puis l'œuvre elle-même. */
+/**
+ * Indices avant la révélation. Jeux vidéo : année, style, puis studio.
+ * Personnages : sexe, style, puis saga.
+ */
 function cluesFor(card: Card): Clue[] {
   const clues: Clue[] = [];
+  if (card.year) clues.push({ key: "annee", label: "Sortie", value: String(card.year) });
   const g = card.gender ? GENDER[card.gender.toLowerCase()] : undefined;
   if (g) clues.push({ key: "genre", label: "Sexe", value: g.value, symbol: g.symbol });
   if (card.style) clues.push({ key: "style", label: "Style", value: card.style });
-  clues.push({ key: "univers", label: "Univers", value: card.anime, image: card.cover ?? undefined });
+  if (card.studio) clues.push({ key: "studio", label: "Studio", value: card.studio });
+  else clues.push({ key: "univers", label: "Saga", value: card.anime, image: card.cover ?? undefined });
   return clues;
 }
 
 /** Révélation de la meilleure fiche, façon pack opening : tension, explosion, indices, carte en 3D. */
-export function PackReveal({ card, secret, fresh, dossierNumber, batch, onDone }: Props) {
+export function PackReveal({ card, secret, fresh, dossierNumber, onDone }: Props) {
   const clues = cluesFor(card);
   const [phase, setPhase] = useState<Phase>("charge");
   const [clue, setClue] = useState(0);
@@ -78,11 +81,6 @@ export function PackReveal({ card, secret, fresh, dossierNumber, batch, onDone }
     if (phase === "show") setBurst((b) => b + 1);
     return () => clearTimeout(t);
   }, [phase, clue, clues.length, card.rarity]);
-
-  // La musique (lancée à l'arrivée sur l'écran d'ouverture) s'éteint en fondu dès que la carte est révélée.
-  useEffect(() => {
-    if (phase === "show") sound.fadeOutMusic(1.8);
-  }, [phase]);
 
   const skip = () => {
     if (phase === "show") return;
@@ -114,9 +112,8 @@ export function PackReveal({ card, secret, fresh, dossierNumber, batch, onDone }
       {phase === "charge" && (
         <div className="reveal-pack" onClick={() => setPhase("burst")}>
           <div className="reveal-pack-inner">
-            <Dossier number={dossierNumber} />
+            <BoosterPack number={dossierNumber} />
           </div>
-          {batch ? <span className="reveal-batch mono">×{batch} dossiers</span> : null}
         </div>
       )}
 
@@ -164,13 +161,13 @@ export function PackReveal({ card, secret, fresh, dossierNumber, batch, onDone }
               <p className="reveal-name">{card.name}</p>
               <div className="reveal-tags mono">
                 <span>
-                  Classe {r.id} · {r.name} · {formatFans(card.favourites)} fans
+                  {r.name} · {formatFans(card.favourites)} votes IGDB
                 </span>
                 {fresh && <span className="tag-new">Nouvelle</span>}
                 {secret && <span className="tag-secret">Top secret</span>}
               </div>
               <button className="btn btn-primary" onClick={onDone} autoFocus>
-                Voir les fiches
+                Voir le booster
               </button>
             </div>
           )}

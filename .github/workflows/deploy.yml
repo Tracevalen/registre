@@ -25,24 +25,31 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # Reprend la dernière liste de personnages téléchargée avec succès.
+      # Reprend la dernière liste de cartes de jeux vidéo téléchargée avec succès.
       - id: cards-cache
         uses: actions/cache/restore@v4
         with:
           path: src/data/cards.json
-          key: cards-${{ github.run_id }}
-          restore-keys: cards-
-      # Met à jour les 1000 personnages depuis AniList, 4 minutes maximum.
-      # Si AniList est lent ou refuse, on garde la liste précédente et le site se publie quand même.
+          key: jeux-${{ github.run_id }}
+          restore-keys: jeux-
+      # Télécharge les jeux et personnages depuis IGDB, 4 minutes maximum.
+      # Si IGDB est lent ou refuse, on garde la liste précédente.
       - id: cards
         run: npm run cards
+        env:
+          IGDB_CLIENT_ID: ${{ secrets.IGDB_CLIENT_ID }}
+          IGDB_CLIENT_SECRET: ${{ secrets.IGDB_CLIENT_SECRET }}
         timeout-minutes: 4
         continue-on-error: true
       - if: steps.cards.outcome == 'success'
         uses: actions/cache/save@v4
         with:
           path: src/data/cards.json
-          key: cards-${{ github.run_id }}
+          key: jeux-${{ github.run_id }}
+      # Sans aucune carte de jeu (clés IGDB absentes la première fois), on ne publie pas un site vide.
+      - name: Vérifie les cartes
+        run: |
+          node -e "const c=require('./src/data/cards.json'); if (c.length < 100 || !c.every(x => x.kind)) { console.error('Aucune carte de jeu vidéo : ajoute les secrets IGDB_CLIENT_ID et IGDB_CLIENT_SECRET dans GitHub (Settings > Secrets and variables > Actions), puis relance.'); process.exit(1) } console.log(c.length + ' cartes')"
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

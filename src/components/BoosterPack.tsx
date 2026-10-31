@@ -1,18 +1,32 @@
 interface Props {
-  /** Numéro gravé au dos du booster. */
+  /** Numéro du booster, affiché en bas. */
   number?: number;
   className?: string;
 }
 
-/** Le booster : une plaque de verre dépoli avec le logo au centre. */
+const Sparkle = ({ className }: { className: string }) => (
+  <svg className={`pack-spark ${className}`} viewBox="0 0 24 24" aria-hidden>
+    <path d="M12 2l2 7 7 3-7 3-2 7-2-7-7-3 7-3z" />
+  </svg>
+);
+
+/** Le booster : dégradé rose → violet → bleu, trame de points, étincelles et logo au centre. */
 export function BoosterPack({ number, className = "" }: Props) {
   return (
     <div className={`pack ${className}`} aria-hidden>
+      <span className="pack-dots" />
+      <span className="pack-shine" />
       <span className="pack-sheen" />
-      <span className="pack-title">Registre</span>
+      <Sparkle className="s1" />
+      <Sparkle className="s2" />
+      <Sparkle className="s3" />
       <span className="pack-logo">R</span>
-      <span className="pack-sub">5 cartes · jeux vidéo</span>
-      {number !== undefined && <span className="pack-number">N°{String(number).padStart(4, "0")}</span>}
+      <span className="pack-foot">
+        <span className="pack-name">Booster</span>
+        <span className="pack-count">
+          {number !== undefined ? `N°${String(number).padStart(4, "0")}` : "5 cartes"}
+        </span>
+      </span>
     </div>
   );
 }

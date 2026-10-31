@@ -49,7 +49,7 @@ export function TopBar({ boosters, ink, xp, nextIn, onHome }: TopBarProps) {
       </button>
       <div className="topbar-pills">
         <span className="pill" title="Encre : sert à demander une carte précise">
-          <span className="pill-dot is-ink" aria-hidden /> {ink}
+          <span className="pill-coin" aria-hidden /> {ink}
         </span>
         <div className="stock" ref={ref}>
           <button
@@ -58,7 +58,8 @@ export function TopBar({ boosters, ink, xp, nextIn, onHome }: TopBarProps) {
             aria-expanded={open}
             title="Boosters en stock"
           >
-            <span className="pill-dot" aria-hidden /> {boosters}/{MAX_BOOSTERS}
+            <span className="pill-card" aria-hidden /> {boosters}
+            <span className="pill-max">/{MAX_BOOSTERS}</span>
           </button>
           {open && (
             <div className="stock-pop" role="status">

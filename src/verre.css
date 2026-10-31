@@ -1618,3 +1618,481 @@ body {
 .panel-head {
   flex-wrap: wrap;
 }
+
+/* ==================================================================
+   Thème nuit (piste A « Booster vedette ») : fond bleu nuit #000A30,
+   halo violet, panneaux marine, polices Fredoka + Nunito.
+   ================================================================== */
+
+:root {
+  --bg: #000a30;
+  --night: #000a30;
+  --surface: #06134a;
+  --surface-2: #0b1d63;
+  --ink: #f3f4ff;
+  --ink-2: #a9b4e6;
+  --ink-3: #6f7cb8;
+  --hair: #16255f;
+  --line: #1b2c78;
+  --glass: #06134a;
+  --glass-2: #0b1d63;
+  --glass-line: #1b2c78;
+  --on-accent: #2a1466;
+  --font: "Nunito", system-ui, sans-serif;
+  --display: "Fredoka", "Nunito", system-ui, sans-serif;
+  --grad-main: linear-gradient(90deg, #ff6fb5, #9b5cff);
+}
+
+html,
+body {
+  background-color: #000a30;
+}
+
+body {
+  background: radial-gradient(520px 440px at 50% 22%, rgba(155, 92, 255, 0.28), transparent 70%), #000a30;
+  background-attachment: fixed;
+  font-family: var(--font);
+}
+
+/* Titres, chiffres et boutons en Fredoka, arrondie et joueuse. */
+h1,
+h2,
+h3,
+.btn,
+.bottomnav button,
+.topbar-who strong,
+.topbar .pill,
+.timer-time,
+.stock-pop strong,
+.sheet-count strong,
+.booster-badge,
+.stage-info h2,
+.summary-name,
+.reveal-name,
+.fiche-head .fiche-name,
+.special-title,
+.panel-head h2,
+.affaire-teaser-text strong,
+.affaire-teaser-cta {
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.glass {
+  background: #06134a;
+  border: 0;
+  box-shadow: inset 0 0 0 1px #1b2c78;
+  border-radius: 26px;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* ---------- Barre du haut ---------- */
+
+.topbar {
+  background: rgba(0, 10, 48, 0.82);
+  backdrop-filter: none;
+}
+
+.avatar {
+  width: 46px;
+  height: 46px;
+  background: linear-gradient(135deg, #9b5cff, #ff6fb5);
+  font-family: var(--display);
+  font-size: 20px;
+}
+
+.topbar-who strong {
+  font-size: 18px;
+}
+
+.topbar-who span {
+  color: #a9b4e6;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.topbar .pill {
+  height: 36px;
+  padding: 0 14px 0 8px;
+  border: 0;
+  border-radius: 18px;
+  background: #0b1d63;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.pill-coin {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff1b8, #ffd166 55%, #f0a830);
+}
+
+.pill-card {
+  width: 16px;
+  height: 20px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #3ee6e0, #6f8cff);
+}
+
+.pill-max {
+  margin-left: -4px;
+  color: #a9b4e6;
+  font-weight: 600;
+}
+
+.pill-stock.is-full .pill-card {
+  background: linear-gradient(135deg, #ffd166, #ff9f43);
+  box-shadow: 0 0 10px rgba(255, 209, 102, 0.6);
+}
+
+.stock-pop {
+  background: #0b1d63;
+  border: 0;
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px #22358a;
+  color: #a9b4e6;
+}
+
+/* ---------- Barre du bas ---------- */
+
+.bottomnav {
+  background: #0b1d63;
+  border: 0;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px #22358a;
+  backdrop-filter: none !important;
+}
+
+.bottomnav button {
+  color: #a9b4e6;
+  font-size: 14px;
+}
+
+.bottomnav button.is-active {
+  background: linear-gradient(135deg, #9b5cff, #6f5cff);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(155, 92, 255, 0.45);
+}
+
+/* ---------- Boutons ---------- */
+
+.btn {
+  background: #0b1d63;
+  box-shadow: inset 0 0 0 1px #22358a;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.btn:not(:disabled):hover {
+  background: #102575;
+  box-shadow: inset 0 0 0 1px #2e44a0;
+}
+
+.btn-primary,
+.hero .btn-primary,
+.opening .btn-primary {
+  background: linear-gradient(90deg, #ff6fb5, #9b5cff);
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(255, 111, 181, 0.35);
+  text-shadow: none;
+}
+
+.btn-primary:not(:disabled):hover,
+.hero .btn-primary:not(:disabled):hover,
+.opening .btn-primary:not(:disabled):hover {
+  background: linear-gradient(90deg, #ff6fb5, #9b5cff);
+  box-shadow: 0 14px 36px rgba(255, 111, 181, 0.5);
+}
+
+.btn-primary:disabled {
+  background: #0b1d63;
+  color: #6f7cb8;
+}
+
+.btn-wide {
+  min-height: 60px;
+  border-radius: 30px;
+  font-size: 20px;
+}
+
+/* ---------- Le booster ---------- */
+
+.pack {
+  display: block;
+  border: 0;
+  border-radius: 30px;
+  background: linear-gradient(150deg, #ff6fb5 0%, #9b5cff 48%, #4c7dff 100%);
+  box-shadow:
+    0 20px 60px rgba(155, 92, 255, 0.55),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.25);
+  transform: rotate(-3deg);
+}
+
+.pack::before {
+  display: none;
+}
+
+.pack-dots {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.18) 1px, transparent 1.6px) 0 0 / 10px
+    10px;
+}
+
+.pack-shine {
+  position: absolute;
+  left: -18%;
+  top: -20%;
+  width: 88%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.pack-sheen {
+  opacity: 0.6;
+}
+
+.pack-spark {
+  position: absolute;
+  fill: #fff6c9;
+  animation: spark 2.4s ease-in-out infinite;
+}
+
+.pack-spark.s1 {
+  top: 9%;
+  right: 13%;
+  width: 11%;
+}
+
+.pack-spark.s2 {
+  top: 21%;
+  right: 29%;
+  width: 6%;
+  fill: #fff;
+  animation-delay: 0.8s;
+}
+
+.pack-spark.s3 {
+  bottom: 30%;
+  left: 10%;
+  width: 8%;
+  fill: #b8fff8;
+  animation-delay: 1.5s;
+}
+
+@keyframes spark {
+  50% {
+    transform: scale(0.6) rotate(20deg);
+    opacity: 0.6;
+  }
+}
+
+.pack-logo {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 42%;
+  transform: translate(-50%, -50%);
+  border: 0;
+  background: rgba(0, 10, 48, 0.35);
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.5);
+  font-family: var(--display);
+  font-size: clamp(30px, 11cqw, 48px);
+  font-weight: 700;
+}
+
+.pack {
+  container-type: inline-size;
+}
+
+.pack-logo {
+  font-size: 20cqw;
+}
+
+.pack-foot {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pack-name {
+  font-family: var(--display);
+  font-size: 8cqw;
+  font-weight: 600;
+  color: #fff;
+}
+
+.pack-count {
+  padding: 1.6cqw 4.4cqw;
+  border-radius: 999px;
+  background: rgba(0, 10, 48, 0.4);
+  color: #fff;
+  font-size: 5.2cqw;
+  font-weight: 700;
+}
+
+.pack-number,
+.pack-title,
+.pack-sub {
+  display: none;
+}
+
+.booster-hero-btn:hover .pack {
+  transform: rotate(-1deg) scale(1.02);
+}
+
+.booster-badge {
+  background: linear-gradient(135deg, #3ee6e0, #6f8cff);
+  border-color: #000a30;
+  font-family: var(--display);
+  box-shadow: 0 6px 20px rgba(62, 230, 224, 0.45);
+}
+
+/* ---------- Panneaux de l'accueil ---------- */
+
+.boosters .special {
+  background: radial-gradient(circle at 100% 0%, rgba(255, 209, 102, 0.16), transparent 60%), #06134a;
+  box-shadow: inset 0 0 0 1px rgba(255, 209, 102, 0.28);
+}
+
+.boosters .special-title {
+  text-transform: none;
+  font-size: 22px;
+}
+
+.boosters .affaire-teaser {
+  background: #06134a;
+  box-shadow: inset 0 0 0 1px #1b2c78;
+  border: 0;
+}
+
+.missions-panel .mission {
+  background: #0b1d63;
+  border: 0;
+  box-shadow: inset 0 0 0 1px #1b2c78;
+}
+
+.missions-panel .mission.is-ready {
+  box-shadow:
+    inset 0 0 0 1.5px rgba(79, 240, 160, 0.6),
+    0 0 24px rgba(79, 240, 160, 0.15);
+}
+
+.mission-track {
+  background: #16255f;
+}
+
+.booster-note,
+.panel-head span,
+.special-lede,
+.affaire-teaser-text {
+  color: #a9b4e6;
+}
+
+/* ---------- Fenêtre « combien de boosters » ---------- */
+
+.sheet-panel {
+  background: #06134a;
+  border: 0;
+  box-shadow:
+    0 -20px 60px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 #22358a;
+}
+
+.sheet-count {
+  background: #0b1d63;
+  border-color: #1b2c78;
+}
+
+.sheet-count strong {
+  font-family: var(--display);
+}
+
+.sheet-count.is-active {
+  background:
+    linear-gradient(#1a1c6e, #1a1c6e) padding-box,
+    linear-gradient(90deg, #ff6fb5, #9b5cff) border-box;
+}
+
+/* ---------- Cartes et ouverture ---------- */
+
+.fiche-inner {
+  background: #0b1546;
+}
+
+.opening {
+  background: radial-gradient(520px 440px at 50% 35%, rgba(155, 92, 255, 0.24), transparent 70%), #000a30;
+}
+
+.opening-bar {
+  background: rgba(0, 10, 48, 0.75);
+  border-bottom-color: #16255f;
+}
+
+.stage-pack {
+  background: none;
+}
+
+.stage-bg::after {
+  background:
+    radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--glow) 35%, transparent), transparent 65%),
+    linear-gradient(180deg, rgba(0, 10, 48, 0.25), rgba(0, 10, 48, 0.9));
+}
+
+.reveal {
+  background:
+    radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--glow) 26%, transparent), transparent 60%),
+    radial-gradient(ellipse at 50% 120%, color-mix(in srgb, var(--glow) 30%, transparent), transparent 55%),
+    #000a30;
+}
+
+.reveal-cardback,
+.card3d-back {
+  background:
+    radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--glow) 45%, transparent), transparent 70%),
+    linear-gradient(160deg, #0b1d63, #000a30);
+}
+
+.modal-panel,
+.stock-pop {
+  background: #0b1d63;
+}
+
+.modal-panel {
+  border: 0;
+  box-shadow: inset 0 0 0 1px #22358a;
+}
+
+.count-picker {
+  background: #06134a;
+  border: 0;
+}
+
+.count-picker button.is-active {
+  background: #fff;
+  color: #2a1466;
+  box-shadow: none;
+}
+
+.boosters .special {
+  border: 0;
+}
+
+/* Le logo garde sa place normale sur le dos des cartes. */
+.reveal-cardback .pack-logo,
+.card3d-back .pack-logo {
+  position: static;
+  transform: none;
+  width: 40%;
+  font-size: clamp(30px, 10vw, 46px);
+}

@@ -11,18 +11,22 @@ interface Props {
   fresh: boolean;
   /** Numéro affiché sur le dossier, ou nombre de dossiers ouverts d'un coup. */
   dossierNumber: number;
+  /** « back » : le booster est déjà ouvert, la tension monte sur le dos de la carte. */
+  intro?: "pack" | "back";
+  /** Texte du bouton final. */
+  doneLabel?: string;
   onDone: () => void;
 }
 
 type Phase = "charge" | "burst" | "clue" | "spin" | "show";
 
-/** Couleur de lumière par classe (charte). */
-const GLOW: Record<Rarity, string> = {
-  E: "#7c88b8",
-  D: "#6fa0ff",
-  C: "#ff8fc8",
-  B: "#00e8c6",
-  A: "#ffc94d",
+/** Couleur de lumière par rareté. */
+export const GLOW: Record<Rarity, string> = {
+  E: "#9aa0ab",
+  D: "#5ea8ff",
+  C: "#b47bff",
+  B: "#ffc54d",
+  A: "#ff9ad5",
 };
 
 /** Plus la fiche est rare, plus la montée en tension dure. */
@@ -55,7 +59,15 @@ function cluesFor(card: Card): Clue[] {
 }
 
 /** Révélation de la meilleure fiche, façon pack opening : tension, explosion, indices, carte en 3D. */
-export function PackReveal({ card, secret, fresh, dossierNumber, onDone }: Props) {
+export function PackReveal({
+  card,
+  secret,
+  fresh,
+  dossierNumber,
+  intro = "pack",
+  doneLabel = "Continuer",
+  onDone,
+}: Props) {
   const clues = cluesFor(card);
   const [phase, setPhase] = useState<Phase>("charge");
   const [clue, setClue] = useState(0);
@@ -112,7 +124,14 @@ export function PackReveal({ card, secret, fresh, dossierNumber, onDone }: Props
       {phase === "charge" && (
         <div className="reveal-pack" onClick={() => setPhase("burst")}>
           <div className="reveal-pack-inner">
-            <BoosterPack number={dossierNumber} />
+            {intro === "pack" ? (
+              <BoosterPack number={dossierNumber} />
+            ) : (
+              <div className="reveal-cardback" aria-hidden>
+                <span className="pack-logo">R</span>
+                <span className="reveal-cardback-label">Carte rare</span>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -150,7 +169,7 @@ export function PackReveal({ card, secret, fresh, dossierNumber, onDone }: Props
                 <span className="card3d-foil" aria-hidden />
               </div>
               <div className="card3d-face card3d-back" aria-hidden>
-                <span className="card3d-back-mark">Registre</span>
+                <span className="pack-logo">R</span>
                 <span className="card3d-back-class">{r.id}</span>
               </div>
             </div>
@@ -163,11 +182,11 @@ export function PackReveal({ card, secret, fresh, dossierNumber, onDone }: Props
                 <span>
                   {r.name} · présent dans {formatFans(card.favourites)} Wikipédias
                 </span>
-                {fresh && <span className="tag-new">Nouvelle</span>}
+                {fresh && <span className="tag-new">Nouveau</span>}
                 {secret && <span className="tag-secret">Top secret</span>}
               </div>
               <button className="btn btn-primary" onClick={onDone} autoFocus>
-                Voir le booster
+                {doneLabel}
               </button>
             </div>
           )}

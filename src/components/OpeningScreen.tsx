@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { bestIndex, type Pull } from "../game/booster";
+import type { Card } from "../game/cards";
 import { RARITY_BY_ID, rarityRank } from "../game/rarities";
 import * as sound from "../lib/sound";
+import { BoosterPack } from "./BoosterPack";
 import { Fiche } from "./Fiche";
-import { PackReveal } from "./PackReveal";
+import { GLOW, PackReveal } from "./PackReveal";
 
 interface Props {
   pull: Pull;
@@ -11,23 +13,33 @@ interface Props {
   onShowCollection: () => void;
 }
 
-type Stage = "reveal" | "summary" | "all";
-
 /**
- * Ouverture booster par booster : la révélation de la meilleure carte, puis le résumé
- * du booster (grande carte et les 4 autres). « Tout passer » montre toutes les cartes d'un coup.
+ * pack : le booster fermé, on touche pour l'ouvrir.
+ * cards : les cartes une par une, de la plus commune à la plus rare.
+ * summary : les 5 cartes du booster. all : toutes les cartes de l'ouverture.
  */
+type Stage = "pack" | "cards" | "summary" | "all";
+
+/** La grande animation n'est jouée que pour une dernière carte Épique ou mieux (ou Top secret). */
+const isBig = (card: Card, secret: boolean) => secret || rarityRank(card.rarity) >= rarityRank("C");
+
 export function OpeningScreen({ pull, onClose, onShowCollection }: Props) {
   const [index, setIndex] = useState(0);
-  const [stage, setStage] = useState<Stage>("reveal");
+  const [stage, setStage] = useState<Stage>("pack");
+  const [step, setStep] = useState(0);
+  const [tearing, setTearing] = useState(false);
   const [muted, setMutedState] = useState(sound.isMuted);
   const total = pull.groups.length;
   const group = pull.groups[index];
   const best = bestIndex(group);
-  const bestCard = group.cards[best];
   const last = index === total - 1;
+  // Ordre de révélation : de la plus commune à la plus rare (la meilleure en dernier).
+  const order = group.cards.map((_, i) => i).reverse();
+  const slot = order[step];
+  const card = group.cards[slot];
+  const secret = group.secret[slot];
+  const lastStep = step === order.length - 1;
 
-  // La musique tourne pendant toutes les ouvertures, et s'éteint au dernier booster révélé.
   useEffect(() => {
     sound.playMusic();
     return () => sound.fadeOutMusic(0.6);
@@ -49,22 +61,50 @@ export function OpeningScreen({ pull, onClose, onShowCollection }: Props) {
     setMutedState(!muted);
   };
 
-  const next = () => {
+  const tear = () => {
+    if (tearing) return;
+    setTearing(true);
+    setTimeout(() => {
+      setTearing(false);
+      setStep(0);
+      setStage("cards");
+    }, 650);
+  };
+
+  const nextCard = () => (lastStep ? setStage("summary") : setStep(step + 1));
+
+  const nextBooster = () => {
     setIndex(index + 1);
-    setStage("reveal");
+    setStep(0);
+    setStage("pack");
   };
 
   const tagFor = (cardId: number, isBest: boolean) =>
     pull.fresh.has(cardId) ? "Nouveau" : isBest ? "Meilleure carte" : undefined;
 
   const allCards = pull.groups
-    .flatMap((g) => g.cards.map((card, i) => ({ card, secret: g.secret[i] })))
+    .flatMap((g) => g.cards.map((c, i) => ({ card: c, secret: g.secret[i] })))
     .sort(
       (a, b) => rarityRank(b.card.rarity) - rarityRank(a.card.rarity) || Number(b.secret) - Number(a.secret),
     );
 
+  const bestCard = group.cards[best];
+  const ambient = stage === "cards" ? card : bestCard;
+
   return (
     <div className="opening" role="dialog" aria-modal aria-label="Ouverture de boosters">
+      {/* Fond d'ambiance : l'image de la carte, très floue, teintée par sa rareté. */}
+      {stage !== "pack" && stage !== "all" && (
+        <div
+          className="stage-bg"
+          aria-hidden
+          style={{
+            backgroundImage: `url("${ambient.image}")`,
+            ["--glow" as string]: GLOW[ambient.rarity],
+          }}
+        />
+      )}
+
       <header className="opening-bar">
         <span>
           {stage === "all" ? `${total} booster${total > 1 ? "s" : ""}` : `Booster ${index + 1} sur ${total}`}
@@ -77,15 +117,77 @@ export function OpeningScreen({ pull, onClose, onShowCollection }: Props) {
         </button>
       </header>
 
-      {stage === "reveal" && (
+      {stage === "pack" && (
+        <section className="stage stage-pack" onClick={tear}>
+          <div className={`stage-pack-wrap ${tearing ? "is-tearing" : ""}`}>
+            <BoosterPack number={pull.id + index} className="stage-pack-pack" />
+          </div>
+          <p className="stage-hint">{tearing ? "Ouverture…" : "Touche le booster pour l'ouvrir"}</p>
+          {total > 1 && (
+            <button
+              className="btn stage-skip"
+              onClick={(e) => {
+                e.stopPropagation();
+                setStage("all");
+              }}
+            >
+              Tout passer
+            </button>
+          )}
+        </section>
+      )}
+
+      {stage === "cards" && lastStep && isBig(card, secret) && (
         <PackReveal
-          key={index}
-          card={bestCard}
-          secret={group.secret[best]}
-          fresh={pull.fresh.has(bestCard.id)}
+          key={`${index}-big`}
+          card={card}
+          secret={secret}
+          fresh={pull.fresh.has(card.id)}
           dossierNumber={pull.id + index}
+          intro="back"
+          doneLabel="Voir le booster"
           onDone={() => setStage("summary")}
         />
+      )}
+
+      {stage === "cards" && !(lastStep && isBig(card, secret)) && (
+        <section className="stage stage-card" onClick={nextCard}>
+          <div className="stage-count">
+            {order.map((s, i) => (
+              <i
+                key={s}
+                className={`${i < step ? "is-done" : ""} ${i === step ? "is-current" : ""}`}
+                style={{ ["--k" as string]: i <= step ? GLOW[group.cards[s].rarity] : undefined }}
+              />
+            ))}
+          </div>
+
+          <div className={`stage-flip class-${card.rarity}`} key={`${index}-${step}`}>
+            <Fiche
+              card={card}
+              secret={secret}
+              tag={pull.fresh.has(card.id) ? "Nouveau" : undefined}
+              className="fiche-xl"
+            />
+          </div>
+
+          <div className="stage-info" key={`i-${index}-${step}`}>
+            <h2>{card.name}</h2>
+            <p>
+              {card.kind === "game" ? "Jeu" : "Personnage"} · {card.anime}
+            </p>
+            <span className={`rarity-pill class-${card.rarity}`}>{RARITY_BY_ID[card.rarity].name}</span>
+          </div>
+
+          <div className="stage-actions" onClick={(e) => e.stopPropagation()}>
+            <button className="btn btn-primary btn-wide" onClick={nextCard} autoFocus>
+              {lastStep ? "Voir le booster" : `Carte suivante (${step + 2}/${order.length})`}
+            </button>
+            <button className="btn btn-wide" onClick={() => setStage("summary")}>
+              Passer au résumé
+            </button>
+          </div>
+        </section>
       )}
 
       {stage === "summary" && (
@@ -112,18 +214,15 @@ export function OpeningScreen({ pull, onClose, onShowCollection }: Props) {
           </div>
 
           <div className="summary-rest">
-            {group.cards.map((card, i) =>
+            {group.cards.map((c, i) =>
               i === best ? null : (
                 <div key={i} className="summary-small">
                   <Fiche
-                    card={card}
+                    card={c}
                     secret={group.secret[i]}
-                    tag={pull.fresh.has(card.id) ? "Nouveau" : undefined}
+                    tag={pull.fresh.has(c.id) ? "Nouveau" : undefined}
                   />
-                  <span
-                    className={`rarity-dot class-${card.rarity}`}
-                    title={RARITY_BY_ID[card.rarity].name}
-                  />
+                  <span className={`rarity-dot class-${c.rarity}`} title={RARITY_BY_ID[c.rarity].name} />
                 </div>
               ),
             )}
@@ -131,23 +230,23 @@ export function OpeningScreen({ pull, onClose, onShowCollection }: Props) {
 
           <div className="summary-actions">
             {last ? (
-              <button className="btn btn-primary btn-wide" onClick={onClose} autoFocus>
-                Terminer
-              </button>
+              <>
+                <button className="btn btn-primary btn-wide" onClick={onClose} autoFocus>
+                  Terminer
+                </button>
+                <button className="btn btn-wide" onClick={onShowCollection}>
+                  Voir ma collection
+                </button>
+              </>
             ) : (
-              <button className="btn btn-primary btn-wide" onClick={next} autoFocus>
-                Booster suivant
-              </button>
-            )}
-            {!last && (
-              <button className="btn btn-wide" onClick={() => setStage("all")}>
-                Tout passer
-              </button>
-            )}
-            {last && (
-              <button className="btn btn-wide" onClick={onShowCollection}>
-                Voir ma collection
-              </button>
+              <>
+                <button className="btn btn-primary btn-wide" onClick={nextBooster} autoFocus>
+                  Booster suivant
+                </button>
+                <button className="btn btn-wide" onClick={() => setStage("all")}>
+                  Tout passer
+                </button>
+              </>
             )}
           </div>
         </section>
@@ -162,8 +261,8 @@ export function OpeningScreen({ pull, onClose, onShowCollection }: Props) {
             </p>
           </div>
           <div className="summary-grid">
-            {allCards.map(({ card, secret }, i) => (
-              <Fiche key={i} card={card} secret={secret} tag={tagFor(card.id, i === 0)} />
+            {allCards.map(({ card: c, secret: s }, i) => (
+              <Fiche key={i} card={c} secret={s} tag={tagFor(c.id, i === 0)} />
             ))}
           </div>
           <div className="summary-actions">

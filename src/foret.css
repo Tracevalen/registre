@@ -2676,3 +2676,702 @@ button.carte:hover {
   letter-spacing: 0.06em;
   white-space: nowrap;
 }
+
+/* ==================================================================
+   Version épurée et large : moins de cadres, plus d'espace,
+   navigation dans la barre du haut sur ordinateur.
+   ================================================================== */
+
+:root {
+  --soft-line: rgba(143, 163, 200, 0.16);
+  --soft-panel: rgba(8, 20, 56, 0.55);
+}
+
+.panel,
+.glass,
+.mission,
+.album,
+.link-item,
+.table-wrap,
+.shredder,
+.affaire {
+  background: var(--soft-panel);
+  box-shadow: inset 0 0 0 1px var(--soft-line);
+}
+
+.side-btn,
+.counts button,
+.topbar .pill,
+.square-btn,
+.pill-btn,
+.tabs,
+.segmented,
+.field,
+.field-search,
+.check {
+  box-shadow: inset 0 0 0 1px var(--soft-line);
+}
+
+.fireflies span {
+  opacity: 0.35;
+}
+
+/* Titre et lien des taux, dans le panneau d'ouverture */
+.hero-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hero-title h1 {
+  font-size: 22px;
+  color: var(--cyan-xl);
+}
+
+.link-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-2);
+  font-family: var(--ui);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.link-btn:hover {
+  color: var(--cyan-l);
+}
+
+.home-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.hero-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.home-cards {
+  display: grid;
+  gap: 12px;
+}
+
+.daily {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+  border: 0;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.daily-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 40px;
+  background: var(--gold-xl);
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+}
+
+.daily-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: #2a1a00;
+}
+
+.daily-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.daily-text strong {
+  color: var(--gold-xl);
+  font-family: var(--ui);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.chip-gold {
+  background: var(--gold-btn);
+  color: #2a1600;
+  white-space: nowrap;
+}
+
+.daily.is-used {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.daily.is-used .chip-gold {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink-2);
+}
+
+.topnav {
+  display: none;
+}
+
+/* ---------- Ordinateur ---------- */
+
+@media (min-width: 760px) {
+  .topbar {
+    max-width: 1200px;
+    padding: 18px 32px 14px;
+    gap: 28px;
+    background: rgba(3, 12, 36, 0.75);
+    border-bottom: 1px solid var(--soft-line);
+    backdrop-filter: blur(10px);
+  }
+
+  .topbar-user {
+    flex: none;
+  }
+
+  .topnav {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .topnav .nav-item {
+    flex-direction: row;
+    gap: 8px;
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+  }
+
+  .topnav .nav-item:hover {
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .topnav .nav-item.is-active {
+    color: var(--cyan-xl);
+    background: rgba(63, 224, 240, 0.1);
+    box-shadow: inset 0 -2px 0 var(--cyan);
+  }
+
+  .topnav .nav-center {
+    height: 42px;
+    padding-bottom: 0;
+    justify-content: center;
+  }
+
+  .topnav .hex-nav {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    background: none;
+    clip-path: none;
+  }
+
+  .topnav .hex-nav .hex-in {
+    width: auto;
+    height: auto;
+    background: none !important;
+    clip-path: none;
+    color: inherit !important;
+  }
+
+  .topnav .hex-nav svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.7;
+  }
+
+  .topnav .nav-badge {
+    position: static;
+    margin-left: 2px;
+    box-shadow: none;
+  }
+
+  .bottomnav {
+    display: none;
+  }
+
+  .main {
+    max-width: 1200px;
+    padding: 36px 32px 80px;
+  }
+
+  /* Accueil : le booster à gauche, le panneau d'ouverture à droite */
+  .home-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 56px;
+    min-height: min(560px, 66vh);
+  }
+
+  .hero-pack {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 480px;
+    border-radius: 24px;
+    background: radial-gradient(closest-side, rgba(63, 224, 240, 0.16), transparent 75%);
+  }
+
+  .stage-home {
+    display: block;
+    padding: 0;
+  }
+
+  .side {
+    display: none;
+  }
+
+  .booster-hero {
+    width: 290px;
+  }
+
+  .booster-hero-btn::after {
+    width: 260px;
+    margin-left: -130px;
+    bottom: -40px;
+  }
+
+  .hero-panel {
+    gap: 22px;
+    padding: 36px;
+    border-radius: 20px;
+    background: var(--soft-panel);
+    box-shadow: inset 0 0 0 1px var(--soft-line);
+  }
+
+  .hero-title h1 {
+    font-size: 34px;
+  }
+
+  .counts button {
+    height: 46px;
+    font-size: 17px;
+  }
+
+  .btn-open {
+    height: 70px;
+    font-size: 26px;
+  }
+
+  .home-note {
+    text-align: left;
+  }
+
+  .boosters {
+    gap: 28px;
+  }
+
+  .home-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .daily,
+  .affaire-teaser {
+    padding: 22px;
+    border-radius: 16px;
+  }
+
+  .missions-panel {
+    padding: 26px;
+    border-radius: 16px;
+  }
+
+  .missions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .mission {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+  }
+
+  .mission .bar {
+    flex: none;
+  }
+
+  /* Collection et autres pages */
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+  }
+
+  .collection-head {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    margin-bottom: 28px;
+  }
+
+  .collection-title {
+    gap: 24px;
+  }
+
+  .collection-title h1 {
+    font-size: 38px;
+  }
+
+  .tabs {
+    width: 420px;
+  }
+
+  .albums-grid {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  }
+
+  .profile {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .profile-head,
+  .profile-note {
+    grid-column: 1 / -1;
+  }
+
+  /* Ouverture : plus grand, plus aéré */
+  .op-bar {
+    max-width: 1100px;
+    padding: 22px 32px 6px;
+  }
+
+  .op-stage {
+    max-width: 640px;
+  }
+
+  .carte-xl {
+    width: 290px;
+  }
+
+  .op-card-zone,
+  .op-pack-wrap {
+    min-height: 470px;
+  }
+
+  .halo-ring {
+    width: 460px;
+    height: 460px;
+  }
+
+  .op-pack .op-pack-pack {
+    width: 250px;
+  }
+
+  .op-actions {
+    max-width: 520px;
+  }
+
+  .op-rewards {
+    max-width: 1100px;
+    padding: 6px 32px 0;
+  }
+
+  .level-panel,
+  .stat-row {
+    max-width: 720px;
+  }
+
+  .reward-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+  }
+
+  .op-rewards .op-actions {
+    max-width: 560px;
+  }
+
+  .card3d .carte {
+    width: 290px;
+  }
+}
+
+@media (min-width: 1300px) {
+  .booster-hero {
+    width: 320px;
+  }
+}
+
+/* ---------- Retouches de la version large ---------- */
+
+.carte.is-locked::after {
+  display: none;
+}
+
+.carte.is-locked,
+.carte.is-locked.r-A,
+.carte.is-locked.r-B {
+  box-shadow: inset 0 0 0 1px var(--soft-line);
+}
+
+.boosters .affaire-teaser {
+  background: var(--soft-panel);
+  background-image: none;
+  box-shadow: inset 0 0 0 1px var(--soft-line);
+}
+
+.btn-green:disabled {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink-2);
+  box-shadow: inset 0 0 0 1px var(--soft-line);
+  filter: none;
+}
+
+@media (min-width: 760px) {
+  .topbar {
+    max-width: none;
+    padding-inline: max(32px, calc((100vw - 1200px) / 2 + 32px));
+  }
+
+  .mission-text {
+    flex: none;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mission .bar {
+    margin-top: auto;
+  }
+
+  .op-actions-sticky {
+    display: grid;
+    grid-template-columns: minmax(0, 240px) minmax(0, 340px);
+    justify-content: center;
+    max-width: none !important;
+    width: 100%;
+  }
+}
+
+@media (max-width: 759px) {
+  .hero-title {
+    display: none;
+  }
+}
+
+/* ==================================================================
+   Accueil minimal : le booster, le choix, le bouton. Rien d'autre.
+   ================================================================== */
+
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  min-height: calc(100dvh - 190px);
+  padding: 10px 0 20px;
+}
+
+.home .booster-hero {
+  width: min(56vw, 230px);
+}
+
+.home-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  width: min(420px, 100%);
+}
+
+.home .counts {
+  gap: 6px;
+}
+
+.home .counts button {
+  height: 36px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-3);
+}
+
+.home .counts button:not(:disabled):hover {
+  color: var(--ink);
+}
+
+.home .counts button.is-active {
+  background: rgba(63, 224, 240, 0.12);
+  box-shadow: none;
+  color: var(--cyan-xl);
+}
+
+.home-line {
+  margin: 0;
+  color: var(--ink-3);
+  font-family: var(--ui);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+.home-line .link-btn {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+
+.home-extras {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.extra {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-2);
+  font-family: var(--ui);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.extra:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink);
+}
+
+.extra-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold-xl);
+  box-shadow: 0 0 8px var(--gold-xl);
+}
+
+.profile .missions-panel {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 760px) {
+  .home {
+    min-height: calc(100dvh - 180px);
+    gap: 48px;
+  }
+
+  .home .booster-hero {
+    width: 270px;
+  }
+}
+
+.home-cards > * {
+  margin: 0;
+}
+
+/* Plus de boutons sur les côtés du booster : tout passe par les panneaux et la navigation. */
+.side {
+  display: none !important;
+}
+
+.stage-home {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 759px) {
+  .hero-title {
+    display: flex;
+  }
+
+  .hero-title h1 {
+    font-size: 20px;
+  }
+}
+
+@media (min-width: 760px) and (max-width: 1000px) {
+  .home-hero {
+    gap: 28px;
+  }
+
+  .booster-hero {
+    width: 230px;
+  }
+
+  .hero-pack {
+    min-height: 400px;
+  }
+
+  .hero-panel {
+    padding: 26px;
+  }
+
+  .topnav .nav-item {
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .topnav .nav-item svg {
+    display: none;
+  }
+}
+
+.link-btn {
+  white-space: nowrap;
+}
+
+@media (min-width: 760px) and (max-width: 1000px) {
+  .topbar {
+    gap: 12px;
+    padding-inline: 20px;
+  }
+
+  .topbar .xpbar {
+    width: 80px;
+  }
+
+  .topbar-xp {
+    display: none;
+  }
+
+  .topnav {
+    gap: 2px;
+  }
+
+  .hero-title h1 {
+    font-size: 26px;
+  }
+
+  .main {
+    padding-inline: 20px;
+  }
+}

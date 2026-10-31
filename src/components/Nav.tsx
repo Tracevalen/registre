@@ -22,10 +22,12 @@ interface TopBarProps {
   xp: number;
   onHome: () => void;
   onInk: () => void;
+  /** Navigation affichée dans la barre du haut sur grand écran. */
+  nav?: ReactNode;
 }
 
 /** Barre du haut : niveau, joueur et barre d'XP, puis l'encre et les boosters en stock. */
-export function TopBar({ boosters, ink, xp, onHome, onInk }: TopBarProps) {
+export function TopBar({ boosters, ink, xp, onHome, onInk, nav }: TopBarProps) {
   const grade = gradeInfo(xp);
   return (
     <header className="topbar">
@@ -41,6 +43,7 @@ export function TopBar({ boosters, ink, xp, onHome, onInk }: TopBarProps) {
           </span>
         </span>
       </button>
+      {nav}
       <div className="topbar-pills">
         <span className="pill" title="Encre : sert à demander une carte précise">
           <span className="ico-diamond" aria-hidden />
@@ -98,10 +101,20 @@ interface BottomNavProps {
   onNavigate: (p: Page) => void;
   /** Une récompense attend dans la collection (album complet, duo prêt). */
   collectionBadge: number;
+  /** Quêtes du jour prêtes à récupérer (dans le profil). */
+  profileBadge?: number;
+  /** « top » : version horizontale, dans la barre du haut (grand écran). */
+  variant?: "top" | "bottom";
 }
 
 /** Barre du bas : quatre espaces, et les boosters au centre dans un hexagone. */
-export function BottomNav({ page, onNavigate, collectionBadge }: BottomNavProps) {
+export function BottomNav({
+  page,
+  onNavigate,
+  collectionBadge,
+  profileBadge = 0,
+  variant = "bottom",
+}: BottomNavProps) {
   const item = (label: string, target: Page, icon: ReactNode, active: boolean, badge = 0) => (
     <button className={`nav-item ${active ? "is-active" : ""}`} onClick={() => onNavigate(target)}>
       {icon}
@@ -110,7 +123,7 @@ export function BottomNav({ page, onNavigate, collectionBadge }: BottomNavProps)
     </button>
   );
   return (
-    <nav className="bottomnav" aria-label="Navigation principale">
+    <nav className={variant === "top" ? "topnav" : "bottomnav"} aria-label="Navigation principale">
       {item("Collection", "archive", Icon.collection, isCollection(page), collectionBadge)}
       {item("Marché", "market", Icon.market, page === "market")}
       <button
@@ -121,7 +134,7 @@ export function BottomNav({ page, onNavigate, collectionBadge }: BottomNavProps)
         Boosters
       </button>
       {item("Amis", "friends", Icon.friends, page === "friends")}
-      {item("Profil", "profile", Icon.profile, page === "profile")}
+      {item("Profil", "profile", Icon.profile, page === "profile", profileBadge)}
     </nav>
   );
 }

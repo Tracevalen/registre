@@ -16,6 +16,7 @@ import {
 } from "./game/booster";
 import { CARDS, type Card } from "./game/cards";
 import { ProfilePage } from "./components/ProfilePage";
+import { missionsForDay } from "./game/missions";
 import { canFuse, LINKS, type Link } from "./game/links";
 import { ALBUMS, specialSeries } from "./game/series";
 import { useSave } from "./game/store";
@@ -71,6 +72,10 @@ export default function App() {
     setFocusLink({ link, fresh: true });
   };
 
+  const readyMissions = missionsForDay(save.daily.day).filter(
+    (m) => (save.daily.counts[m.counter] ?? 0) >= m.goal && !save.daily.claimed.includes(m.id),
+  ).length;
+
   const ownedCount = CARDS.filter((c) => save.owned[c.id]).length;
 
   const readyAlbums = ALBUMS.filter(
@@ -115,6 +120,15 @@ export default function App() {
         xp={save.xp}
         onHome={() => setPage("home")}
         onInk={() => setPage("archive")}
+        nav={
+          <BottomNav
+            page={page}
+            onNavigate={setPage}
+            collectionBadge={readyAlbums + readyLinks}
+            profileBadge={readyMissions}
+            variant="top"
+          />
+        }
       />
 
       <div className="fireflies" aria-hidden>
@@ -139,14 +153,9 @@ export default function App() {
           <HomePage
             save={save}
             nextIn={nextIn}
-            readyAlbums={readyAlbums}
-            readyLinks={readyLinks}
             onOpen={(n) => open(n)}
             onOpenSpecial={() => open(1, true)}
             onShowAffaire={() => setPage("affaire")}
-            onShowAlbums={() => setPage("albums")}
-            onShowLinks={() => setPage("links")}
-            onClaim={claim}
           />
         ) : page === "affaire" ? (
           <AffairePage save={save} onGuess={guessAffaire} onFocus={setFocus} />
@@ -168,7 +177,7 @@ export default function App() {
             text="Échanger et vendre ses doublons contre de l'encre, entre joueurs. Il arrive avec les comptes (connexion Discord)."
           />
         ) : page === "profile" ? (
-          <ProfilePage save={save} />
+          <ProfilePage save={save} onClaim={claim} />
         ) : (
           <SoonPage
             title="Amis"
@@ -177,7 +186,12 @@ export default function App() {
         )}
       </main>
 
-      <BottomNav page={page} onNavigate={setPage} collectionBadge={readyAlbums + readyLinks} />
+      <BottomNav
+        page={page}
+        onNavigate={setPage}
+        collectionBadge={readyAlbums + readyLinks}
+        profileBadge={readyMissions}
+      />
 
       {pull && (
         <OpeningScreen

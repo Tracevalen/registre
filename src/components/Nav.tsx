@@ -1,5 +1,7 @@
+import { useEffect, useRef, useState } from "react";
 import { gradeInfo } from "../game/grades";
-import { MAX_BOOSTERS } from "../game/store";
+import { MAX_BOOSTERS, RECHARGE_MS } from "../game/store";
+import { formatDuration } from "../lib/format";
 
 export type Page = "home" | "affaire" | "archive" | "albums" | "links" | "market" | "friends";
 
@@ -9,12 +11,29 @@ interface TopBarProps {
   boosters: number;
   ink: number;
   xp: number;
+  nextIn: number;
   onHome: () => void;
 }
 
 /** Barre du haut : le joueur (invité tant qu'il n'y a pas de comptes), l'encre et le stock. */
-export function TopBar({ boosters, ink, xp, onHome }: TopBarProps) {
+export function TopBar({ boosters, ink, xp, nextIn, onHome }: TopBarProps) {
   const grade = gradeInfo(xp);
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const full = boosters >= MAX_BOOSTERS;
+  // Temps avant que le stock soit plein : le prochain booster, puis un toutes les RECHARGE_MS.
+  const toFull = full ? 0 : nextIn + (MAX_BOOSTERS - boosters - 1) * RECHARGE_MS;
+
+  // Le minuteur se referme quand on touche ailleurs.
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: PointerEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    };
+    window.addEventListener("pointerdown", close);
+    return () => window.removeEventListener("pointerdown", close);
+  }, [open]);
+
   return (
     <header className="topbar">
       <button className="topbar-user" onClick={onHome} aria-label="Accueil">
@@ -32,9 +51,34 @@ export function TopBar({ boosters, ink, xp, onHome }: TopBarProps) {
         <span className="pill" title="Encre : sert à demander une carte précise">
           <span className="pill-dot is-ink" aria-hidden /> {ink}
         </span>
-        <span className="pill" title="Boosters en stock">
-          <span className="pill-dot" aria-hidden /> {boosters}/{MAX_BOOSTERS}
-        </span>
+        <div className="stock" ref={ref}>
+          <button
+            className={`pill pill-stock ${full ? "is-full" : ""}`}
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            title="Boosters en stock"
+          >
+            <span className="pill-dot" aria-hidden /> {boosters}/{MAX_BOOSTERS}
+          </button>
+          {open && (
+            <div className="stock-pop" role="status">
+              {full ? (
+                <>
+                  <strong>Stock plein</strong>
+                  <span>Ouvre un booster pour relancer le minuteur.</span>
+                </>
+              ) : (
+                <>
+                  <span>Prochain booster dans</span>
+                  <strong>{formatDuration(nextIn)}</strong>
+                  <span>
+                    Plein à {MAX_BOOSTERS} dans {formatLong(toFull)}
+                  </span>
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
@@ -110,4 +154,13 @@ export function SoonPage({ title, text }: { title: string; text: string }) {
       <p>{text}</p>
     </section>
   );
+}
+
+/** Durée lisible : « 42 min » ou « 1 h 12 ». */
+function formatLong(ms: number) {
+  const min = Math.ceil(ms / 60000);
+  if (min < 60) return `${min} min`;
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return m ? `${h} h ${String(m).padStart(2, "0")}` : `${h} h`;
 }

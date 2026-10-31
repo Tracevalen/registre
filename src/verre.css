@@ -1296,3 +1296,325 @@ body {
     radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.45), transparent 60%), rgba(255, 255, 255, 0.12);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
 }
+
+/* ==================================================================
+   Couleurs de jeu : boutons vifs et dégradés
+   ================================================================== */
+
+:root {
+  --grad-main: linear-gradient(135deg, #8b5cff 0%, #d94dff 50%, #ff4f9a 100%);
+  --grad-gold: linear-gradient(135deg, #ffd166 0%, #ff9f43 100%);
+  --grad-cyan: linear-gradient(135deg, #3ee0ff 0%, #4d7cff 100%);
+  --grad-green: linear-gradient(135deg, #4ff0a0 0%, #1fc8b4 100%);
+}
+
+.btn-primary,
+.hero .btn-primary,
+.opening .btn-primary {
+  background: var(--grad-main);
+  color: #fff;
+  box-shadow:
+    0 8px 24px rgba(217, 77, 255, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:not(:disabled):hover,
+.hero .btn-primary:not(:disabled):hover,
+.opening .btn-primary:not(:disabled):hover {
+  background: var(--grad-main);
+  color: #fff;
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow:
+    0 12px 32px rgba(217, 77, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.btn-primary:not(:disabled):active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.btn-primary:disabled {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink-2);
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.bottomnav button.is-active {
+  background: var(--grad-main);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(217, 77, 255, 0.4);
+}
+
+/* Booster du jour : doré */
+.boosters .special .btn-primary {
+  background: var(--grad-gold);
+  color: #3a2200;
+  text-shadow: none;
+  box-shadow: 0 8px 24px rgba(255, 159, 67, 0.35);
+}
+
+.boosters .special {
+  background: radial-gradient(circle at 100% 0%, rgba(255, 179, 71, 0.18), transparent 60%), var(--glass);
+  border-color: rgba(255, 196, 102, 0.3);
+}
+
+.boosters .special .eyebrow {
+  color: #ffc56b;
+}
+
+/* Enquête : bleu */
+.boosters .affaire-teaser-mark {
+  background: var(--grad-cyan);
+  color: #fff;
+}
+
+.boosters .affaire-teaser-cta {
+  background: var(--grad-cyan);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(77, 124, 255, 0.35);
+}
+
+/* Missions : vert quand c'est prêt */
+.missions-panel .mission.is-ready .btn-primary {
+  background: var(--grad-green);
+  color: #053024;
+  text-shadow: none;
+  box-shadow: 0 6px 18px rgba(79, 240, 160, 0.35);
+}
+
+.missions-panel .mission-fill {
+  background: var(--grad-green);
+}
+
+.panel-head h2::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: var(--grad-green);
+  vertical-align: middle;
+}
+
+/* ---------- Booster de l'accueil ---------- */
+
+.booster-hero-btn {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.booster-hero-btn:hover {
+  transform: scale(1.03);
+}
+
+.booster-hero-btn:active {
+  transform: scale(0.98);
+}
+
+.booster-hero {
+  width: min(58vw, 230px);
+}
+
+.booster-badge {
+  position: absolute;
+  top: -10px;
+  right: -12px;
+  display: grid;
+  place-items: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--grad-main);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  box-shadow: 0 6px 20px rgba(217, 77, 255, 0.5);
+  border: 3px solid var(--bg);
+}
+
+.booster-cta {
+  margin: 4px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  animation: hint-pulse 2.2s ease-in-out infinite;
+}
+
+/* ---------- Choix du nombre de boosters ---------- */
+
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  animation: fade-in 0.2s both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.sheet-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 520px;
+  padding: 12px 20px calc(24px + env(safe-area-inset-bottom));
+  border-radius: 28px 28px 0 0;
+  border: 1px solid var(--glass-line);
+  border-bottom: 0;
+  background: #1a1b21;
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5);
+  animation: sheet-up 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+}
+
+@media (min-width: 600px) {
+  .sheet {
+    align-items: center;
+  }
+  .sheet-panel {
+    border-radius: 28px;
+    border-bottom: 1px solid var(--glass-line);
+  }
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+.sheet-grip {
+  align-self: center;
+  width: 40px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sheet-panel h2 {
+  margin: 4px 0 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.sheet-sub {
+  margin: -8px 0 0;
+  color: var(--ink-2);
+}
+
+.sheet-counts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.sheet-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 14px 4px;
+  border: 1.5px solid var(--glass-line);
+  border-radius: 18px;
+  background: var(--glass);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.sheet-count strong {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.sheet-count span {
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.sheet-count.is-active {
+  border-color: transparent;
+  background:
+    linear-gradient(#26202f, #26202f) padding-box,
+    var(--grad-main) border-box;
+  box-shadow: 0 6px 20px rgba(217, 77, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.sheet-count:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ---------- Stock et minuteur caché, en haut ---------- */
+
+.stock {
+  position: relative;
+}
+
+.pill-stock {
+  cursor: pointer;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+}
+
+.pill-stock.is-full .pill-dot {
+  background: #ffd166;
+  box-shadow: 0 0 8px #ffd166;
+}
+
+.stock-pop {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 200px;
+  padding: 14px 16px;
+  border: 1px solid var(--glass-line);
+  border-radius: 18px;
+  background: #1f2027;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  color: var(--ink-2);
+  font-size: 13px;
+  animation: summary-in 0.2s both;
+}
+
+.stock-pop strong {
+  color: var(--ink);
+  font-size: 26px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.missions-panel .mission.is-ready {
+  border-color: rgba(79, 240, 160, 0.5);
+  box-shadow: 0 0 24px rgba(79, 240, 160, 0.15);
+}
+
+.panel-head h2 {
+  white-space: nowrap;
+}
+
+.panel-head {
+  flex-wrap: wrap;
+}

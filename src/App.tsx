@@ -86,7 +86,13 @@ export default function App() {
 
   return (
     <>
-      <TopBar boosters={save.boosters} ink={save.ink} xp={save.xp} onHome={() => setPage("home")} />
+      <TopBar
+        boosters={save.boosters}
+        ink={save.ink}
+        xp={save.xp}
+        nextIn={nextIn}
+        onHome={() => setPage("home")}
+      />
 
       <main className="main">
         {isCollection(page) && (

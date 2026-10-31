@@ -1,3 +1,4 @@
+import { ConfirmDialog } from "./ConfirmDialog";
 import { useMemo, useState } from "react";
 import {
   affaireReward,
@@ -42,6 +43,8 @@ export function AffairePage({ save, onGuess, onFocus }: Props) {
     setQuery("");
   };
 
+  const [manual, setManual] = useState<string | null>(null);
+
   const share = async () => {
     const text = shareText(save.daily.day, clues, won);
     try {
@@ -49,7 +52,7 @@ export function AffairePage({ save, onGuess, onFocus }: Props) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      window.prompt("Copie ce texte :", text);
+      setManual(text);
     }
   };
 
@@ -150,6 +153,18 @@ export function AffairePage({ save, onGuess, onFocus }: Props) {
         Vert : identique · Jaune : la carte mystère est plus haut (↑) ou plus bas (↓) · Noir : différent.
         Raretés de {RARITY_BY_ID.C.name.toLowerCase()} à {RARITY_BY_ID.A.name.toLowerCase()} uniquement.
       </p>
+
+      {manual && (
+        <ConfirmDialog title="Partager" confirmLabel="" cancelLabel="Fermer" onCancel={() => setManual(null)}>
+          <p>Copie ce texte pour partager ton résultat :</p>
+          <textarea
+            className="confirm-copy"
+            readOnly
+            value={manual}
+            onFocus={(e) => e.currentTarget.select()}
+          />
+        </ConfirmDialog>
+      )}
     </div>
   );
 }

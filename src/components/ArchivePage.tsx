@@ -3,6 +3,7 @@ import { CARDS, CARDS_BY_RARITY, formatFans, formatNumber, type Card } from "../
 import { SHRED_INK, shreddable } from "../game/economy";
 import { RARITIES, RARITY_BY_ID, rarityRank, type Rarity } from "../game/rarities";
 import type { SaveData } from "../game/store";
+import { ConfirmDialog } from "./ConfirmDialog";
 import { Fiche } from "./Fiche";
 
 type Sort = "number" | "rarity" | "recent";
@@ -19,6 +20,7 @@ const SERIES = [...new Set(CARDS.map((c) => c.anime))].sort((a, b) => a.localeCo
 
 export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
   const [rarity, setRarity] = useState<Rarity | "all">("all");
+  const [ask, setAsk] = useState<"shred" | "reset" | null>(null);
   const [series, setSeries] = useState("all");
   const [kind, setKind] = useState<"all" | "game" | "character">("all");
   const [query, setQuery] = useState("");
@@ -155,15 +157,7 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
           <span className="ink-count">
             <strong>{save.ink}</strong> encre
           </span>
-          <button
-            className="btn btn-sm"
-            disabled={spare.count === 0}
-            onClick={() =>
-              window.confirm(
-                `Broyer ${spare.count} doublon${spare.count > 1 ? "s" : ""} pour ${spare.ink} encre ?`,
-              ) && onShredAll()
-            }
-          >
+          <button className="btn btn-sm" disabled={spare.count === 0} onClick={() => setAsk("shred")}>
             {spare.count
               ? `Broyer ${spare.count} doublon${spare.count > 1 ? "s" : ""} (+${spare.ink})`
               : "Aucun doublon"}
@@ -251,13 +245,47 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
       )}
 
       <footer className="archive-foot">
-        <button
-          className="link mono"
-          onClick={() => window.confirm("Effacer tout le registre de ce navigateur ?") && onReset()}
-        >
+        <button className="link mono" onClick={() => setAsk("reset")}>
           Réinitialiser la sauvegarde
         </button>
       </footer>
+
+      {ask === "shred" && (
+        <ConfirmDialog
+          title="Broyeuse"
+          icon="✦"
+          confirmLabel={`Broyer (+${spare.ink})`}
+          onConfirm={onShredAll}
+          onCancel={() => setAsk(null)}
+        >
+          <p>
+            <strong>
+              {spare.count} doublon{spare.count > 1 ? "s" : ""}
+            </strong>{" "}
+            {spare.count > 1 ? "vont" : "va"} être broyé{spare.count > 1 ? "s" : ""}.
+          </p>
+          <p className="confirm-gain">
+            <span className="ico-diamond" aria-hidden /> +{spare.ink} encre
+          </p>
+          <p className="confirm-note">
+            Un exemplaire de chaque carte est gardé, et les Top secret ne sont jamais broyés.
+          </p>
+        </ConfirmDialog>
+      )}
+
+      {ask === "reset" && (
+        <ConfirmDialog
+          title="Tout effacer ?"
+          icon="!"
+          danger
+          confirmLabel="Effacer"
+          onConfirm={onReset}
+          onCancel={() => setAsk(null)}
+        >
+          <p>Ta collection, ton encre et ta progression seront supprimées de ce navigateur.</p>
+          <p className="confirm-note">Impossible de revenir en arrière.</p>
+        </ConfirmDialog>
+      )}
     </div>
   );
 }

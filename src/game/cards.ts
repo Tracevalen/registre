@@ -9,7 +9,7 @@ export interface Card {
   name: string;
   nativeName: string | null;
   image: string;
-  /** Saga du jeu ou du personnage (franchise IGDB). Le nom du champ vient de la première version. */
+  /** Saga du jeu ou du personnage (série ou univers Wikidata). Le nom du champ vient de la première version. */
   anime: string;
   favourites: number;
   url: string;

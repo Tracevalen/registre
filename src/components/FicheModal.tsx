@@ -83,7 +83,7 @@ export function FicheModal({ card, save, onClose, onShred, onRequest, onToggleWa
             {owned && (
               <>
                 <dt>Popularité</dt>
-                <dd className="mono">{formatFans(card.favourites)} votes IGDB</dd>
+                <dd className="mono">{formatFans(card.favourites)} Wikipédias</dd>
                 <dt>Exemplaires</dt>
                 <dd className="mono">
                   {count}
@@ -150,7 +150,7 @@ export function FicheModal({ card, save, onClose, onShred, onRequest, onToggleWa
 
           {owned && (
             <a className="link mono" href={card.url} target="_blank" rel="noreferrer">
-              Fiche IGDB ↗
+              Article Wikipédia ↗
             </a>
           )}
         </div>

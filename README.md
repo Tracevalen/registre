@@ -6,7 +6,7 @@ Aucun avantage payant : tout le monde a les mêmes boosters, le même stock (15 
 
 ## Raretés
 
-Calculées selon la popularité du jeu sur IGDB (nombre de votes) :
+Calculées selon la popularité : le nombre de Wikipédias (langues) qui ont un article sur la carte.
 
 | Rareté      | Lettre |
 | ----------- | ------ |
@@ -20,19 +20,14 @@ Au-dessus : les cartes Duo et Trio, obtenues uniquement par fusion.
 
 ## Données
 
-Les cartes viennent d'IGDB (la base de jeux vidéo de Twitch). Le déploiement les télécharge à chaque push, avec deux secrets à créer dans GitHub (Settings → Secrets and variables → Actions) :
-
-- `IGDB_CLIENT_ID`
-- `IGDB_CLIENT_SECRET`
-
-Les clés se créent gratuitement sur https://dev.twitch.tv/console (Register Your Application). Sans ces secrets, le déploiement s'arrête et l'ancienne version du site reste en ligne.
+Les cartes viennent de Wikidata et Wikipédia : aucune clé ni aucun compte n'est nécessaire. La liste est enregistrée dans `src/data/cards.json`. Pour la mettre à jour, lance `npm run cards` sur ton ordinateur, puis push.
 
 Les licences maison de Nintendo et de Pokémon sont exclues. Professeur Layton (Level-5) est toujours inclus.
 
 ## Commandes
 
-| Commande        | Effet                                                      |
-| --------------- | ---------------------------------------------------------- |
-| `npm run dev`   | lance le site en local                                     |
-| `npm run build` | construit le site dans `dist/`                             |
-| `npm run cards` | régénère `src/data/cards.json` depuis IGDB (clés requises) |
+| Commande        | Effet                                           |
+| --------------- | ----------------------------------------------- |
+| `npm run dev`   | lance le site en local                          |
+| `npm run build` | construit le site dans `dist/`                  |
+| `npm run cards` | régénère `src/data/cards.json` depuis Wikipédia |

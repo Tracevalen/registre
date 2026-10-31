@@ -161,7 +161,7 @@ export function PackReveal({ card, secret, fresh, dossierNumber, onDone }: Props
               <p className="reveal-name">{card.name}</p>
               <div className="reveal-tags mono">
                 <span>
-                  {r.name} · {formatFans(card.favourites)} votes IGDB
+                  {r.name} · présent dans {formatFans(card.favourites)} Wikipédias
                 </span>
                 {fresh && <span className="tag-new">Nouvelle</span>}
                 {secret && <span className="tag-secret">Top secret</span>}

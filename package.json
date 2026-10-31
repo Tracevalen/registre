@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run typecheck && npm run lint && npm run format:check",
-    "cards": "node scripts/fetch-games.mjs"
+    "cards": "node scripts/fetch-wiki.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

@@ -14,12 +14,33 @@ import {
   type BoosterGroup,
   type Pull,
 } from "./game/booster";
-import type { Card } from "./game/cards";
+import { CARDS, type Card } from "./game/cards";
+import { ProfilePage } from "./components/ProfilePage";
 import { canFuse, LINKS, type Link } from "./game/links";
 import { ALBUMS, specialSeries } from "./game/series";
 import { useSave } from "./game/store";
 import { AlbumsPage } from "./components/AlbumsPage";
 import { AffairePage } from "./components/AffairePage";
+
+/** Positions des lucioles du fond (en %), et leur décalage d'animation. */
+const FIREFLIES = [
+  [22, 18, 0],
+  [75, 22, 2],
+  [24, 40, 4],
+  [74, 43, 1],
+  [31, 49, 3],
+  [69, 50, 5],
+  [8, 50, 2.5],
+  [92, 47, 0.5],
+  [38, 14, 6],
+  [64, 15, 3.5],
+  [51, 49, 1.5],
+  [4, 62, 4.5],
+  [86, 70, 2],
+  [14, 82, 5.5],
+  [58, 76, 0.8],
+  [40, 92, 3.2],
+];
 
 export default function App() {
   const {
@@ -49,6 +70,8 @@ export default function App() {
     fuse(link);
     setFocusLink({ link, fresh: true });
   };
+
+  const ownedCount = CARDS.filter((c) => save.owned[c.id]).length;
 
   const readyAlbums = ALBUMS.filter(
     (a) => !save.albumsClaimed.includes(a.series) && a.cards.every((c) => save.owned[c.id]),
@@ -90,9 +113,15 @@ export default function App() {
         boosters={save.boosters}
         ink={save.ink}
         xp={save.xp}
-        nextIn={nextIn}
         onHome={() => setPage("home")}
+        onInk={() => setPage("archive")}
       />
+
+      <div className="fireflies" aria-hidden>
+        {FIREFLIES.map(([x, y, d], i) => (
+          <span key={i} style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${d}s` }} />
+        ))}
+      </div>
 
       <main className="main">
         {isCollection(page) && (
@@ -101,15 +130,22 @@ export default function App() {
             onNavigate={setPage}
             readyAlbums={readyAlbums}
             readyLinks={readyLinks}
+            owned={ownedCount}
+            total={CARDS.length}
+            progress={ownedCount / CARDS.length}
           />
         )}
         {page === "home" ? (
           <HomePage
             save={save}
             nextIn={nextIn}
+            readyAlbums={readyAlbums}
+            readyLinks={readyLinks}
             onOpen={(n) => open(n)}
             onOpenSpecial={() => open(1, true)}
             onShowAffaire={() => setPage("affaire")}
+            onShowAlbums={() => setPage("albums")}
+            onShowLinks={() => setPage("links")}
             onClaim={claim}
           />
         ) : page === "affaire" ? (
@@ -131,6 +167,8 @@ export default function App() {
             title="Marché"
             text="Échanger et vendre ses doublons contre de l'encre, entre joueurs. Il arrive avec les comptes (connexion Discord)."
           />
+        ) : page === "profile" ? (
+          <ProfilePage save={save} />
         ) : (
           <SoonPage
             title="Amis"
@@ -145,6 +183,9 @@ export default function App() {
         <OpeningScreen
           key={pull.id}
           pull={pull}
+          xp={save.xp}
+          boosters={save.boosters}
+          onAgain={(n) => open(n)}
           onClose={() => setPull(null)}
           onShowCollection={() => {
             setPull(null);

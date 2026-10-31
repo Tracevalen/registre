@@ -1,89 +1,97 @@
-import { useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { gradeInfo } from "../game/grades";
-import { MAX_BOOSTERS, RECHARGE_MS } from "../game/store";
-import { formatDuration } from "../lib/format";
 
-export type Page = "home" | "affaire" | "archive" | "albums" | "links" | "market" | "friends";
+export type Page = "home" | "affaire" | "archive" | "albums" | "links" | "market" | "friends" | "profile";
 
 const COLLECTION: Page[] = ["archive", "albums", "links"];
+
+export const isCollection = (p: Page) => COLLECTION.includes(p);
+
+/** Hexagone à bord doré (niveau, boutons, badges). */
+export function Hex({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return (
+    <span className={`hex ${className}`}>
+      <span className="hex-in">{children}</span>
+    </span>
+  );
+}
 
 interface TopBarProps {
   boosters: number;
   ink: number;
   xp: number;
-  nextIn: number;
   onHome: () => void;
+  onInk: () => void;
 }
 
-/** Barre du haut : le joueur (invité tant qu'il n'y a pas de comptes), l'encre et le stock. */
-export function TopBar({ boosters, ink, xp, nextIn, onHome }: TopBarProps) {
+/** Barre du haut : niveau, joueur et barre d'XP, puis l'encre et les boosters en stock. */
+export function TopBar({ boosters, ink, xp, onHome, onInk }: TopBarProps) {
   const grade = gradeInfo(xp);
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const full = boosters >= MAX_BOOSTERS;
-  // Temps avant que le stock soit plein : le prochain booster, puis un toutes les RECHARGE_MS.
-  const toFull = full ? 0 : nextIn + (MAX_BOOSTERS - boosters - 1) * RECHARGE_MS;
-
-  // Le minuteur se referme quand on touche ailleurs.
-  useEffect(() => {
-    if (!open) return;
-    const close = (e: PointerEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
-    };
-    window.addEventListener("pointerdown", close);
-    return () => window.removeEventListener("pointerdown", close);
-  }, [open]);
-
   return (
     <header className="topbar">
       <button className="topbar-user" onClick={onHome} aria-label="Accueil">
-        <span className="avatar" aria-hidden>
-          I
-        </span>
+        <Hex className="hex-level">{grade.index + 1}</Hex>
         <span className="topbar-who">
           <strong>Invité</strong>
-          <span title={grade.next ? `${grade.next.xp - xp} XP avant ${grade.next.name}` : "Grade maximal"}>
-            {grade.current.name}
+          <span className="xpbar" aria-hidden>
+            <span style={{ width: `${grade.progress * 100}%` }} />
+          </span>
+          <span className="topbar-xp">
+            {grade.next ? `${xp} / ${grade.next.xp} XP` : `${xp} XP · ${grade.current.name}`}
           </span>
         </span>
       </button>
       <div className="topbar-pills">
         <span className="pill" title="Encre : sert à demander une carte précise">
-          <span className="pill-coin" aria-hidden /> {ink}
-        </span>
-        <div className="stock" ref={ref}>
-          <button
-            className={`pill pill-stock ${full ? "is-full" : ""}`}
-            onClick={() => setOpen(!open)}
-            aria-expanded={open}
-            title="Boosters en stock"
-          >
-            <span className="pill-card" aria-hidden /> {boosters}
-            <span className="pill-max">/{MAX_BOOSTERS}</span>
+          <span className="ico-diamond" aria-hidden />
+          {ink}
+          <button className="pill-plus" onClick={onInk} aria-label="Gagner de l'encre (broyer ses doublons)">
+            +
           </button>
-          {open && (
-            <div className="stock-pop" role="status">
-              {full ? (
-                <>
-                  <strong>Stock plein</strong>
-                  <span>Ouvre un booster pour relancer le minuteur.</span>
-                </>
-              ) : (
-                <>
-                  <span>Prochain booster dans</span>
-                  <strong>{formatDuration(nextIn)}</strong>
-                  <span>
-                    Plein à {MAX_BOOSTERS} dans {formatLong(toFull)}
-                  </span>
-                </>
-              )}
-            </div>
-          )}
-        </div>
+        </span>
+        <span className="pill" title="Boosters en stock">
+          <span className="ico-hexa" aria-hidden />
+          {boosters}
+        </span>
       </div>
     </header>
   );
 }
+
+const Icon = {
+  collection: (
+    <svg viewBox="0 0 24 24" aria-hidden>
+      <rect x="4" y="4" width="7" height="9" />
+      <rect x="13" y="4" width="7" height="9" />
+      <rect x="4" y="15" width="7" height="5" />
+      <rect x="13" y="15" width="7" height="5" />
+    </svg>
+  ),
+  market: (
+    <svg viewBox="0 0 24 24" aria-hidden>
+      <path d="M4 8h14l-3-3M20 16H6l3 3" />
+    </svg>
+  ),
+  boosters: (
+    <svg viewBox="0 0 24 24" aria-hidden>
+      <rect x="7" y="3" width="12" height="16" rx="2" />
+      <path d="M4 7v11a3 3 0 0 0 3 3h8" />
+    </svg>
+  ),
+  friends: (
+    <svg viewBox="0 0 24 24" aria-hidden>
+      <circle cx="9" cy="8" r="3.5" />
+      <circle cx="17" cy="9" r="2.5" />
+      <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14.5c2.8 0 5 2.2 5 5" />
+    </svg>
+  ),
+  profile: (
+    <svg viewBox="0 0 24 24" aria-hidden>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" />
+    </svg>
+  ),
+};
 
 interface BottomNavProps {
   page: Page;
@@ -92,22 +100,28 @@ interface BottomNavProps {
   collectionBadge: number;
 }
 
-/** Barre du bas : les quatre espaces du site. */
+/** Barre du bas : quatre espaces, et les boosters au centre dans un hexagone. */
 export function BottomNav({ page, onNavigate, collectionBadge }: BottomNavProps) {
-  const items: { label: string; target: Page; active: boolean; badge?: number }[] = [
-    { label: "Boosters", target: "home", active: page === "home" || page === "affaire" },
-    { label: "Collection", target: "archive", active: COLLECTION.includes(page), badge: collectionBadge },
-    { label: "Marché", target: "market", active: page === "market" },
-    { label: "Amis", target: "friends", active: page === "friends" },
-  ];
+  const item = (label: string, target: Page, icon: ReactNode, active: boolean, badge = 0) => (
+    <button className={`nav-item ${active ? "is-active" : ""}`} onClick={() => onNavigate(target)}>
+      {icon}
+      {label}
+      {badge > 0 && <span className="nav-badge">{badge}</span>}
+    </button>
+  );
   return (
     <nav className="bottomnav" aria-label="Navigation principale">
-      {items.map((it) => (
-        <button key={it.label} className={it.active ? "is-active" : ""} onClick={() => onNavigate(it.target)}>
-          {it.label}
-          {!!it.badge && <span className="nav-badge">{it.badge}</span>}
-        </button>
-      ))}
+      {item("Collection", "archive", Icon.collection, isCollection(page), collectionBadge)}
+      {item("Marché", "market", Icon.market, page === "market")}
+      <button
+        className={`nav-item nav-center ${page === "home" || page === "affaire" ? "is-active" : ""}`}
+        onClick={() => onNavigate("home")}
+      >
+        <Hex className="hex-nav">{Icon.boosters}</Hex>
+        Boosters
+      </button>
+      {item("Amis", "friends", Icon.friends, page === "friends")}
+      {item("Profil", "profile", Icon.profile, page === "profile")}
     </nav>
   );
 }
@@ -117,51 +131,65 @@ interface CollectionTabsProps {
   onNavigate: (p: Page) => void;
   readyAlbums: number;
   readyLinks: number;
+  /** Part de la collection obtenue, de 0 à 1. */
+  progress: number;
+  owned: number;
+  total: number;
 }
 
-/** Les onglets de la collection : cartes, albums par saga, duos et trios. */
-export function CollectionTabs({ page, onNavigate, readyAlbums, readyLinks }: CollectionTabsProps) {
+/** En-tête de la collection : titre, anneau de progression, onglets. */
+export function CollectionTabs({
+  page,
+  onNavigate,
+  readyAlbums,
+  readyLinks,
+  progress,
+  owned,
+  total,
+}: CollectionTabsProps) {
   const tabs: { label: string; target: Page; badge: number }[] = [
+    { label: "Séries", target: "albums", badge: readyAlbums },
     { label: "Cartes", target: "archive", badge: 0 },
-    { label: "Albums", target: "albums", badge: readyAlbums },
-    { label: "Duos & trios", target: "links", badge: readyLinks },
+    { label: "Duos", target: "links", badge: readyLinks },
   ];
   return (
-    <div className="count-picker collection-tabs" role="tablist">
-      {tabs.map((t) => (
-        <button
-          key={t.target}
-          role="tab"
-          aria-selected={page === t.target}
-          className={page === t.target ? "is-active" : ""}
-          onClick={() => onNavigate(t.target)}
-        >
-          {t.label}
-          {t.badge > 0 && <span className="nav-badge">{t.badge}</span>}
-        </button>
-      ))}
+    <div className="collection-head">
+      <div className="collection-title">
+        <div>
+          <h1 className="title-serif">Collection</h1>
+          <p className="label">
+            <strong>{owned}</strong> / {total} cartes
+          </p>
+        </div>
+        <span className="ring" style={{ ["--p" as string]: progress }}>
+          <span>{Math.floor(progress * 100)}%</span>
+        </span>
+      </div>
+      <div className="tabs" role="tablist">
+        {tabs.map((t) => (
+          <button
+            key={t.target}
+            role="tab"
+            aria-selected={page === t.target}
+            className={page === t.target ? "is-active" : ""}
+            onClick={() => onNavigate(t.target)}
+          >
+            {t.label}
+            {t.badge > 0 && <span className="tab-dot" aria-label={`${t.badge} à récupérer`} />}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
 
-export const isCollection = (p: Page) => COLLECTION.includes(p);
-
 /** Page provisoire pour ce qui demande des comptes joueurs (marché, amis). */
 export function SoonPage({ title, text }: { title: string; text: string }) {
   return (
-    <section className="glass soon">
-      <p className="eyebrow">Bientôt</p>
-      <h1>{title}</h1>
+    <section className="panel soon">
+      <p className="label">Bientôt</p>
+      <h1 className="title-serif">{title}</h1>
       <p>{text}</p>
     </section>
   );
-}
-
-/** Durée lisible : « 42 min » ou « 1 h 12 ». */
-function formatLong(ms: number) {
-  const min = Math.ceil(ms / 60000);
-  if (min < 60) return `${min} min`;
-  const h = Math.floor(min / 60);
-  const m = min % 60;
-  return m ? `${h} h ${String(m).padStart(2, "0")}` : `${h} h`;
 }

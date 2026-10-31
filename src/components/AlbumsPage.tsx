@@ -1,3 +1,4 @@
+import { RARITY_BY_ID } from "../game/rarities";
 import { useMemo, useState } from "react";
 import type { Card } from "../game/cards";
 import { ALBUMS } from "../game/series";
@@ -112,7 +113,7 @@ export function AlbumsPage({ save, onFocus, onClaim }: Props) {
                         onClick={() => onFocus(c)}
                         aria-label={`Carte de rareté ${c.rarity} pas encore obtenue`}
                       >
-                        <span>{c.rarity}</span>
+                        <span>{RARITY_BY_ID[c.rarity].short}</span>
                       </button>
                     </li>
                   ),

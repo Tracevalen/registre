@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { CARDS, CARDS_BY_RARITY, formatFans, formatNumber, type Card } from "../game/cards";
 import { SHRED_INK, shreddable } from "../game/economy";
-import { RARITIES, rarityRank, type Rarity } from "../game/rarities";
+import { RARITIES, RARITY_BY_ID, rarityRank, type Rarity } from "../game/rarities";
 import type { SaveData } from "../game/store";
 import { Fiche } from "./Fiche";
 
@@ -85,7 +85,7 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
                 className={rarity === r.id ? "is-active" : ""}
                 onClick={() => setRarity(rarity === r.id ? "all" : r.id)}
               >
-                <strong>{r.id}</strong>
+                <strong>{r.short}</strong>
                 <span className="mono">
                   {have}/{pool.length}
                 </span>
@@ -179,37 +179,35 @@ export function ArchivePage({ save, onFocus, onShredAll, onReset }: Props) {
         <div className="grid">
           {list.map((c) =>
             save.owned[c.id] ? (
-              <div key={c.id} className="grid-item">
-                <Fiche
-                  card={c}
-                  secret={(save.secret[c.id] ?? 0) > 0}
-                  prestige={save.prestige[c.id] ?? 0}
-                  onClick={() => onFocus(c)}
-                />
-                {save.owned[c.id] > 1 && (
-                  <span className="copies" title={`${save.owned[c.id] - 1} doublon(s)`}>
-                    +{save.owned[c.id] - 1}
-                  </span>
-                )}
-              </div>
+              <Fiche
+                key={c.id}
+                card={c}
+                secret={(save.secret[c.id] ?? 0) > 0}
+                prestige={save.prestige[c.id] ?? 0}
+                copies={save.owned[c.id] - 1}
+                onClick={() => onFocus(c)}
+              />
             ) : (
               <button
                 key={c.id}
-                className={`grid-item empty-fiche class-${c.rarity} ${save.wanted.includes(c.id) ? "is-wanted" : ""}`}
+                className={`carte is-locked r-${c.rarity} ${save.wanted.includes(c.id) ? "is-wanted" : ""}`}
                 onClick={() => onFocus(c)}
+                aria-label={`Carte N°${formatNumber(c.number)}, ${RARITY_BY_ID[c.rarity].name}, pas encore obtenue`}
               >
-                <div className="empty-fiche-head mono">
-                  <span>N°{formatNumber(c.number)}</span>
-                  <span className="empty-fiche-class">{c.rarity}</span>
+                <div className="carte-art">
+                  <svg className="carte-lock" viewBox="0 0 24 24" aria-hidden>
+                    <rect x="5" y="11" width="14" height="10" rx="2" />
+                    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                  </svg>
+                  {save.wanted.includes(c.id) && <span className="carte-banner is-wanted">Recherchée</span>}
                 </div>
-                <div className="empty-fiche-body">
-                  <span className="redacted" />
-                  <span className="redacted short" />
-                  <span className="empty-fiche-label mono">
-                    {save.wanted.includes(c.id) ? "Avis de recherche" : "Pas encore obtenue"}
-                  </span>
+                <div className="carte-foot">
+                  <div className="carte-text">
+                    <h3 className="carte-name">N°{formatNumber(c.number)}</h3>
+                    <span className="carte-sub">{RARITY_BY_ID[c.rarity].name}</span>
+                  </div>
+                  <span className="carte-hex">{RARITY_BY_ID[c.rarity].short}</span>
                 </div>
-                <div className="empty-fiche-series">{c.anime}</div>
               </button>
             ),
           )}
